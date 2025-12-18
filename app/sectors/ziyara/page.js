@@ -31,7 +31,7 @@ const idadPrograms = [
     topics: ['Strategy & Planning', 'Conflict Resolution', 'Public Relations']
   },
   {
-    name: 'Idad Al-Du'at (Caller to Islam)',
+    name: 'Idad Al-Duat (Caller to Islam)',
     topics: ['Psychology of Dawah', 'Digital Dawah', 'Community Outreach']
   },
   {
