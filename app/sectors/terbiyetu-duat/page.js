@@ -61,7 +61,7 @@ export default function TerbiyetuDuatPage() {
         </div>
         
         <div className="relative z-10 container mx-auto px-6 text-center text-white">
-          <h1 className="text-5xl font-serif font-bold mb-4">Terbiyetu Du'at</h1>
+          <h1 className="text-5xl font-serif font-bold mb-4">Terbiyetu Duat</h1>
           <p className="text-2xl font-light">Character, Spiritual Growth, Mentorship</p>
         </div>
       </section>
