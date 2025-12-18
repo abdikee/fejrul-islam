@@ -25,7 +25,7 @@ const sectors = [
   },
   {
     id: 3,
-    title: 'Terbiyetu Du'at',
+    title: 'Terbiyetu Duat',
     description: 'Character, Spiritual Growth, Mentorship',
     icon: Heart,
     color: 'rose',
