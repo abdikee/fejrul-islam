@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 const subsections = [
   {
-    title: 'Jeme'a History',
+    title: 'Jemea History',
     icon: History,
     color: 'amber',
     description: 'Explore the timeline, milestones, and legacy of HUMSJ'
