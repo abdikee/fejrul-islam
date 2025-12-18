@@ -21,7 +21,7 @@ const sectors = [
     icon: Users,
     color: 'amber',
     href: '/sectors/literature',
-    features: ['Jeme'a History', 'Status Dashboard', 'Creative Works', 'Publications']
+    features: ['Jemea History', 'Status Dashboard', 'Creative Works', 'Publications']
   },
   {
     id: 3,
