@@ -21,7 +21,7 @@ const subsections = [
     title: 'Leadership Academy',
     icon: GraduationCap,
     color: 'emerald',
-    items: ['Idad Al-Qadah', 'Idad Al-Du'at', 'Idad Al-Imam', 'Idad Al-Khutaba']
+    items: ['Idad Al-Qadah', 'Idad Al-Duat', 'Idad Al-Imam', 'Idad Al-Khutaba']
   }
 ];
 
