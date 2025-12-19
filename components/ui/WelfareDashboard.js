@@ -83,27 +83,27 @@ const WelfareDashboard = () => {
       </div>
 
       {/* Filters */}
-      <div className=\"bg-white p-6 rounded-xl shadow-md border border-slate-200\">
-        <div className=\"grid grid-cols-1 md:grid-cols-3 gap-4\">
-          <div className=\"relative\">
-            <Search className=\"absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400\" />
+      <div className="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input
-              type=\"text\"
-              placeholder=\"Search students...\"
+              type="text"
+              placeholder="Search students..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className=\"w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent\"
+              className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
 
-          <div className=\"relative\">
-            <Filter className=\"absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400\" />
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
             <select
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
-              className=\"w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none\"
+              className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none"
             >
-              <option value=\"all\">All Departments</option>
+              <option value="all">All Departments</option>
               {departments.map(dept => (
                 <option key={dept} value={dept}>{dept}</option>
               ))}
@@ -114,18 +114,18 @@ const WelfareDashboard = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className=\"w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none\"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent appearance-none"
             >
-              <option value=\"all\">All Status</option>
-              <option value=\"green\">✓ Good Standing</option>
-              <option value=\"yellow\">⚠ Needs Attention</option>
-              <option value=\"red\">⚠ Urgent</option>
+              <option value="all">All Status</option>
+              <option value="green">✓ Good Standing</option>
+              <option value="yellow">⚠ Needs Attention</option>
+              <option value="red">⚠ Urgent</option>
             </select>
           </div>
         </div>
 
-        <div className=\"mt-4 text-sm text-slate-600\">
-          Showing <span className=\"font-bold text-purple-600\">{filteredStudents.length}</span> of <span className=\"font-bold\">{studentWelfareData.length}</span> students
+        <div className="mt-4 text-sm text-slate-600">
+          Showing <span className="font-bold text-purple-600">{filteredStudents.length}</span> of <span className="font-bold">{studentWelfareData.length}</span> students
         </div>
       </div>
 
