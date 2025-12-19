@@ -8,7 +8,7 @@ const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Qirat & Ilm', href: '/sectors/qirat-ilm' },
   { name: 'Literature', href: '/sectors/literature' },
-  { name: 'Terbiyetu Duat', href: '/sectors/terbiyetu-duat' },
+  { name: 'Tarbiya & Idad', href: '/sectors/tarbiya-idad' },
   { name: 'Dawah', href: '/sectors/comparative-religion' },
   { name: 'Ziyara', href: '/sectors/ziyara' },
 ];
