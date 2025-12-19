@@ -47,8 +47,8 @@ const sectors = [
     description: 'Student Welfare & Leadership',
     icon: Shield,
     color: 'purple',
-    href: '/sectors/ziyara',
-    features: ['Student Welfare', 'Mental Health', 'Leadership Academy', 'Idad Programs']
+    href: '/sectors/ziyara-enhanced',
+    features: ['Welfare Dashboard', 'Counseling Services', 'Status Tracking', 'Leadership Access']
   }
 ];
 
