@@ -25,12 +25,12 @@ const sectors = [
   },
   {
     id: 3,
-    title: 'Terbiyetu Duat',
-    description: 'Character, Spiritual Growth, Mentorship',
+    title: 'Tarbiya & Idad',
+    description: 'Character, Spiritual Growth, Leadership Training',
     icon: Heart,
     color: 'rose',
-    href: '/sectors/terbiyetu-duat',
-    features: ['Tazkiyat al-Nafs', 'Usrah Circles', 'Family Tarbiya', 'Spiritual Discipline']
+    href: '/sectors/tarbiya-idad',
+    features: ['Tazkiyat al-Nafs', 'Usrah Circles', 'Training Materials', 'Idad Programs']
   },
   {
     id: 4,
