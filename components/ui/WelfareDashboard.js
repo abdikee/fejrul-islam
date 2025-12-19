@@ -50,34 +50,34 @@ const WelfareDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4\">
-        <div className=\"bg-emerald-100 border-2 border-emerald-300 rounded-xl p-6\">
-          <div className=\"flex items-center justify-between\">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-emerald-100 border-2 border-emerald-300 rounded-xl p-6">
+          <div className="flex items-center justify-between">
             <div>
-              <p className=\"text-sm font-semibold text-emerald-700\">Good Standing</p>
-              <p className=\"text-4xl font-bold text-emerald-800\">{statusCounts.green}</p>
+              <p className="text-sm font-semibold text-emerald-700">Good Standing</p>
+              <p className="text-4xl font-bold text-emerald-800">{statusCounts.green}</p>
             </div>
-            <CheckCircle className=\"w-12 h-12 text-emerald-600\" />
+            <CheckCircle className="w-12 h-12 text-emerald-600" />
           </div>
         </div>
 
-        <div className=\"bg-amber-100 border-2 border-amber-300 rounded-xl p-6\">
-          <div className=\"flex items-center justify-between\">
+        <div className="bg-amber-100 border-2 border-amber-300 rounded-xl p-6">
+          <div className="flex items-center justify-between">
             <div>
-              <p className=\"text-sm font-semibold text-amber-700\">Needs Attention</p>
-              <p className=\"text-4xl font-bold text-amber-800\">{statusCounts.yellow}</p>
+              <p className="text-sm font-semibold text-amber-700">Needs Attention</p>
+              <p className="text-4xl font-bold text-amber-800">{statusCounts.yellow}</p>
             </div>
-            <AlertTriangle className=\"w-12 h-12 text-amber-600\" />
+            <AlertTriangle className="w-12 h-12 text-amber-600" />
           </div>
         </div>
 
-        <div className=\"bg-red-100 border-2 border-red-300 rounded-xl p-6\">
-          <div className=\"flex items-center justify-between\">
+        <div className="bg-red-100 border-2 border-red-300 rounded-xl p-6">
+          <div className="flex items-center justify-between">
             <div>
-              <p className=\"text-sm font-semibold text-red-700\">Urgent Care</p>
-              <p className=\"text-4xl font-bold text-red-800\">{statusCounts.red}</p>
+              <p className="text-sm font-semibold text-red-700">Urgent Care</p>
+              <p className="text-4xl font-bold text-red-800">{statusCounts.red}</p>
             </div>
-            <AlertCircle className=\"w-12 h-12 text-red-600\" />
+            <AlertCircle className="w-12 h-12 text-red-600" />
           </div>
         </div>
       </div>
