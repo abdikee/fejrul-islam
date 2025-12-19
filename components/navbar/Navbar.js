@@ -10,7 +10,7 @@ const navigation = [
   { name: 'Literature', href: '/sectors/literature' },
   { name: 'Tarbiya & Idad', href: '/sectors/tarbiya-idad' },
   { name: 'Dawah', href: '/sectors/comparative-religion' },
-  { name: 'Ziyara', href: '/sectors/ziyara' },
+  { name: 'Ziyara', href: '/sectors/ziyara-enhanced' },
 ];
 
 export default function Navbar() {
