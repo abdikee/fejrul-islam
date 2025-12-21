@@ -1,0 +1,603 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { BookOpen, Bell, FileText, Plus, Edit, Trash2, Save, X } from 'lucide-react';
+
+export default function ContentManagement() {
+  const [activeTab, setActiveTab] = useState('announcements');
+  const [announcements, setAnnouncements] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+
+  // Form states
+  const [formData, setFormData] = useState({});
+
+  useEffect(() => {
+    loadData();
+  }, [activeTab]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      if (activeTab === 'announcements') {
+        const res = await fetch('/api/admin/announcements', {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (data.success) setAnnouncements(data.announcements);
+      } else if (activeTab === 'courses') {
+        const res = await fetch('/api/admin/courses', {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (data.success) setCourses(data.courses);
+      } else if (activeTab === 'resources') {
+        const res = await fetch('/api/admin/resources', {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (data.success) setResources(data.resources);
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+    setLoading(false);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const endpoint = `/api/admin/${activeTab}`;
+      const method = editingItem ? 'PUT' : 'POST';
+      
+      const res = await fetch(endpoint, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
+        body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
+      });
+
+      const data = await res.json();
+      
+      if (data.success) {
+        alert(`${activeTab.slice(0, -1)} ${editingItem ? 'updated' : 'created'} successfully!`);
+        setShowForm(false);
+        setEditingItem(null);
+        setFormData({});
+        loadData();
+      } else {
+        alert(data.message || 'Operation failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred');
+    }
+    setLoading(false);
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+
+    try {
+      const res = await fetch(`/api/admin/${activeTab}?id=${id}`, {
+        method: 'DELETE',
+        credentials: 'include' // Include cookies for authentication
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert('Deleted successfully!');
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const handleEdit = (item) => {
+    setEditingItem(item);
+    setFormData(item);
+    setShowForm(true);
+  };
+
+  const resetForm = () => {
+    setShowForm(false);
+    setEditingItem(null);
+    setFormData({});
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-900">Content Management</h1>
+        <button
+          onClick={() => setShowForm(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          <Plus className="w-5 h-5" />
+          Add New
+        </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-4 border-b">
+        <button
+          onClick={() => setActiveTab('announcements')}
+          className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+            activeTab === 'announcements'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <Bell className="w-5 h-5" />
+          Announcements
+        </button>
+        <button
+          onClick={() => setActiveTab('courses')}
+          className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+            activeTab === 'courses'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <BookOpen className="w-5 h-5" />
+          Courses
+        </button>
+        <button
+          onClick={() => setActiveTab('resources')}
+          className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+            activeTab === 'resources'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <FileText className="w-5 h-5" />
+          Resources
+        </button>
+      </div>
+
+      {/* Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold">
+                  {editingItem ? 'Edit' : 'Add New'} {activeTab.slice(0, -1)}
+                </h2>
+                <button onClick={resetForm} className="text-gray-500 hover:text-gray-700">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {activeTab === 'announcements' && <AnnouncementForm formData={formData} setFormData={setFormData} />}
+                {activeTab === 'courses' && <CourseForm formData={formData} setFormData={setFormData} />}
+                {activeTab === 'resources' && <ResourceForm formData={formData} setFormData={setFormData} />}
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    <Save className="w-5 h-5" />
+                    {loading ? 'Saving...' : 'Save'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content List */}
+      <div className="bg-white rounded-lg shadow">
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">Loading...</div>
+        ) : (
+          <>
+            {activeTab === 'announcements' && (
+              <AnnouncementsList 
+                announcements={announcements} 
+                onEdit={handleEdit} 
+                onDelete={handleDelete} 
+              />
+            )}
+            {activeTab === 'courses' && (
+              <CoursesList 
+                courses={courses} 
+                onEdit={handleEdit} 
+                onDelete={handleDelete} 
+              />
+            )}
+            {activeTab === 'resources' && (
+              <ResourcesList 
+                resources={resources} 
+                onEdit={handleEdit} 
+                onDelete={handleDelete} 
+              />
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Announcement Form Component
+function AnnouncementForm({ formData, setFormData }) {
+  return (
+    <>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+        <input
+          type="text"
+          required
+          value={formData.title || ''}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+        <textarea
+          required
+          rows={4}
+          value={formData.content || ''}
+          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+          <select
+            value={formData.announcementType || 'general'}
+            onChange={(e) => setFormData({ ...formData, announcementType: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="general">General</option>
+            <option value="academic">Academic</option>
+            <option value="event">Event</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+          <select
+            value={formData.priority || 'normal'}
+            onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="low">Low</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+            <option value="urgent">Urgent</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
+          <select
+            value={formData.targetAudience || 'all'}
+            onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Users</option>
+            <option value="students">Students Only</option>
+            <option value="mentors">Mentors Only</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Expire Date</label>
+          <input
+            type="date"
+            value={formData.expireDate || ''}
+            onChange={(e) => setFormData({ ...formData, expireDate: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+// Course Form Component
+function CourseForm({ formData, setFormData }) {
+  return (
+    <>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Course Title *</label>
+        <input
+          type="text"
+          required
+          value={formData.title || ''}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+        <textarea
+          required
+          rows={3}
+          value={formData.description || ''}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sector *</label>
+          <select
+            required
+            value={formData.sectorId || ''}
+            onChange={(e) => setFormData({ ...formData, sectorId: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Sector</option>
+            <option value="1">Dawah</option>
+            <option value="2">Irshad</option>
+            <option value="3">Tarbiya</option>
+            <option value="4">Idad</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
+          <select
+            value={formData.level || 'Beginner'}
+            onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Duration (weeks)</label>
+          <input
+            type="number"
+            min="1"
+            value={formData.durationWeeks || ''}
+            onChange={(e) => setFormData({ ...formData, durationWeeks: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+// Resource Form Component
+function ResourceForm({ formData, setFormData }) {
+  return (
+    <>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Resource Title *</label>
+        <input
+          type="text"
+          required
+          value={formData.title || ''}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+        <textarea
+          rows={3}
+          value={formData.description || ''}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+          <select
+            required
+            value={formData.resourceType || ''}
+            onChange={(e) => setFormData({ ...formData, resourceType: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Type</option>
+            <option value="pdf">PDF Document</option>
+            <option value="video">Video</option>
+            <option value="audio">Audio</option>
+            <option value="link">External Link</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sector</label>
+          <select
+            value={formData.sectorId || ''}
+            onChange={(e) => setFormData({ ...formData, sectorId: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">All Sectors</option>
+            <option value="1">Dawah</option>
+            <option value="2">Irshad</option>
+            <option value="3">Tarbiya</option>
+            <option value="4">Idad</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">File Path / URL *</label>
+        <input
+          type="text"
+          required
+          value={formData.filePath || ''}
+          onChange={(e) => setFormData({ ...formData, filePath: e.target.value })}
+          placeholder="e.g., /uploads/document.pdf or https://example.com"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Access Level</label>
+        <select
+          value={formData.accessLevel || 'public'}
+          onChange={(e) => setFormData({ ...formData, accessLevel: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="public">Public</option>
+          <option value="student">Students Only</option>
+          <option value="mentor">Mentors Only</option>
+          <option value="admin">Admin Only</option>
+        </select>
+      </div>
+    </>
+  );
+}
+
+// Lists Components
+function AnnouncementsList({ announcements, onEdit, onDelete }) {
+  if (announcements.length === 0) {
+    return <div className="p-8 text-center text-gray-500">No announcements yet</div>;
+  }
+
+  return (
+    <div className="divide-y">
+      {announcements.map((item) => (
+        <div key={item.id} className="p-4 hover:bg-gray-50">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-900">{item.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{item.content}</p>
+              <div className="flex gap-3 mt-2 text-xs text-gray-500">
+                <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">{item.announcement_type}</span>
+                <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">{item.priority}</span>
+                <span>{new Date(item.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+            <div className="flex gap-2 ml-4">
+              <button
+                onClick={() => onEdit(item)}
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(item.id)}
+                className="p-2 text-red-600 hover:bg-red-50 rounded"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CoursesList({ courses, onEdit, onDelete }) {
+  if (courses.length === 0) {
+    return <div className="p-8 text-center text-gray-500">No courses yet</div>;
+  }
+
+  return (
+    <div className="divide-y">
+      {courses.map((item) => (
+        <div key={item.id} className="p-4 hover:bg-gray-50">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-900">{item.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+              <div className="flex gap-3 mt-2 text-xs text-gray-500">
+                <span className="px-2 py-1 bg-green-100 text-green-700 rounded">{item.level}</span>
+                <span>{item.duration_weeks} weeks</span>
+              </div>
+            </div>
+            <div className="flex gap-2 ml-4">
+              <button
+                onClick={() => onEdit(item)}
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(item.id)}
+                className="p-2 text-red-600 hover:bg-red-50 rounded"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ResourcesList({ resources, onEdit, onDelete }) {
+  if (resources.length === 0) {
+    return <div className="p-8 text-center text-gray-500">No resources yet</div>;
+  }
+
+  return (
+    <div className="divide-y">
+      {resources.map((item) => (
+        <div key={item.id} className="p-4 hover:bg-gray-50">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-900">{item.title}</h3>
+              <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+              <div className="flex gap-3 mt-2 text-xs text-gray-500">
+                <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded">{item.resource_type}</span>
+                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded">{item.access_level}</span>
+                <span>Downloads: {item.download_count || 0}</span>
+              </div>
+            </div>
+            <div className="flex gap-2 ml-4">
+              <button
+                onClick={() => onEdit(item)}
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(item.id)}
+                className="p-2 text-red-600 hover:bg-red-50 rounded"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}

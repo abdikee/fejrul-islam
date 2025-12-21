@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Heart, Users, GraduationCap, BookOpen, Download, Award, ChevronRight } from 'lucide-react';
+import { Heart, Users, GraduationCap, BookOpen, Download, Award, ChevronRight, Calendar, User, Clock, CheckCircle } from 'lucide-react';
 import TrainingMaterials from '@/components/ui/TrainingMaterials';
 import DuatVettingForm from '@/components/forms/DuatVettingForm';
 import { idadPrograms } from '@/data/training';
@@ -28,6 +28,43 @@ const subsections = [
   }
 ];
 
+const weeklySchedule = [
+  {
+    id: 1,
+    day: 'Monday',
+    time: '7:00 PM',
+    topic: 'Tazkiyat al-Nafs',
+    description: 'Heart purification and spiritual development',
+    instructor: 'Ustadh Ahmad',
+    participants: 45
+  },
+  {
+    id: 2,
+    day: 'Wednesday',
+    time: '6:30 PM',
+    topic: 'Usrah Circle',
+    description: 'Brotherhood building and accountability',
+    instructor: 'Ustadh Omar',
+    participants: 32
+  },
+  {
+    id: 3,
+    day: 'Friday',
+    time: '8:00 PM',
+    topic: 'Family Tarbiya',
+    description: 'Islamic family values and relationships',
+    instructor: 'Ustadha Fatima',
+    participants: 38
+  }
+];
+
+const achievements = [
+  { label: 'Students Trained', value: '2,156', icon: Users },
+  { label: 'Programs Completed', value: '89', icon: GraduationCap },
+  { label: 'Active Mentors', value: '67', icon: Heart },
+  { label: 'Success Rate', value: '94%', icon: Award }
+];
+
 const colorClasses = {
   rose: 'bg-rose-100 text-rose-700 border-rose-300',
   purple: 'bg-purple-100 text-purple-700 border-purple-300',
@@ -36,6 +73,8 @@ const colorClasses = {
 
 export default function TarbiyaIdadPage() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [selectedSession, setSelectedSession] = useState(null);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -167,6 +206,23 @@ export default function TarbiyaIdadPage() {
                 <p className="text-rose-200 text-lg">Surah Ash-Shams (91:9-10)</p>
               </div>
             </section>
+
+            {/* Achievements Section */}
+            <section className="bg-white p-8 rounded-xl shadow-md">
+              <h2 className="text-3xl font-serif font-bold text-slate-800 mb-8 text-center">Our Impact</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {achievements.map((achievement, idx) => {
+                  const Icon = achievement.icon;
+                  return (
+                    <div key={idx} className="text-center p-4 bg-slate-50 rounded-lg border border-slate-200">
+                      <Icon className="w-8 h-8 mx-auto mb-3 text-purple-600" />
+                      <p className="text-2xl font-bold text-slate-800">{achievement.value}</p>
+                      <p className="text-sm text-slate-600">{achievement.label}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           </div>
         )}
 
@@ -185,6 +241,38 @@ export default function TarbiyaIdadPage() {
                 Our weekly training program covers essential topics in Tarbiya, Dawah, Irshad, and Idad. 
                 Each week includes comprehensive materials with study guides, discussion questions, and practical applications.
               </p>
+            </div>
+
+            {/* Weekly Schedule */}
+            <div className="bg-white p-8 rounded-xl shadow-md">
+              <h3 className="text-2xl font-bold text-slate-800 mb-6">Weekly Schedule</h3>
+              <div className="space-y-4">
+                {weeklySchedule.map((session) => (
+                  <div 
+                    key={session.id}
+                    className="p-4 bg-slate-50 rounded-lg border border-slate-200 hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => setSelectedSession(session)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-2">
+                          <span className="font-bold text-emerald-600">{session.day}</span>
+                          <span className="text-slate-600">{session.time}</span>
+                          <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs rounded-full">
+                            {session.participants} participants
+                          </span>
+                        </div>
+                        <h4 className="font-semibold text-slate-800">{session.topic}</h4>
+                        <p className="text-sm text-slate-600">{session.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-slate-600">Instructor:</p>
+                        <p className="font-semibold text-slate-800">{session.instructor}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <TrainingMaterials />
@@ -212,7 +300,11 @@ export default function TarbiyaIdadPage() {
 
             {/* Programs Grid */}
             {idadPrograms.map((program, idx) => (
-              <div key={program.id} className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+              <div 
+                key={program.id} 
+                className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden cursor-pointer hover:shadow-xl transition-shadow"
+                onClick={() => setSelectedProgram(program)}
+              >
                 {/* Program Header */}
                 <div className={`bg-gradient-to-r ${
                   idx === 0 ? 'from-emerald-500 to-emerald-700' :
@@ -238,27 +330,25 @@ export default function TarbiyaIdadPage() {
                 <div className="p-6">
                   <p className="text-slate-600 mb-6 text-lg">{program.description}</p>
 
-                  {/* Modules */}
+                  {/* Modules Preview */}
                   <div className="mb-6">
                     <h4 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
                       <BookOpen className="w-5 h-5 text-purple-600" />
-                      Curriculum Modules
+                      Curriculum Modules ({program.modules.length})
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {program.modules.map((module, mIdx) => (
+                      {program.modules.slice(0, 2).map((module, mIdx) => (
                         <div key={mIdx} className="bg-slate-50 p-4 rounded-lg border border-slate-200">
                           <h5 className="font-bold text-slate-800 mb-2">{module.name}</h5>
-                          <ul className="space-y-1">
-                            {module.topics.map((topic, tIdx) => (
-                              <li key={tIdx} className="text-sm text-slate-600 flex items-start gap-2">
-                                <ChevronRight className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
-                                {topic}
-                              </li>
-                            ))}
-                          </ul>
+                          <p className="text-xs text-slate-500">{module.topics.length} topics covered</p>
                         </div>
                       ))}
                     </div>
+                    {program.modules.length > 2 && (
+                      <p className="text-sm text-slate-500 mt-2">
+                        +{program.modules.length - 2} more modules...
+                      </p>
+                    )}
                   </div>
 
                   {/* Requirements */}
@@ -268,11 +358,16 @@ export default function TarbiyaIdadPage() {
                       Requirements
                     </h4>
                     <div className="flex flex-wrap gap-2">
-                      {program.requirements.map((req, rIdx) => (
+                      {program.requirements.slice(0, 3).map((req, rIdx) => (
                         <span key={rIdx} className="text-sm px-3 py-1 bg-white text-amber-800 rounded-full border border-amber-200">
                           {req}
                         </span>
                       ))}
+                      {program.requirements.length > 3 && (
+                        <span className="text-sm px-3 py-1 bg-amber-200 text-amber-800 rounded-full">
+                          +{program.requirements.length - 3} more
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -288,6 +383,151 @@ export default function TarbiyaIdadPage() {
           </div>
         )}
       </div>
+
+      {/* Program Detail Modal */}
+      {selectedProgram && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-800">{selectedProgram.name}</h2>
+                  <p className="text-lg text-slate-600">{selectedProgram.title}</p>
+                  <div className="flex items-center gap-4 mt-2 text-slate-600">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {selectedProgram.duration}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedProgram(null)}
+                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="prose max-w-none">
+                <p className="text-slate-700 leading-relaxed mb-6">
+                  {selectedProgram.description}
+                </p>
+                
+                <h4 className="text-xl font-bold text-slate-800 mb-4">Complete Curriculum</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {selectedProgram.modules.map((module, mIdx) => (
+                    <div key={mIdx} className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                      <h5 className="font-bold text-slate-800 mb-2">{module.name}</h5>
+                      <ul className="space-y-1">
+                        {module.topics.map((topic, tIdx) => (
+                          <li key={tIdx} className="text-sm text-slate-600 flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            {topic}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                
+                <h4 className="text-xl font-bold text-slate-800 mb-4">Requirements & Prerequisites</h4>
+                <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {selectedProgram.requirements.map((req, rIdx) => (
+                      <div key={rIdx} className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-amber-600" />
+                        <span className="text-sm text-amber-800">{req}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between">
+                <div className="text-sm text-slate-600">
+                  Comprehensive {selectedProgram.duration} program with certification
+                </div>
+                <button 
+                  onClick={() => {
+                    setSelectedProgram(null);
+                    setActiveTab('apply');
+                  }}
+                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                >
+                  Apply Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Session Detail Modal */}
+      {selectedSession && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-slate-800">{selectedSession.topic}</h2>
+                  <div className="flex items-center gap-4 mt-2 text-slate-600">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      {selectedSession.day}s at {selectedSession.time}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <User className="w-4 h-4" />
+                      {selectedSession.instructor}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedSession(null)}
+                  className="text-slate-400 hover:text-slate-600 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="prose max-w-none">
+                <p className="text-slate-700 leading-relaxed mb-4">
+                  {selectedSession.description}
+                </p>
+                <p className="text-slate-700 leading-relaxed mb-4">
+                  This weekly session is designed to provide systematic spiritual development through 
+                  interactive discussions, practical exercises, and peer accountability. Each session 
+                  builds upon previous lessons to create a comprehensive learning experience.
+                </p>
+                
+                <div className="bg-emerald-50 p-4 rounded-lg border border-emerald-200 mb-4">
+                  <h4 className="font-semibold text-emerald-900 mb-2">What to Expect:</h4>
+                  <ul className="text-sm text-emerald-800 space-y-1">
+                    <li>• Interactive discussions and Q&A sessions</li>
+                    <li>• Practical exercises for spiritual development</li>
+                    <li>• Small group activities and peer support</li>
+                    <li>• Take-home materials and reflection guides</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-4 border-t border-slate-200 flex items-center justify-between">
+                <div className="flex items-center gap-4 text-sm text-slate-600">
+                  <span>{selectedSession.participants} regular participants</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
+                    Open to all
+                  </span>
+                </div>
+                <button 
+                  onClick={() => alert('Registration for weekly sessions coming soon!')}
+                  className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                >
+                  Join Session
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Call to Action */}
       {activeTab === 'overview' && (

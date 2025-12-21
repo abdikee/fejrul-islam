@@ -1,0 +1,235 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { User, Lock, Eye, EyeOff, BookOpen, ArrowLeft, Shield, Users } from 'lucide-react';
+
+export default function MaleLoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Check if user gender matches the portal
+        if (data.user.gender !== 'male') {
+          alert('This is the Brothers Portal. Please use the Sisters Portal for female accounts.');
+          return;
+        }
+        
+        // Redirect to male dashboard
+        window.location.href = '/dashboard/male';
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred during login. Please try again.');
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-slate-200">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-slate-800">Fejrul Islam</h1>
+                <p className="text-xs text-slate-600">Brothers Portal</p>
+              </div>
+            </Link>
+            <Link 
+              href="/auth/login" 
+              className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm">Back to Selection</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-6 py-12">
+        <div className="max-w-md mx-auto">
+          {/* Login Card */}
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            {/* Header with Islamic Pattern */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white text-center relative">
+              {/* Decorative Islamic Geometric Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <pattern id="islamic-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <polygon points="10,0 20,10 10,20 0,10" fill="white" />
+                    <circle cx="10" cy="10" r="3" fill="none" stroke="white" strokeWidth="0.5" />
+                  </pattern>
+                  <rect width="100" height="100" fill="url(#islamic-pattern)" />
+                </svg>
+              </div>
+              
+              <div className="relative z-10">
+                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold mb-2">Brothers Portal</h2>
+                <p className="text-blue-100">Welcome back, Akhi</p>
+              </div>
+            </div>
+
+            {/* Form */}
+            <div className="p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Email Field */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      placeholder="your.email@example.com"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Password Field */}
+                <div>
+                  <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      id="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="block w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      placeholder="Enter your password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Remember Me & Forgot Password */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <input
+                      id="rememberMe"
+                      name="rememberMe"
+                      type="checkbox"
+                      checked={formData.rememberMe}
+                      onChange={handleInputChange}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                    />
+                    <label htmlFor="rememberMe" className="ml-2 block text-sm text-slate-700">
+                      Remember me
+                    </label>
+                  </div>
+                  <Link href="/auth/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
+                    Forgot password?
+                  </Link>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]"
+                >
+                  Enter Brothers Portal
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div className="mt-8 pt-6 border-t border-slate-200">
+                <p className="text-center text-sm text-slate-600 mb-4">
+                  Don't have an account?
+                </p>
+                <Link
+                  href="/auth/signup/male"
+                  className="w-full block text-center py-3 px-4 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                >
+                  Register as Brother
+                </Link>
+              </div>
+
+              {/* Islamic Quote */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-sm text-blue-800 text-center font-medium mb-1">
+                  "إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ"
+                </p>
+                <p className="text-xs text-blue-600 text-center italic">
+                  "The believers are but brothers" - Quran 49:10
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Links */}
+          <div className="text-center mt-6 space-y-2">
+            <Link href="/auth/login/female" className="block text-sm text-slate-600 hover:text-slate-800">
+              Switch to Sisters Portal
+            </Link>
+            <Link href="/" className="block text-sm text-slate-500 hover:text-slate-700">
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

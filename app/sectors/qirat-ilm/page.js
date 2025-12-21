@@ -1,7 +1,7 @@
 'use client';
 
 import { BookOpen, FileText, Languages, Download } from 'lucide-react';
-import { courses } from '@/data/courses';
+import CoursesList from '@/components/dashboard/CoursesList';
 import Link from 'next/link';
 
 const subsections = [
@@ -121,37 +121,7 @@ export default function QiratIlmPage() {
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-serif font-bold text-center text-slate-800 mb-10">Available Courses</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.map((course) => (
-              <div 
-                key={course.id}
-                className="bg-white rounded-lg shadow-md border border-slate-200 p-6 hover:shadow-xl transition-shadow"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <span className="text-xs font-semibold px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full">
-                    {course.track}
-                  </span>
-                  <span className="text-xs px-3 py-1 bg-slate-100 text-slate-600 rounded-full">
-                    {course.level}
-                  </span>
-                </div>
-                
-                <h3 className="text-xl font-bold text-slate-800 mb-2">{course.title}</h3>
-                <p className="text-sm text-slate-600 mb-4">{course.description}</p>
-                
-                <div className="space-y-2 text-sm text-slate-700">
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Duration:</span>
-                    <span>{course.duration}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-semibold">Instructor:</span>
-                    <span>{course.instructor}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <CoursesList sectorId={1} limit={12} />
         </div>
       </section>
 
