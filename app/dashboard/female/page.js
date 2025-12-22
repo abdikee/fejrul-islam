@@ -4,34 +4,65 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   BookOpen, Calendar, Users, Heart, MessageCircle, 
-  Star, Clock, Award, TrendingUp, Bell, Settings,
-  User, Home, ChevronRight, Moon, Sun, Flower2,
-  Sparkles, Shield, Target, CheckCircle
+  Star, Clock, Award, Bell, Settings, User, Moon, Flower2,
+  Sparkles, Target, CheckCircle, LogOut
 } from 'lucide-react';
+
+import StudentFooter from '@/components/dashboard/StudentFooter';
 
 export default function FemaleDashboard() {
   const [user, setUser] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     
-    // Mock user data - replace with actual API call
-    setUser({
-      firstName: 'Aisha',
-      lastName: 'Rahman',
-      email: 'aisha.rahman@example.com',
-      gender: 'female',
-      level: 'Intermediate',
-      points: 1250,
-      streak: 15,
-      completedCourses: 8,
-      currentCourses: 3
-    });
-
+    // Fetch current user data
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        const data = await response.json();
+        
+        if (data.success) {
+          // Check if user is female
+          if (data.user.gender !== 'female') {
+            window.location.href = '/dashboard/male';
+            return;
+          }
+          setUser(data.user);
+        } else {
+          // Redirect to login if not authenticated
+          window.location.href = '/auth/login';
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        // Use mock data for development
+        setUser({
+          firstName: 'Aisha',
+          lastName: 'Rahman',
+          email: 'aisha.rahman@example.com',
+          gender: 'female',
+          level: 'Intermediate',
+          points: 1250,
+          streak: 15,
+          completedCourses: 8,
+          currentCourses: 3
+        });
+      }
+    };
+    
+    fetchUser();
     return () => clearInterval(timer);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/auth/login';
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const femaleColorScheme = {
     primary: 'teal',
@@ -114,10 +145,77 @@ export default function FemaleDashboard() {
               <button className="p-2 hover:bg-teal-100 rounded-lg transition-colors">
                 <Settings className="w-5 h-5 text-teal-600" />
               </button>
+              <button 
+                onClick={handleLogout}
+                className="p-2 hover:bg-red-100 rounded-lg transition-colors group"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5 text-slate-500 group-hover:text-red-600" />
+              </button>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Quick Navigation Bar */}
+      <nav className="bg-teal-50 border-b border-teal-200 sticky top-16 z-30">
+        <div className="container mx-auto px-4 lg:px-6">
+          <div className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-1 overflow-x-auto">
+              <Link
+                href="/dashboard/female"
+                className="px-4 py-2 text-sm font-medium text-teal-700 bg-teal-100 rounded-lg hover:bg-teal-200 transition-colors whitespace-nowrap"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/dashboard/courses"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                My Courses
+              </Link>
+              <Link
+                href="/dashboard/schedule"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Schedule
+              </Link>
+              <Link
+                href="/dashboard/resources"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Resources
+              </Link>
+              <Link
+                href="/dashboard/study-plan"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Study Plan
+              </Link>
+              <Link
+                href="/dashboard/announcements"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Announcements
+              </Link>
+              <Link
+                href="/dashboard/settings"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Settings
+              </Link>
+            </div>
+            <div className="hidden md:flex items-center gap-2">
+              <Link
+                href="/mentorship"
+                className="px-3 py-1 text-xs font-medium text-teal-600 border border-teal-300 rounded-full hover:bg-teal-50 transition-colors"
+              >
+                Find Mentor
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 lg:px-6 py-6">
@@ -153,19 +251,34 @@ export default function FemaleDashboard() {
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-teal-200">
               <h3 className="text-lg font-bold text-slate-800 mb-4">Quick Actions</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {quickActions.map((action, index) => {
-                  const Icon = action.icon;
-                  return (
-                    <Link
-                      key={index}
-                      href={action.href}
-                      className={`p-4 rounded-xl border-2 border-${action.color}-200 bg-${action.color}-50 hover:bg-${action.color}-100 transition-all duration-200 text-center group`}
-                    >
-                      <Icon className={`w-8 h-8 text-${action.color}-600 mx-auto mb-2 group-hover:scale-110 transition-transform`} />
-                      <p className={`text-sm font-medium text-${action.color}-700`}>{action.label}</p>
-                    </Link>
-                  );
-                })}
+                <Link
+                  href="/dashboard/courses"
+                  className="p-4 rounded-xl border-2 border-teal-200 bg-teal-50 hover:bg-teal-100 text-teal-600 transition-all duration-200 text-center group"
+                >
+                  <BookOpen className="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-sm font-medium">My Courses</p>
+                </Link>
+                <Link
+                  href="/dashboard/schedule"
+                  className="p-4 rounded-xl border-2 border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-600 transition-all duration-200 text-center group"
+                >
+                  <Calendar className="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-sm font-medium">Schedule</p>
+                </Link>
+                <Link
+                  href="/dashboard/resources"
+                  className="p-4 rounded-xl border-2 border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 transition-all duration-200 text-center group"
+                >
+                  <Users className="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-sm font-medium">Resources</p>
+                </Link>
+                <Link
+                  href="/dashboard/study-plan"
+                  className="p-4 rounded-xl border-2 border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition-all duration-200 text-center group"
+                >
+                  <MessageCircle className="w-8 h-8 mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-sm font-medium">Study Plan</p>
+                </Link>
               </div>
             </div>
 
@@ -267,6 +380,9 @@ export default function FemaleDashboard() {
           </div>
         </div>
       </main>
+
+      {/* Student Footer */}
+      <StudentFooter user={user} />
     </div>
   );
 }

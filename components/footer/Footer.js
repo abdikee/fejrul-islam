@@ -117,11 +117,11 @@ export default function Footer() {
             <div>
               <h4 className="text-lg font-semibold text-white mb-4">Our Sectors</h4>
               <ul className="space-y-2">
-                <li><Link href="/sectors/qirat-ilm" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Qirat & Ilm</Link></li>
-                <li><Link href="/sectors/literature" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Literature</Link></li>
-                <li><Link href="/sectors/tarbiya-idad" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Tarbiya & Idad</Link></li>
-                <li><Link href="/sectors/comparative-religion" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Dawah</Link></li>
-                <li><Link href="/sectors/ziyara-enhanced" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Ziyara</Link></li>
+                <li>Qirat & Ilm</li>
+                <li>Literature</li>
+                <li>Tarbiya & Idad</li>
+                <li>Dawah</li>
+                <li>Ziyara</li>
               </ul>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function Footer() {
               © {currentYear} Haramaya University Muslim Students' Jama'a. All rights reserved.
             </p>
             <p className="text-xs text-slate-500 mt-1">
-              Built with ❤️ for the Muslim Ummah
+              Built by A2K for the Muslim Ummah
             </p>
           </div>
         </div>

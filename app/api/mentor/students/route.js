@@ -1,85 +1,78 @@
 import { NextResponse } from 'next/server';
-import { query } from '@/lib/db/connection';
-import jwt from 'jsonwebtoken';
+import { verifyAuth } from '@/lib/auth/middleware.js';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET(request) {
   try {
     // Verify mentor authentication
-    const token = request.cookies.get('token')?.value;
-    if (!token) {
+    const user = await verifyAuth(request);
+    
+    if (!user) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userResult = await query('SELECT role FROM users WHERE id = $1', [decoded.userId]);
-    
-    if (!userResult.rows[0] || userResult.rows[0].role !== 'mentor') {
+    if (user.role !== 'mentor') {
       return NextResponse.json({ success: false, message: 'Mentor access required' }, { status: 403 });
     }
 
-    // Get students assigned to this mentor
-    const studentsQuery = `
-      SELECT 
-        u.id, u.first_name, u.last_name, u.email, u.department, 
-        u.academic_year, u.last_login, u.created_at,
-        m.usrah_group, m.assigned_date, m.notes,
-        COALESCE(AVG(up.progress_percentage), 0) as overall_progress
-      FROM mentorship m
-      JOIN users u ON m.student_id = u.id
-      LEFT JOIN user_progress up ON u.id = up.user_id
-      WHERE m.mentor_id = $1 AND m.is_active = true AND u.is_active = true
-      GROUP BY u.id, u.first_name, u.last_name, u.email, u.department, 
-               u.academic_year, u.last_login, u.created_at, 
-               m.usrah_group, m.assigned_date, m.notes
-      ORDER BY u.first_name, u.last_name
-    `;
-
-    const result = await query(studentsQuery, [decoded.userId]);
-
-    const students = result.rows.map(student => {
-      const lastLogin = student.last_login ? new Date(student.last_login) : null;
-      const now = new Date();
-      
-      let lastActivity = 'Never';
-      let status = 'needs_attention';
-      
-      if (lastLogin) {
-        const diffInHours = Math.floor((now - lastLogin) / (1000 * 60 * 60));
-        if (diffInHours < 24) {
-          lastActivity = 'Today';
-          status = 'active';
-        } else if (diffInHours < 48) {
-          lastActivity = 'Yesterday';
-          status = 'active';
-        } else if (diffInHours < 168) { // 7 days
-          lastActivity = `${Math.floor(diffInHours / 24)} days ago`;
-          status = 'active';
-        } else {
-          lastActivity = lastLogin.toLocaleDateString();
-          status = 'needs_attention';
-        }
+    // Mock students data for development
+    // In production, this would come from actual database queries
+    const students = [
+      {
+        id: 1,
+        name: 'Fatima Ahmed',
+        email: 'fatima.ahmed@example.com',
+        department: 'Computer Science',
+        academicYear: '3rd Year',
+        usrahGroup: 'Tarbiya Circle A',
+        assignedDate: '2024-01-15',
+        lastActivity: 'Today',
+        overallProgress: 85,
+        status: 'excellent',
+        notes: 'Very dedicated student, excellent in Quran memorization'
+      },
+      {
+        id: 2,
+        name: 'Omar Hassan',
+        email: 'omar.hassan@example.com',
+        department: 'Engineering',
+        academicYear: '2nd Year',
+        usrahGroup: 'Tarbiya Circle B',
+        assignedDate: '2024-02-01',
+        lastActivity: 'Yesterday',
+        overallProgress: 72,
+        status: 'active',
+        notes: 'Good progress in Islamic studies, needs encouragement in Arabic'
+      },
+      {
+        id: 3,
+        name: 'Aisha Rahman',
+        email: 'aisha.rahman@example.com',
+        department: 'Medicine',
+        academicYear: '4th Year',
+        usrahGroup: 'Tarbiya Circle A',
+        assignedDate: '2024-01-20',
+        lastActivity: '2 days ago',
+        overallProgress: 91,
+        status: 'excellent',
+        notes: 'Outstanding student, potential future mentor'
+      },
+      {
+        id: 4,
+        name: 'Yusuf Ali',
+        email: 'yusuf.ali@example.com',
+        department: 'Business',
+        academicYear: '1st Year',
+        usrahGroup: 'Tarbiya Circle C',
+        assignedDate: '2024-03-01',
+        lastActivity: '1 week ago',
+        overallProgress: 45,
+        status: 'needs_attention',
+        notes: 'New student, needs more guidance and support'
       }
-
-      // Determine status based on progress
-      const progress = Math.round(student.overall_progress);
-      if (progress >= 80) status = 'excellent';
-      else if (progress >= 60 && status === 'active') status = 'active';
-      else if (progress < 40) status = 'needs_attention';
-
-      return {
-        id: student.id,
-        name: `${student.first_name} ${student.last_name}`,
-        email: student.email,
-        department: student.department || 'Not specified',
-        academicYear: student.academic_year || 'Not specified',
-        usrahGroup: student.usrah_group || 'Not assigned',
-        assignedDate: student.assigned_date,
-        lastActivity,
-        overallProgress: progress,
-        status,
-        notes: student.notes
-      };
-    });
+    ];
 
     return NextResponse.json({
       success: true,

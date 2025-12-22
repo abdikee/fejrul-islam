@@ -24,6 +24,14 @@ import {
 } from 'lucide-react';
 
 export default function IslamicAdminSidebar({ user, activeTab, setActiveTab, isOpen, onClose, currentTime }) {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } finally {
+      window.location.href = '/';
+    }
+  };
+
   // Get Islamic greeting based on time
   const getIslamicGreeting = () => {
     const hour = currentTime.getHours();
@@ -243,16 +251,17 @@ export default function IslamicAdminSidebar({ user, activeTab, setActiveTab, isO
             </p>
           </div>
           
-          <Link
-            href="/api/auth/logout"
-            className="flex items-center gap-3 px-4 py-3 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl transition-all duration-200 border border-red-500/30"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl transition-all duration-200 border border-red-500/30"
           >
             <LogOut className="w-5 h-5" />
-            <div>
+            <div className="text-left">
               <span className="font-medium">Logout</span>
               <p className="text-xs text-red-400">تسجيل الخروج</p>
             </div>
-          </Link>
+          </button>
         </div>
       </div>
 

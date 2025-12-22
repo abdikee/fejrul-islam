@@ -248,6 +248,18 @@ CREATE TABLE resources (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Editable website pages (simple CMS)
+CREATE TABLE site_pages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    slug VARCHAR(120) UNIQUE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT DEFAULT '',
+    is_active BOOLEAN DEFAULT true,
+    updated_by UUID REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for better performance
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role ON users(role);
@@ -257,6 +269,7 @@ CREATE INDEX idx_daily_habits_user_date ON daily_habits(user_id, habit_date);
 CREATE INDEX idx_idad_submissions_user_id ON idad_submissions(user_id);
 CREATE INDEX idx_messages_recipient ON messages(recipient_id, is_read);
 CREATE INDEX idx_prayer_times_location_date ON prayer_times(location, date);
+CREATE INDEX idx_site_pages_slug ON site_pages(slug);
 
 -- Triggers for updated_at timestamps
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -270,3 +283,4 @@ $$ language 'plpgsql';
 CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_user_progress_updated_at BEFORE UPDATE ON user_progress FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_daily_habits_updated_at BEFORE UPDATE ON daily_habits FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_site_pages_updated_at BEFORE UPDATE ON site_pages FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

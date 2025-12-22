@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { BookOpen, Play, Download, Clock, Users, Star, Filter, Search } from 'lucide-react';
+import ManagedPageSection from '@/components/site/ManagedPageSection';
 
 const knowledgeSeries = [
   {
@@ -404,6 +405,8 @@ export default function KnowledgeSeriesPage() {
           </Link>
         </div>
       </section>
+
+      <ManagedPageSection slug="knowledge-series" />
     </div>
   );
 }

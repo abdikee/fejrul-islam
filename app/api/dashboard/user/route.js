@@ -1,18 +1,16 @@
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import { getUserById, getUserProgress, getUserMentor } from '@/lib/db/utils';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { verifyJwtToken } from '@/lib/auth/jwt.js';
 
 async function verifyToken(request) {
   try {
-    const token = request.cookies.get('token')?.value;
+    const token = request.cookies.get('auth-token')?.value;
     
     if (!token) {
       return null;
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = verifyJwtToken(token);
     return decoded;
   } catch (error) {
     return null;

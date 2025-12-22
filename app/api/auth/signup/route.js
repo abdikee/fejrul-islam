@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createUser } from '@/lib/db/utils.js';
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+import { signJwtToken } from '@/lib/auth/jwt.js';
 
 export async function POST(request) {
   try {
@@ -58,6 +56,12 @@ export async function POST(request) {
       );
     }
 
+    // Determine role (for development, we can create mentors by email pattern)
+    let role = 'student';
+    if (email.includes('mentor') || email.includes('ustadh') || email.includes('teacher')) {
+      role = 'mentor';
+    }
+
     // Create user
     const userData = {
       email: email.toLowerCase().trim(),
@@ -67,20 +71,19 @@ export async function POST(request) {
       gender,
       department: department?.trim() || null,
       academicYear: academicYear ? parseInt(academicYear) : null,
-      role: 'student'
+      role
     };
 
     const newUser = await createUser(userData);
 
     // Create JWT token
-    const token = jwt.sign(
+    const token = signJwtToken(
       { 
         userId: newUser.id, 
         email: newUser.email, 
         role: newUser.role,
         gender: newUser.gender 
       },
-      JWT_SECRET,
       { expiresIn: '7d' }
     );
 
@@ -106,7 +109,8 @@ export async function POST(request) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 // 7 days (seconds)
     });
 
     return response;

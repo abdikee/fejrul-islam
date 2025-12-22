@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Users, BookOpen, Heart, Target, Award, Globe } from 'lucide-react';
+import ManagedPageSection from '@/components/site/ManagedPageSection';
 
 export default function AboutPage() {
   return (
@@ -244,6 +245,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <ManagedPageSection slug="about" />
     </div>
   );
 }

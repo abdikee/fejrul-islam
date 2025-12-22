@@ -31,13 +31,17 @@ export default function MaleLoginPage() {
 
       if (data.success) {
         // Check if user gender matches the portal
-        if (data.user.gender !== 'male') {
+        if (data.user.gender !== 'male' && data.user.role === 'student') {
           alert('This is the Brothers Portal. Please use the Sisters Portal for female accounts.');
           return;
         }
         
-        // Redirect to male dashboard
-        window.location.href = '/dashboard/male';
+        // Redirect based on role and redirect URL
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+        } else {
+          window.location.href = '/dashboard/male';
+        }
       } else {
         alert(data.message || 'Login failed');
       }
@@ -190,7 +194,7 @@ export default function MaleLoginPage() {
                   type="submit"
                   className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]"
                 >
-                  Enter Brothers Portal
+                  Login Brothers Portal
                 </button>
               </form>
 

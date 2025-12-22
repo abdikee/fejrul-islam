@@ -16,17 +16,34 @@ async function connectToMongo() {
 }
 
 // Helper function to handle CORS
-function handleCORS(response) {
-  response.headers.set('Access-Control-Allow-Origin', process.env.CORS_ORIGINS || '*')
+function handleCORS(response, allowedOrigin) {
+  if (!allowedOrigin) return response
+
+  response.headers.set('Access-Control-Allow-Origin', allowedOrigin)
+  response.headers.append('Vary', 'Origin')
+  response.headers.set('Access-Control-Allow-Credentials', 'true')
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  response.headers.set('Access-Control-Allow-Credentials', 'true')
   return response
 }
 
+function getAllowedCorsOrigin(request) {
+  const requestOrigin = request.headers.get('origin')
+  if (!requestOrigin) return null
+
+  const allowed = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+  if (allowed.length === 0) return null
+  return allowed.includes(requestOrigin) ? requestOrigin : null
+}
+
 // OPTIONS handler for CORS
-export async function OPTIONS() {
-  return handleCORS(new NextResponse(null, { status: 200 }))
+export async function OPTIONS(request) {
+  const allowedOrigin = getAllowedCorsOrigin(request)
+  return handleCORS(new NextResponse(null, { status: 204 }), allowedOrigin)
 }
 
 // Route handler function
@@ -38,13 +55,15 @@ async function handleRoute(request, { params }) {
   try {
     const db = await connectToMongo()
 
+    const allowedOrigin = getAllowedCorsOrigin(request)
+
     // Root endpoint - GET /api/root (since /api/ is not accessible with catch-all)
     if (route === '/root' && method === 'GET') {
-      return handleCORS(NextResponse.json({ message: "Hello World" }))
+      return handleCORS(NextResponse.json({ message: "Hello World" }), allowedOrigin)
     }
     // Root endpoint - GET /api/root (since /api/ is not accessible with catch-all)
     if (route === '/' && method === 'GET') {
-      return handleCORS(NextResponse.json({ message: "Hello World" }))
+      return handleCORS(NextResponse.json({ message: "Hello World" }), allowedOrigin)
     }
 
     // Status endpoints - POST /api/status
@@ -55,7 +74,7 @@ async function handleRoute(request, { params }) {
         return handleCORS(NextResponse.json(
           { error: "client_name is required" }, 
           { status: 400 }
-        ))
+        ), allowedOrigin)
       }
 
       const statusObj = {
@@ -65,7 +84,7 @@ async function handleRoute(request, { params }) {
       }
 
       await db.collection('status_checks').insertOne(statusObj)
-      return handleCORS(NextResponse.json(statusObj))
+      return handleCORS(NextResponse.json(statusObj), allowedOrigin)
     }
 
     // Status endpoints - GET /api/status
@@ -78,21 +97,24 @@ async function handleRoute(request, { params }) {
       // Remove MongoDB's _id field from response
       const cleanedStatusChecks = statusChecks.map(({ _id, ...rest }) => rest)
       
-      return handleCORS(NextResponse.json(cleanedStatusChecks))
+      return handleCORS(NextResponse.json(cleanedStatusChecks), allowedOrigin)
     }
 
     // Route not found
-    return handleCORS(NextResponse.json(
+    const notFoundRes = NextResponse.json(
       { error: `Route ${route} not found` }, 
       { status: 404 }
-    ))
+    )
+    return handleCORS(notFoundRes, allowedOrigin)
 
   } catch (error) {
     console.error('API Error:', error)
-    return handleCORS(NextResponse.json(
+    const errRes = NextResponse.json(
       { error: "Internal server error" }, 
       { status: 500 }
-    ))
+    )
+    const allowedOrigin = getAllowedCorsOrigin(request)
+    return handleCORS(errRes, allowedOrigin)
   }
 }
 

@@ -7,9 +7,12 @@ import Footer from '@/components/footer/Footer';
 export default function ConditionalLayout({ children }) {
   const pathname = usePathname();
   const isAdminRoute = pathname?.startsWith('/admin');
+  const isMentorRoute = pathname?.startsWith('/mentor');
+  const isDashboardRoute = pathname?.startsWith('/dashboard');
+  const isAuthRoute = pathname?.startsWith('/auth');
 
-  if (isAdminRoute) {
-    // Admin routes: no navbar/footer, full screen
+  if (isAdminRoute || isMentorRoute || isDashboardRoute || isAuthRoute) {
+    // Admin, mentor, student dashboard, and auth routes: no navbar/footer, full screen
     return children;
   }
 

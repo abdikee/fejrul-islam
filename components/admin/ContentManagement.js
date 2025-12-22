@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BookOpen, Bell, FileText, Plus, Edit, Trash2, Save, X } from 'lucide-react';
+import { BookOpen, Bell, FileText, Plus, Edit, Trash2, Save, X, Globe } from 'lucide-react';
 
 export default function ContentManagement() {
   const [activeTab, setActiveTab] = useState('announcements');
   const [announcements, setAnnouncements] = useState([]);
   const [courses, setCourses] = useState([]);
   const [resources, setResources] = useState([]);
+  const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -40,6 +41,12 @@ export default function ContentManagement() {
         });
         const data = await res.json();
         if (data.success) setResources(data.resources);
+      } else if (activeTab === 'pages') {
+        const res = await fetch('/api/admin/pages', {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (data.success) setPages(data.pages);
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -52,20 +59,28 @@ export default function ContentManagement() {
     setLoading(true);
 
     try {
-      const endpoint = `/api/admin/${activeTab}`;
+      const endpoint = activeTab === 'pages' ? '/api/admin/pages' : `/api/admin/${activeTab}`;
       const method = editingItem ? 'PUT' : 'POST';
+
+      let body = editingItem ? { ...formData } : { ...formData };
+      if (activeTab === 'announcements' && editingItem) {
+        body = { ...formData, announcementId: editingItem.id };
+      } else if (activeTab === 'pages' && editingItem) {
+        body = { ...formData, id: editingItem.id };
+      }
       
       const res = await fetch(endpoint, {
         method,
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include', // Include cookies for authentication
-        body: JSON.stringify(editingItem ? { ...formData, id: editingItem.id } : formData)
+        body: JSON.stringify(body)
       });
 
       const data = await res.json();
       
       if (data.success) {
-        alert(`${activeTab.slice(0, -1)} ${editingItem ? 'updated' : 'created'} successfully!`);
+        const label = activeTab === 'pages' ? 'page' : activeTab.slice(0, -1);
+        alert(`${label} ${editingItem ? 'updated' : 'created'} successfully!`);
         setShowForm(false);
         setEditingItem(null);
         setFormData({});
@@ -84,7 +99,13 @@ export default function ContentManagement() {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const res = await fetch(`/api/admin/${activeTab}?id=${id}`, {
+      const endpoint = activeTab === 'pages'
+        ? `/api/admin/pages?id=${id}`
+        : activeTab === 'announcements'
+          ? `/api/admin/announcements?announcementId=${id}`
+          : `/api/admin/${activeTab}?id=${id}`;
+
+      const res = await fetch(endpoint, {
         method: 'DELETE',
         credentials: 'include' // Include cookies for authentication
       });
@@ -160,6 +181,18 @@ export default function ContentManagement() {
           <FileText className="w-5 h-5" />
           Resources
         </button>
+
+        <button
+          onClick={() => setActiveTab('pages')}
+          className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+            activeTab === 'pages'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <Globe className="w-5 h-5" />
+          Website Pages
+        </button>
       </div>
 
       {/* Form Modal */}
@@ -180,6 +213,7 @@ export default function ContentManagement() {
                 {activeTab === 'announcements' && <AnnouncementForm formData={formData} setFormData={setFormData} />}
                 {activeTab === 'courses' && <CourseForm formData={formData} setFormData={setFormData} />}
                 {activeTab === 'resources' && <ResourceForm formData={formData} setFormData={setFormData} />}
+                {activeTab === 'pages' && <PageForm formData={formData} setFormData={setFormData} />}
 
                 <div className="flex gap-3 pt-4">
                   <button
@@ -229,6 +263,13 @@ export default function ContentManagement() {
                 resources={resources} 
                 onEdit={handleEdit} 
                 onDelete={handleDelete} 
+              />
+            )}
+            {activeTab === 'pages' && (
+              <PagesList
+                pages={pages}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
               />
             )}
           </>
@@ -482,6 +523,60 @@ function ResourceForm({ formData, setFormData }) {
   );
 }
 
+// Website Pages Form Component
+function PageForm({ formData, setFormData }) {
+  return (
+    <>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
+        <input
+          type="text"
+          required
+          value={formData.slug || ''}
+          onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+          placeholder="e.g., home, about, sectors"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+        <p className="text-xs text-gray-500 mt-1">This should match the route name used by the public page (e.g. /about → about).</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+        <input
+          type="text"
+          required
+          value={formData.title || ''}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+        <textarea
+          rows={10}
+          value={formData.content || ''}
+          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+          placeholder="Enter page content (Markdown supported)."
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+          <input
+            type="checkbox"
+            checked={formData.is_active ?? formData.isActive ?? true}
+            onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+            className="h-4 w-4"
+          />
+          Active
+        </label>
+      </div>
+    </>
+  );
+}
+
 // Lists Components
 function AnnouncementsList({ announcements, onEdit, onDelete }) {
   if (announcements.length === 0) {
@@ -579,6 +674,50 @@ function ResourcesList({ resources, onEdit, onDelete }) {
                 <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded">{item.resource_type}</span>
                 <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded">{item.access_level}</span>
                 <span>Downloads: {item.download_count || 0}</span>
+              </div>
+            </div>
+            <div className="flex gap-2 ml-4">
+              <button
+                onClick={() => onEdit(item)}
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(item.id)}
+                className="p-2 text-red-600 hover:bg-red-50 rounded"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PagesList({ pages, onEdit, onDelete }) {
+  if (pages.length === 0) {
+    return <div className="p-8 text-center text-gray-500">No pages yet</div>;
+  }
+
+  return (
+    <div className="divide-y">
+      {pages.map((item) => (
+        <div key={item.id} className="p-4 hover:bg-gray-50">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-3">
+                <h3 className="font-semibold text-gray-900">{item.title}</h3>
+                <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">{item.slug}</span>
+                <span className={`px-2 py-1 rounded text-xs ${item.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  {item.is_active ? 'active' : 'inactive'}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mt-2 line-clamp-2">{item.content || '—'}</p>
+              <div className="flex gap-3 mt-2 text-xs text-gray-500">
+                <span>Updated: {item.updated_at ? new Date(item.updated_at).toLocaleDateString() : '—'}</span>
               </div>
             </div>
             <div className="flex gap-2 ml-4">

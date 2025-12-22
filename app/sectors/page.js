@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { BookOpen, Users, Heart, MessageCircle, Shield, ArrowRight, CheckCircle, Star, Target, Globe } from 'lucide-react';
+import ManagedPageSection from '@/components/site/ManagedPageSection';
 
 const sectors = [
   {

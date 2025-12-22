@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db/connection';
-import jwt from 'jsonwebtoken';
+import { verifyJwtToken } from '@/lib/auth/jwt.js';
 
 export async function GET(request) {
   try {
     // Verify admin authentication
-    const token = request.cookies.get('token')?.value;
+    const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = verifyJwtToken(token);
     const userResult = await query('SELECT role FROM users WHERE id = $1', [decoded.userId]);
     
     if (!userResult.rows[0] || userResult.rows[0].role !== 'admin') {

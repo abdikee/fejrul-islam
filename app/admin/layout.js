@@ -1,26 +1,15 @@
-import { Inter, Merriweather } from 'next/font/google';
-
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
-
-const merriweather = Merriweather({ 
-  weight: ['300', '400', '700'],
-  subsets: ['latin'],
-  variable: '--font-merriweather',
-});
+import '../globals.css';
 
 export const metadata = {
-  title: 'Admin Dashboard - HUMSJ',
-  description: 'Administrative control panel for HUMSJ platform',
+  title: 'Admin Portal - HUMSJ',
+  description: 'Administrative dashboard for HUMSJ system management',
 };
 
 export default function AdminLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${merriweather.variable} font-sans antialiased bg-slate-50`}>
-        {/* No navbar or footer for admin - completely separate interface */}
+      <body className="font-sans antialiased bg-slate-50">
+        {/* No general navbar or footer - admin has its own interface */}
         {children}
       </body>
     </html>

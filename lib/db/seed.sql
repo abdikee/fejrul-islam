@@ -83,3 +83,10 @@ INSERT INTO resources (title, description, resource_type, sector_id, access_leve
 ('Tajweed Rules Guide', 'Comprehensive guide to Quranic recitation rules', 'pdf', 2, 'student', (SELECT id FROM users WHERE email = 'sheikh.abdullah@humsj.edu')),
 ('Dawah Methodology Handbook', 'Practical guide for Islamic outreach', 'pdf', 1, 'student', (SELECT id FROM users WHERE email = 'sheikh.abdullah@humsj.edu')),
 ('Character Development Workbook', 'Interactive exercises for spiritual growth', 'pdf', 3, 'student', (SELECT id FROM users WHERE email = 'sheikh.abdullah@humsj.edu'));
+
+-- Seed editable website pages (blank by default)
+INSERT INTO site_pages (slug, title, content, updated_by) VALUES
+('home', 'Home', '', (SELECT id FROM users WHERE email = 'admin@humsj.edu')),
+('about', 'About', '', (SELECT id FROM users WHERE email = 'admin@humsj.edu')),
+('sectors', 'Sectors', '', (SELECT id FROM users WHERE email = 'admin@humsj.edu')),
+('knowledge-series', 'Knowledge Series', '', (SELECT id FROM users WHERE email = 'admin@humsj.edu'));
