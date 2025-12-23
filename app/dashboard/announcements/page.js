@@ -25,76 +25,84 @@ export default function StudentAnnouncements() {
           setUser(authData.user);
         }
 
-        // Mock announcements data
-        const mockAnnouncements = [
-          {
-            id: 1,
-            title: 'Ramadan Schedule Update',
-            content: 'Updated prayer and study schedule for the holy month of Ramadan. All classes will be adjusted to accommodate Iftar and Tarawih prayers.',
-            announcement_type: 'schedule',
-            priority: 'urgent',
-            publish_date: '2024-12-22T10:00:00Z',
-            expire_date: '2025-01-15T23:59:59Z',
-            target_audience: 'all',
-            author: 'Admin Team',
-            read_status: false,
-            is_bookmarked: false
-          },
-          {
-            id: 2,
-            title: 'New Islamic Finance Course Available',
-            content: 'We are excited to announce a new comprehensive course on Islamic Finance principles. Registration opens next week.',
-            announcement_type: 'course',
-            priority: 'high',
-            publish_date: '2024-12-20T14:30:00Z',
-            expire_date: '2025-01-30T23:59:59Z',
-            target_audience: 'students',
-            author: 'Academic Department',
-            read_status: true,
-            is_bookmarked: true
-          },
-          {
-            id: 3,
-            title: 'Weekly Quran Study Circle',
-            content: 'Join us every Friday for our weekly Quran study circle. This week we will be discussing Surah Al-Baqarah verses 255-260.',
-            announcement_type: 'event',
-            priority: 'normal',
-            publish_date: '2024-12-18T09:00:00Z',
-            expire_date: '2024-12-27T23:59:59Z',
-            target_audience: user?.gender || 'all',
-            author: 'Ustadh Omar',
-            read_status: true,
-            is_bookmarked: false
-          },
-          {
-            id: 4,
-            title: 'System Maintenance Notice',
-            content: 'The learning platform will undergo scheduled maintenance on December 25th from 2:00 AM to 6:00 AM. Please save your work.',
-            announcement_type: 'system',
-            priority: 'normal',
-            publish_date: '2024-12-15T16:00:00Z',
-            expire_date: '2024-12-26T06:00:00Z',
-            target_audience: 'all',
-            author: 'IT Department',
-            read_status: false,
-            is_bookmarked: false
-          },
-          {
-            id: 5,
-            title: 'Arabic Language Workshop',
-            content: 'Special workshop on Arabic grammar and vocabulary. Perfect for students looking to improve their Quranic understanding.',
-            announcement_type: 'workshop',
-            priority: 'high',
-            publish_date: '2024-12-12T11:00:00Z',
-            expire_date: '2025-01-05T23:59:59Z',
-            target_audience: 'students',
-            author: 'Language Department',
-            read_status: true,
-            is_bookmarked: true
-          }
-        ];
+        // Fetch announcements from API
+        const announcementsResponse = await fetch('/api/announcements');
+        const announcementsData = await announcementsResponse.json();
         
-        setAnnouncements(mockAnnouncements);
+        if (announcementsData.success && announcementsData.announcements) {
+          setAnnouncements(announcementsData.announcements);
+        } else {
+          // Fallback to mock data if API fails
+          const mockAnnouncements = [
+            {
+              id: 1,
+              title: 'Ramadan Schedule Update',
+              content: 'Updated prayer and study schedule for the holy month of Ramadan. All classes will be adjusted to accommodate Iftar and Tarawih prayers.',
+              announcement_type: 'schedule',
+              priority: 'urgent',
+              publish_date: '2024-12-22T10:00:00Z',
+              expire_date: '2025-01-15T23:59:59Z',
+              target_audience: 'all',
+              author: 'Admin Team',
+              read_status: false,
+              is_bookmarked: false
+            },
+            {
+              id: 2,
+              title: 'New Islamic Finance Course Available',
+              content: 'We are excited to announce a new comprehensive course on Islamic Finance principles. Registration opens next week.',
+              announcement_type: 'course',
+              priority: 'high',
+              publish_date: '2024-12-20T14:30:00Z',
+              expire_date: '2025-01-30T23:59:59Z',
+              target_audience: 'students',
+              author: 'Academic Department',
+              read_status: true,
+              is_bookmarked: true
+            },
+            {
+              id: 3,
+              title: 'Weekly Quran Study Circle',
+              content: 'Join us every Friday for our weekly Quran study circle. This week we will be discussing Surah Al-Baqarah verses 255-260.',
+              announcement_type: 'event',
+              priority: 'normal',
+              publish_date: '2024-12-18T09:00:00Z',
+              expire_date: '2024-12-27T23:59:59Z',
+              target_audience: authData.user?.gender || 'all',
+              author: 'Ustadh Omar',
+              read_status: true,
+              is_bookmarked: false
+            },
+            {
+              id: 4,
+              title: 'System Maintenance Notice',
+              content: 'The learning platform will undergo scheduled maintenance on December 25th from 2:00 AM to 6:00 AM. Please save your work.',
+              announcement_type: 'system',
+              priority: 'normal',
+              publish_date: '2024-12-15T16:00:00Z',
+              expire_date: '2024-12-26T06:00:00Z',
+              target_audience: 'all',
+              author: 'IT Department',
+              read_status: false,
+              is_bookmarked: false
+            },
+            {
+              id: 5,
+              title: 'Arabic Language Workshop',
+              content: 'Special workshop on Arabic grammar and vocabulary. Perfect for students looking to improve their Quranic understanding.',
+              announcement_type: 'workshop',
+              priority: 'high',
+              publish_date: '2024-12-12T11:00:00Z',
+              expire_date: '2025-01-05T23:59:59Z',
+              target_audience: 'students',
+              author: 'Language Department',
+              read_status: true,
+              is_bookmarked: true
+            }
+          ];
+          
+          setAnnouncements(mockAnnouncements);
+        }
       } catch (error) {
         console.error('Error fetching announcements:', error);
         setUser({ firstName: 'Ahmad', gender: 'male' });
@@ -104,6 +112,11 @@ export default function StudentAnnouncements() {
     };
 
     fetchData();
+    
+    // Poll for new announcements every 15 seconds
+    const interval = setInterval(fetchData, 15000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const markAsRead = async (announcementId) => {

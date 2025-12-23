@@ -27,89 +27,97 @@ export default function StudentResources() {
           setUser(authData.user);
         }
 
-        // Mock resources data
-        const mockResources = [
-          {
-            id: 1,
-            title: 'Complete Quran Recitation Guide',
-            description: 'Comprehensive guide for proper Quranic recitation with Tajweed rules',
-            resource_type: 'PDF',
-            file_size: '15.2 MB',
-            download_count: 1247,
-            sector_name: 'Qirat & Ilm',
-            sector_color: 'teal',
-            created_at: '2024-12-20',
-            rating: 4.8,
-            is_favorite: true
-          },
-          {
-            id: 2,
-            title: 'Islamic Finance Principles Video Series',
-            description: 'Complete video course on Islamic banking and finance principles',
-            resource_type: 'Video',
-            file_size: '2.1 GB',
-            download_count: 892,
-            sector_name: 'Tarbiya & Idad',
-            sector_color: 'blue',
-            created_at: '2024-12-18',
-            rating: 4.9,
-            is_favorite: false
-          },
-          {
-            id: 3,
-            title: 'Arabic Grammar Workbook',
-            description: 'Interactive workbook for learning Arabic grammar fundamentals',
-            resource_type: 'PDF',
-            file_size: '8.7 MB',
-            download_count: 654,
-            sector_name: 'Literature',
-            sector_color: 'green',
-            created_at: '2024-12-15',
-            rating: 4.6,
-            is_favorite: false
-          },
-          {
-            id: 4,
-            title: 'Comparative Religion Study Materials',
-            description: 'Comprehensive materials for understanding different religious perspectives',
-            resource_type: 'Archive',
-            file_size: '45.3 MB',
-            download_count: 423,
-            sector_name: 'Comparative Religion',
-            sector_color: 'purple',
-            created_at: '2024-12-12',
-            rating: 4.7,
-            is_favorite: true
-          },
-          {
-            id: 5,
-            title: 'Islamic History Timeline',
-            description: 'Visual timeline of major events in Islamic history',
-            resource_type: 'Image',
-            file_size: '3.2 MB',
-            download_count: 789,
-            sector_name: 'Literature',
-            sector_color: 'green',
-            created_at: '2024-12-10',
-            rating: 4.5,
-            is_favorite: false
-          },
-          {
-            id: 6,
-            title: 'Nasheed Collection',
-            description: 'Beautiful Islamic nasheeds for spiritual inspiration',
-            resource_type: 'Audio',
-            file_size: '156 MB',
-            download_count: 1156,
-            sector_name: 'Ziyara',
-            sector_color: 'orange',
-            created_at: '2024-12-08',
-            rating: 4.9,
-            is_favorite: true
-          }
-        ];
+        // Fetch resources from API
+        const resourcesResponse = await fetch('/api/resources');
+        const resourcesData = await resourcesResponse.json();
         
-        setResources(mockResources);
+        if (resourcesData.success && resourcesData.resources) {
+          setResources(resourcesData.resources);
+        } else {
+          // Fallback to mock data if API fails
+          const mockResources = [
+            {
+              id: 1,
+              title: 'Complete Quran Recitation Guide',
+              description: 'Comprehensive guide for proper Quranic recitation with Tajweed rules',
+              resource_type: 'PDF',
+              file_size: '15.2 MB',
+              download_count: 1247,
+              sector_name: 'Qirat & Ilm',
+              sector_color: 'teal',
+              created_at: '2024-12-20',
+              rating: 4.8,
+              is_favorite: true
+            },
+            {
+              id: 2,
+              title: 'Islamic Finance Principles Video Series',
+              description: 'Complete video course on Islamic banking and finance principles',
+              resource_type: 'Video',
+              file_size: '2.1 GB',
+              download_count: 892,
+              sector_name: 'Tarbiya & Idad',
+              sector_color: 'blue',
+              created_at: '2024-12-18',
+              rating: 4.9,
+              is_favorite: false
+            },
+            {
+              id: 3,
+              title: 'Arabic Grammar Workbook',
+              description: 'Interactive workbook for learning Arabic grammar fundamentals',
+              resource_type: 'PDF',
+              file_size: '8.7 MB',
+              download_count: 654,
+              sector_name: 'Literature',
+              sector_color: 'green',
+              created_at: '2024-12-15',
+              rating: 4.6,
+              is_favorite: false
+            },
+            {
+              id: 4,
+              title: 'Comparative Religion Study Materials',
+              description: 'Comprehensive materials for understanding different religious perspectives',
+              resource_type: 'Archive',
+              file_size: '45.3 MB',
+              download_count: 423,
+              sector_name: 'Comparative Religion',
+              sector_color: 'purple',
+              created_at: '2024-12-12',
+              rating: 4.7,
+              is_favorite: true
+            },
+            {
+              id: 5,
+              title: 'Islamic History Timeline',
+              description: 'Visual timeline of major events in Islamic history',
+              resource_type: 'Image',
+              file_size: '3.2 MB',
+              download_count: 789,
+              sector_name: 'Literature',
+              sector_color: 'green',
+              created_at: '2024-12-10',
+              rating: 4.5,
+              is_favorite: false
+            },
+            {
+              id: 6,
+              title: 'Nasheed Collection',
+              description: 'Beautiful Islamic nasheeds for spiritual inspiration',
+              resource_type: 'Audio',
+              file_size: '156 MB',
+              download_count: 1156,
+              sector_name: 'Ziyara',
+              sector_color: 'orange',
+              created_at: '2024-12-08',
+              rating: 4.9,
+              is_favorite: true
+            }
+          ];
+          
+          setResources(mockResources);
+        }
       } catch (error) {
         console.error('Error fetching resources:', error);
         setUser({ firstName: 'Ahmad', gender: 'male' });
@@ -119,6 +127,11 @@ export default function StudentResources() {
     };
 
     fetchData();
+    
+    // Poll for new resources every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const handleDownload = async (resourceId) => {

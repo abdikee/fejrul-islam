@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   BookOpen, Calendar, Users, Heart, MessageCircle, 
   Star, Clock, Award, Bell, Settings, User, Moon, Flower2,
-  Sparkles, Target, CheckCircle, LogOut
+  Sparkles, Target, CheckCircle, LogOut, GraduationCap
 } from 'lucide-react';
 
 import StudentFooter from '@/components/dashboard/StudentFooter';
@@ -175,6 +175,18 @@ export default function FemaleDashboard() {
                 My Courses
               </Link>
               <Link
+                href="/dashboard/sectors"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                All Sectors
+              </Link>
+              <Link
+                href="/dashboard/qirat"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Qirat & Ilm
+              </Link>
+              <Link
                 href="/dashboard/schedule"
                 className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-teal-700 hover:bg-teal-100 rounded-lg transition-colors whitespace-nowrap"
               >
@@ -225,12 +237,12 @@ export default function FemaleDashboard() {
             {/* Welcome Card */}
             <div className="bg-gradient-to-r from-teal-500 to-purple-600 rounded-2xl p-6 text-white">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-2">Welcome Back, Sister!</h2>
                   <p className="text-teal-100 mb-4">
                     Continue your journey of Islamic learning and spiritual growth
                   </p>
-                  <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-4 text-sm mb-4">
                     <div className="flex items-center gap-2">
                       <Star className="w-4 h-4" />
                       <span>{user.points} Points</span>
@@ -240,6 +252,13 @@ export default function FemaleDashboard() {
                       <span>{user.streak} Day Streak</span>
                     </div>
                   </div>
+                  <Link
+                    href="/dashboard/sectors"
+                    className="inline-flex items-center gap-2 bg-white text-teal-600 px-6 py-3 rounded-lg font-semibold hover:bg-teal-50 transition-colors shadow-lg"
+                  >
+                    <GraduationCap className="w-5 h-5" />
+                    Enroll in Sectors
+                  </Link>
                 </div>
                 <div className="hidden md:block">
                   <Sparkles className="w-16 h-16 text-teal-200" />

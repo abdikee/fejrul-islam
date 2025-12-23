@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   BookOpen, Calendar, Users, Sword, 
   Star, Clock, Bell, Settings, User, Sun, Shield, Zap,
-  Target, CheckCircle, Trophy, Activity, Compass, LogOut
+  Target, CheckCircle, Trophy, Activity, Compass, LogOut, GraduationCap
 } from 'lucide-react';
 
 import StudentFooter from '@/components/dashboard/StudentFooter';
@@ -331,6 +331,18 @@ export default function MaleDashboard() {
                 My Courses
               </Link>
               <Link
+                href="/dashboard/sectors"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                All Sectors
+              </Link>
+              <Link
+                href="/dashboard/qirat"
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-100 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Qirat & Ilm
+              </Link>
+              <Link
                 href="/dashboard/schedule"
                 className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-emerald-100 rounded-lg transition-colors whitespace-nowrap"
               >
@@ -381,12 +393,12 @@ export default function MaleDashboard() {
             {/* Welcome Card */}
             <div className="bg-gradient-to-r from-emerald-500 to-blue-600 rounded-2xl p-6 text-white">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1">
                   <h2 className="text-2xl font-bold mb-2">Welcome Back, Brother!</h2>
                   <p className="text-emerald-100 mb-4">
                     Continue your path of knowledge, leadership, and service to the Ummah
                   </p>
-                  <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-4 text-sm mb-4">
                     <div className="flex items-center gap-2">
                       <Star className="w-4 h-4" />
                       <span>{points} Points</span>
@@ -400,6 +412,13 @@ export default function MaleDashboard() {
                       <span>Live Data</span>
                     </div>
                   </div>
+                  <Link
+                    href="/dashboard/sectors"
+                    className="inline-flex items-center gap-2 bg-white text-emerald-600 px-6 py-3 rounded-lg font-semibold hover:bg-emerald-50 transition-colors shadow-lg"
+                  >
+                    <GraduationCap className="w-5 h-5" />
+                    Enroll in Sectors
+                  </Link>
                 </div>
                 <div className="hidden md:block">
                   <Compass className="w-16 h-16 text-emerald-200" />

@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { User, Mail, Lock, Eye, EyeOff, BookOpen, ArrowLeft, Users, Phone, Calendar, MapPin } from 'lucide-react';
+import Alert from '@/components/ui/Alert';
 
 export default function MaleSignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [alert, setAlert] = useState(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,16 +24,25 @@ export default function MaleSignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAlert(null); // Clear any existing alerts
     
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setAlert({
+        type: 'error',
+        title: 'Password Mismatch',
+        message: 'Passwords do not match. Please ensure both passwords are identical.'
+      });
       return;
     }
     
     // Validate terms agreement
     if (!formData.agreeToTerms) {
-      alert('Please agree to the terms and conditions');
+      setAlert({
+        type: 'warning',
+        title: 'Terms Required',
+        message: 'Please agree to the terms and conditions to continue.'
+      });
       return;
     }
 
@@ -56,15 +67,30 @@ export default function MaleSignupPage() {
       const data = await response.json();
 
       if (data.success) {
-        alert('Registration successful! Welcome to the Brotherhood!');
+        setAlert({
+          type: 'success',
+          title: 'Registration Successful!',
+          message: 'Welcome to the Brotherhood! Redirecting to your dashboard...'
+        });
+        
         // Redirect to male dashboard
-        window.location.href = '/dashboard/male';
+        setTimeout(() => {
+          window.location.href = '/dashboard/male';
+        }, 1500);
       } else {
-        alert(data.message || 'Registration failed');
+        setAlert({
+          type: 'error',
+          title: 'Registration Failed',
+          message: data.message || 'Unable to complete registration. Please try again.'
+        });
       }
     } catch (error) {
       console.error('Registration error:', error);
-      alert('An error occurred during registration. Please try again.');
+      setAlert({
+        type: 'error',
+        title: 'Error',
+        message: 'An error occurred during registration. Please try again.'
+      });
     }
   };
 
@@ -130,6 +156,17 @@ export default function MaleSignupPage() {
 
             {/* Form */}
             <div className="p-8">
+              {/* Alert Display */}
+              {alert && (
+                <Alert
+                  type={alert.type}
+                  title={alert.title}
+                  message={alert.message}
+                  onClose={() => setAlert(null)}
+                  className="mb-6"
+                />
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name Fields */}
                 <div className="grid grid-cols-2 gap-4">

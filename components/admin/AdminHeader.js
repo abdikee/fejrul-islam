@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { 
   Search, Bell, Settings, Shield, Database, 
   Activity, AlertCircle, CheckCircle, Clock, LogOut,
@@ -9,6 +10,9 @@ import {
 } from 'lucide-react';
 
 export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications] = useState(5);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -19,6 +23,17 @@ export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
     users: 'healthy'
   });
   const [bulkAction, setBulkAction] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
+
+  // Read filter from URL on mount and when URL changes
+  useEffect(() => {
+    const filterParam = searchParams.get('filter');
+    if (filterParam) {
+      setActiveFilter(filterParam);
+    } else {
+      setActiveFilter('all');
+    }
+  }, [searchParams]);
 
   const handleLogout = async () => {
     try {
@@ -103,6 +118,19 @@ export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
       storage: Math.random() > 0.7 ? 'warning' : 'healthy',
       users: 'healthy'
     });
+  };
+
+  const handleFilterChange = (filter) => {
+    setActiveFilter(filter);
+    // Update URL with filter parameter
+    const params = new URLSearchParams(searchParams.toString());
+    if (filter === 'all') {
+      params.delete('filter');
+    } else {
+      params.set('filter', filter);
+    }
+    const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    router.push(newUrl);
   };
 
   const getStatusIcon = (status) => {
@@ -296,16 +324,44 @@ export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
           <div className="flex items-center justify-between">
             {/* Content Actions */}
             <div className="flex items-center gap-2">
-              <button className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-xl hover:bg-blue-200 transition-colors">
+              <button 
+                onClick={() => handleFilterChange('all')}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
+                  activeFilter === 'all'
+                    ? 'text-blue-600 bg-blue-100'
+                    : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
+                }`}
+              >
                 All Content
               </button>
-              <button className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
+              <button 
+                onClick={() => handleFilterChange('pending')}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
+                  activeFilter === 'pending'
+                    ? 'text-blue-600 bg-blue-100'
+                    : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
+                }`}
+              >
                 Pending Review
               </button>
-              <button className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
+              <button 
+                onClick={() => handleFilterChange('published')}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
+                  activeFilter === 'published'
+                    ? 'text-blue-600 bg-blue-100'
+                    : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
+                }`}
+              >
                 Published
               </button>
-              <button className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors">
+              <button 
+                onClick={() => handleFilterChange('archived')}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${
+                  activeFilter === 'archived'
+                    ? 'text-blue-600 bg-blue-100'
+                    : 'text-slate-600 hover:text-blue-600 hover:bg-blue-50'
+                }`}
+              >
                 Archived
               </button>
             </div>

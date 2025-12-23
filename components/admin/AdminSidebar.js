@@ -29,7 +29,8 @@ export default function AdminSidebar({ isOpen, onClose }) {
           name: 'System Overview',
           href: '/admin/dashboard',
           icon: LayoutDashboard,
-          description: 'Main dashboard and key metrics'
+          description: 'Main dashboard and key metrics',
+          enabled: true
         }
       ]
     },
@@ -40,19 +41,22 @@ export default function AdminSidebar({ isOpen, onClose }) {
           name: 'All Users',
           href: '/admin/users',
           icon: Users,
-          description: 'Manage all system users'
+          description: 'Manage all system users',
+          enabled: true
         },
         {
           name: 'Students',
-          href: '/admin/users/students',
+          href: '/admin/students',
           icon: GraduationCap,
-          description: 'Student management'
+          description: 'Student management',
+          enabled: true
         },
         {
           name: 'Mentors',
-          href: '/admin/users/mentors',
+          href: '/admin/mentors',
           icon: UserCheck,
-          description: 'Mentor management'
+          description: 'Mentor management',
+          enabled: true
         }
       ]
     },
@@ -63,31 +67,36 @@ export default function AdminSidebar({ isOpen, onClose }) {
           name: 'All Content',
           href: '/admin/content',
           icon: FileText,
-          description: 'Manage all content'
+          description: 'Manage all content',
+          enabled: true
         },
         {
           name: 'Courses',
-          href: '/admin/content/courses',
+          href: '/admin/courses',
           icon: BookOpen,
-          description: 'Course management'
+          description: 'Course management',
+          enabled: true
         },
         {
           name: 'Announcements',
-          href: '/admin/content/announcements',
+          href: '/admin/announcements',
           icon: Megaphone,
-          description: 'System announcements'
+          description: 'System announcements',
+          enabled: true
         },
         {
           name: 'Resources',
-          href: '/admin/content/resources',
+          href: '/admin/resources',
           icon: Upload,
-          description: 'Learning resources'
+          description: 'Learning resources',
+          enabled: true
         },
         {
           name: 'Sectors',
-          href: '/admin/content/sectors',
+          href: '/admin/sectors',
           icon: Compass,
-          description: 'Educational sectors'
+          description: 'Educational sectors',
+          enabled: true
         }
       ]
     },
@@ -98,19 +107,22 @@ export default function AdminSidebar({ isOpen, onClose }) {
           name: 'Analytics Dashboard',
           href: '/admin/analytics',
           icon: BarChart3,
-          description: 'System analytics'
+          description: 'System analytics',
+          enabled: true
         },
         {
           name: 'User Activity',
-          href: '/admin/analytics/activity',
+          href: '/admin/analytics',
           icon: Activity,
-          description: 'User engagement metrics'
+          description: 'User engagement (Coming Soon)',
+          enabled: false
         },
         {
           name: 'Performance Reports',
-          href: '/admin/analytics/performance',
+          href: '/admin/analytics',
           icon: TrendingUp,
-          description: 'System performance'
+          description: 'System performance (Coming Soon)',
+          enabled: false
         }
       ]
     },
@@ -121,19 +133,36 @@ export default function AdminSidebar({ isOpen, onClose }) {
           name: 'Settings',
           href: '/admin/settings',
           icon: Settings,
-          description: 'System configuration'
+          description: 'System configuration',
+          enabled: true
         },
         {
-          name: 'Security',
-          href: '/admin/settings/security',
+          name: 'Audit Logs',
+          href: '/admin/audit-logs',
+          icon: Activity,
+          description: 'System activity logs',
+          enabled: true
+        },
+        {
+          name: 'Impersonate User',
+          href: '/admin/impersonate',
           icon: Shield,
-          description: 'Security settings'
+          description: 'View as another user',
+          enabled: true
+        },
+        {
+          name: 'Content Manager',
+          href: '/admin/content-manager',
+          icon: FileText,
+          description: 'Manage global content',
+          enabled: true
         },
         {
           name: 'Database',
-          href: '/admin/settings/database',
+          href: '/admin/settings',
           icon: Database,
-          description: 'Database management'
+          description: 'Database management (Coming Soon)',
+          enabled: false
         }
       ]
     }
@@ -141,28 +170,11 @@ export default function AdminSidebar({ isOpen, onClose }) {
 
   const quickActions = [
     {
-      name: 'New Course',
-      href: '/admin/content/courses/new',
-      icon: BookOpen,
-      color: 'text-blue-600'
-    },
-    {
-      name: 'Send Alert',
-      href: '/admin/content/announcements/new',
-      icon: Bell,
-      color: 'text-red-600'
-    },
-    {
-      name: 'User Report',
-      href: '/admin/analytics/users',
-      icon: Users,
-      color: 'text-green-600'
-    },
-    {
-      name: 'System Log',
-      href: '/admin/analytics/logs',
+      name: 'Search',
+      href: '/admin/search?q=',
       icon: MessageSquare,
-      color: 'text-purple-600'
+      color: 'text-purple-600',
+      enabled: true
     }
   ];
 
@@ -196,7 +208,23 @@ export default function AdminSidebar({ isOpen, onClose }) {
             <div className="space-y-1">
               {section.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href && item.enabled;
+                
+                if (!item.enabled) {
+                  // Disabled item - show but not clickable
+                  return (
+                    <div
+                      key={item.name}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg opacity-50 cursor-not-allowed"
+                    >
+                      <Icon className="w-5 h-5 text-blue-400" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate text-blue-200">{item.name}</p>
+                        <p className="text-xs truncate text-blue-400">{item.description}</p>
+                      </div>
+                    </div>
+                  );
+                }
                 
                 return (
                   <Link

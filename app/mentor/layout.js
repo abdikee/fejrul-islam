@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyJwtToken } from '@/lib/auth/jwt.js';
+import MentorShell from '@/components/mentor/MentorShell';
 
 export const metadata = {
   title: 'Mentor Portal - HUMSJ',
@@ -16,19 +17,22 @@ export default function MentorLayout({ children }) {
     redirect('/auth/login');
   }
 
+  let user = null;
   try {
     const decoded = verifyJwtToken(token);
     if (decoded?.role !== 'mentor' && decoded?.role !== 'admin') {
       redirect('/dashboard');
     }
+    user = decoded;
   } catch {
     redirect('/auth/login');
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* No general navbar or footer - mentor has its own interface */}
-      {children}
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+      <MentorShell user={user}>
+        {children}
+      </MentorShell>
     </div>
   );
 }

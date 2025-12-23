@@ -110,17 +110,26 @@ export async function POST(request) {
       );
     }
 
-    // Create course
+    // Generate a unique course code
+    const courseCode = `COURSE-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+    // Create course with correct column names
     const newCourseResult = await query(`
       INSERT INTO courses (
-        title, description, sector_id, level, duration_weeks, 
-        prerequisites, learning_objectives
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, title, level, duration_weeks, created_at
+        code, title, description, sector_id, difficulty_level, estimated_weeks, 
+        prerequisites, learning_objectives, is_active
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      RETURNING id, code, title, difficulty_level, estimated_weeks, created_at
     `, [
-      title, description, parseInt(sectorId), level || 'Beginner', 
-      durationWeeks ? parseInt(durationWeeks) : null, 
-      prerequisites, learningObjectives ? [learningObjectives] : null
+      courseCode,
+      title, 
+      description, 
+      parseInt(sectorId), 
+      level || 'Beginner', 
+      durationWeeks ? parseInt(durationWeeks) : 8, 
+      prerequisites, 
+      learningObjectives, 
+      true
     ]);
 
     return NextResponse.json({
@@ -132,7 +141,7 @@ export async function POST(request) {
   } catch (error) {
     console.error('Error creating course:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to create course' },
+      { success: false, message: 'Failed to create course: ' + error.message },
       { status: 500 }
     );
   }

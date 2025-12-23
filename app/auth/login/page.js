@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { User, Users, ArrowRight, BookOpen, Heart } from 'lucide-react';
 import AuthHeader from '@/components/auth/AuthHeader';
-import Footer from '@/components/footer/Footer';
+import MainFooter from '@/components/layout/MainFooter';
 
 export default function LoginGenderSelection() {
   return (
@@ -147,7 +147,7 @@ export default function LoginGenderSelection() {
       </div>
 
       {/* Footer */}
-      <Footer />
+      <MainFooter />
     </div>
   );
 }

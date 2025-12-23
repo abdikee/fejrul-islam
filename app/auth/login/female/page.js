@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { User, Lock, Eye, EyeOff, BookOpen, ArrowLeft, Heart, Flower } from 'lucide-react';
+import Alert from '@/components/ui/Alert';
 
 export default function FemaleLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [alert, setAlert] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -14,6 +16,7 @@ export default function FemaleLoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setAlert(null); // Clear any existing alerts
     
     try {
       const response = await fetch('/api/auth/login', {
@@ -32,7 +35,11 @@ export default function FemaleLoginPage() {
       if (data.success) {
         // Check if user gender matches the portal
         if (data.user.gender !== 'female' && data.user.role === 'student') {
-          alert('This is the Sisters Portal. Please use the Brothers Portal for male accounts.');
+          setAlert({
+            type: 'warning',
+            title: 'Wrong Portal',
+            message: 'This is the Sisters Portal. Please use the Brothers Portal for male accounts.'
+          });
           return;
         }
         
@@ -43,11 +50,19 @@ export default function FemaleLoginPage() {
           window.location.href = '/dashboard/female';
         }
       } else {
-        alert(data.message || 'Login failed');
+        setAlert({
+          type: 'error',
+          title: 'Login Failed',
+          message: data.message || 'Invalid email or password. Please try again.'
+        });
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('An error occurred during login. Please try again.');
+      setAlert({
+        type: 'error',
+        title: 'Error',
+        message: 'An error occurred during login. Please try again.'
+      });
     }
   };
 
@@ -116,6 +131,17 @@ export default function FemaleLoginPage() {
 
             {/* Form */}
             <div className="p-8">
+              {/* Alert Display */}
+              {alert && (
+                <Alert
+                  type={alert.type}
+                  title={alert.title}
+                  message={alert.message}
+                  onClose={() => setAlert(null)}
+                  className="mb-6"
+                />
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Email Field */}
                 <div>

@@ -26,75 +26,42 @@ export default function StudentCourses() {
         if (authData.success) {
           setUser(authData.user);
           
-          // Get courses data
-          const coursesResponse = await fetch('/api/dashboard/student');
+          // Get enrolled courses from LMS
+          const coursesResponse = await fetch('/api/courses/my-courses');
           const coursesData = await coursesResponse.json();
           
+          // Get all available courses from admin
+          const availableResponse = await fetch('/api/admin/courses');
+          const availableData = await availableResponse.json();
+          
           if (coursesData.success) {
+            const enrolledCourses = coursesData.courses || [];
+            const allCourses = availableData.success ? availableData.courses || [] : [];
+            
+            // Filter out enrolled courses from available courses
+            const enrolledIds = new Set(enrolledCourses.map(c => c.id));
+            const availableCourses = allCourses.filter(c => !enrolledIds.has(c.id) && c.is_active !== false);
+            
             setCourses({
-              enrolled: coursesData.dashboard.enrolledCourses || [],
-              available: coursesData.dashboard.availableCourses || []
+              enrolled: enrolledCourses,
+              available: availableCourses
             });
           }
         }
       } catch (error) {
         console.error('Error fetching courses:', error);
-        // Mock data for development
-        setUser({ firstName: 'Ahmad', gender: 'male' });
-        setCourses({
-          enrolled: [
-            {
-              id: 1,
-              title: 'Islamic Finance Fundamentals',
-              description: 'Learn the principles of Islamic banking and finance',
-              level: 'Beginner',
-              progress_percentage: 65,
-              sector_name: 'Tarbiya & Idad',
-              sector_color: 'blue',
-              duration_weeks: 8,
-              related_resources: 12
-            },
-            {
-              id: 2,
-              title: 'Quranic Arabic',
-              description: 'Master the Arabic language of the Quran',
-              level: 'Intermediate',
-              progress_percentage: 40,
-              sector_name: 'Qirat & Ilm',
-              sector_color: 'teal',
-              duration_weeks: 12,
-              related_resources: 18
-            }
-          ],
-          available: [
-            {
-              id: 3,
-              title: 'Islamic History',
-              description: 'Comprehensive study of Islamic civilization',
-              level: 'Beginner',
-              sector_name: 'Literature',
-              sector_color: 'green',
-              duration_weeks: 10,
-              related_resources: 15
-            },
-            {
-              id: 4,
-              title: 'Comparative Religion',
-              description: 'Understanding different religious perspectives',
-              level: 'Advanced',
-              sector_name: 'Comparative Religion',
-              sector_color: 'purple',
-              duration_weeks: 6,
-              related_resources: 8
-            }
-          ]
-        });
+        setCourses({ enrolled: [], available: [] });
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
+    
+    // Poll for new courses every 10 seconds for real-time updates
+    const interval = setInterval(fetchData, 10000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const handleEnrollCourse = async (courseId) => {
@@ -313,42 +280,52 @@ export default function StudentCourses() {
             </span>
           </div>
 
-          <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
-            {filteredCourses.available.map((course) => (
-              <div key={course.id} className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all">
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`px-3 py-1 bg-${course.sector_color}-100 text-${course.sector_color}-700 rounded-full text-sm font-medium`}>
-                    {course.sector_name}
+          {filteredCourses.available.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-slate-200">
+              <BookOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-slate-800 mb-2">No Available Courses</h3>
+              <p className="text-slate-600">Check back later for new courses or explore sectors.</p>
+            </div>
+          ) : (
+            <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
+              {filteredCourses.available.map((course) => (
+                <div key={course.id} className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`px-3 py-1 bg-${course.sector_color || 'blue'}-100 text-${course.sector_color || 'blue'}-700 rounded-full text-sm font-medium`}>
+                      {course.sector_name || 'General'}
+                    </div>
+                    <div className={`px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-medium`}>
+                      {course.level}
+                    </div>
                   </div>
-                  <div className={`px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-medium`}>
-                    {course.level}
+                  
+                  <h3 className="text-xl font-bold text-slate-800 mb-2">{course.title}</h3>
+                  <p className="text-slate-600 mb-4 line-clamp-2">{course.description}</p>
+                  
+                  <div className="flex items-center justify-between text-sm text-slate-600 mb-4">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      <span>{course.duration_weeks} weeks</span>
+                    </div>
+                    {course.related_resources && (
+                      <div className="flex items-center gap-1">
+                        <Download className="w-4 h-4" />
+                        <span>{course.related_resources} resources</span>
+                      </div>
+                    )}
                   </div>
-                </div>
-                
-                <h3 className="text-xl font-bold text-slate-800 mb-2">{course.title}</h3>
-                <p className="text-slate-600 mb-4 line-clamp-2">{course.description}</p>
-                
-                <div className="flex items-center justify-between text-sm text-slate-600 mb-4">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{course.duration_weeks} weeks</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Download className="w-4 h-4" />
-                    <span>{course.related_resources} resources</span>
-                  </div>
-                </div>
 
-                <button
-                  onClick={() => handleEnrollCourse(course.id)}
-                  className={`w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-${genderColors.secondary}-600 text-white rounded-xl font-semibold hover:bg-${genderColors.secondary}-700 transition-colors`}
-                >
-                  <BookOpen className="w-4 h-4" />
-                  Enroll Now
-                </button>
-              </div>
-            ))}
-          </div>
+                  <button
+                    onClick={() => handleEnrollCourse(course.id)}
+                    className={`w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-${genderColors.secondary}-600 text-white rounded-xl font-semibold hover:bg-${genderColors.secondary}-700 transition-colors`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Enroll Now
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

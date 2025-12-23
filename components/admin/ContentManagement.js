@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { BookOpen, Bell, FileText, Plus, Edit, Trash2, Save, X, Globe } from 'lucide-react';
 
 export default function ContentManagement() {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('announcements');
   const [announcements, setAnnouncements] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -15,6 +17,17 @@ export default function ContentManagement() {
 
   // Form states
   const [formData, setFormData] = useState({});
+
+  // Get active filter from URL
+  const activeFilter = searchParams.get('filter') || 'all';
+
+  // Set initial tab from URL parameter
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && ['announcements', 'courses', 'resources', 'pages'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     loadData();
@@ -132,11 +145,32 @@ export default function ContentManagement() {
     setFormData({});
   };
 
+  // Apply filter to data
+  const getFilteredData = (data) => {
+    if (activeFilter === 'all') return data;
+    if (activeFilter === 'pending') return data.filter(item => item.status === 'draft' || !item.status);
+    if (activeFilter === 'published') return data.filter(item => item.status === 'published' || item.is_active);
+    if (activeFilter === 'archived') return data.filter(item => item.status === 'archived' || item.is_active === false);
+    return data;
+  };
+
+  const filteredAnnouncements = getFilteredData(announcements);
+  const filteredCourses = getFilteredData(courses);
+  const filteredResources = getFilteredData(resources);
+  const filteredPages = getFilteredData(pages);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Content Management</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Content Management</h1>
+          {activeFilter !== 'all' && (
+            <p className="text-sm text-blue-600 mt-1">
+              Showing <span className="font-semibold">{activeFilter}</span> content
+            </p>
+          )}
+        </div>
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -246,30 +280,34 @@ export default function ContentManagement() {
           <>
             {activeTab === 'announcements' && (
               <AnnouncementsList 
-                announcements={announcements} 
+                announcements={filteredAnnouncements} 
                 onEdit={handleEdit} 
-                onDelete={handleDelete} 
+                onDelete={handleDelete}
+                activeFilter={activeFilter}
               />
             )}
             {activeTab === 'courses' && (
               <CoursesList 
-                courses={courses} 
+                courses={filteredCourses} 
                 onEdit={handleEdit} 
-                onDelete={handleDelete} 
+                onDelete={handleDelete}
+                activeFilter={activeFilter}
               />
             )}
             {activeTab === 'resources' && (
               <ResourcesList 
-                resources={resources} 
+                resources={filteredResources} 
                 onEdit={handleEdit} 
-                onDelete={handleDelete} 
+                onDelete={handleDelete}
+                activeFilter={activeFilter}
               />
             )}
             {activeTab === 'pages' && (
               <PagesList
-                pages={pages}
+                pages={filteredPages}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                activeFilter={activeFilter}
               />
             )}
           </>
@@ -578,9 +616,13 @@ function PageForm({ formData, setFormData }) {
 }
 
 // Lists Components
-function AnnouncementsList({ announcements, onEdit, onDelete }) {
+function AnnouncementsList({ announcements, onEdit, onDelete, activeFilter }) {
   if (announcements.length === 0) {
-    return <div className="p-8 text-center text-gray-500">No announcements yet</div>;
+    return (
+      <div className="p-8 text-center text-gray-500">
+        {activeFilter === 'all' ? 'No announcements yet' : `No ${activeFilter} announcements found`}
+      </div>
+    );
   }
 
   return (
@@ -618,9 +660,13 @@ function AnnouncementsList({ announcements, onEdit, onDelete }) {
   );
 }
 
-function CoursesList({ courses, onEdit, onDelete }) {
+function CoursesList({ courses, onEdit, onDelete, activeFilter }) {
   if (courses.length === 0) {
-    return <div className="p-8 text-center text-gray-500">No courses yet</div>;
+    return (
+      <div className="p-8 text-center text-gray-500">
+        {activeFilter === 'all' ? 'No courses yet' : `No ${activeFilter} courses found`}
+      </div>
+    );
   }
 
   return (
@@ -657,9 +703,13 @@ function CoursesList({ courses, onEdit, onDelete }) {
   );
 }
 
-function ResourcesList({ resources, onEdit, onDelete }) {
+function ResourcesList({ resources, onEdit, onDelete, activeFilter }) {
   if (resources.length === 0) {
-    return <div className="p-8 text-center text-gray-500">No resources yet</div>;
+    return (
+      <div className="p-8 text-center text-gray-500">
+        {activeFilter === 'all' ? 'No resources yet' : `No ${activeFilter} resources found`}
+      </div>
+    );
   }
 
   return (
@@ -697,9 +747,13 @@ function ResourcesList({ resources, onEdit, onDelete }) {
   );
 }
 
-function PagesList({ pages, onEdit, onDelete }) {
+function PagesList({ pages, onEdit, onDelete, activeFilter }) {
   if (pages.length === 0) {
-    return <div className="p-8 text-center text-gray-500">No pages yet</div>;
+    return (
+      <div className="p-8 text-center text-gray-500">
+        {activeFilter === 'all' ? 'No pages yet' : `No ${activeFilter} pages found`}
+      </div>
+    );
   }
 
   return (
