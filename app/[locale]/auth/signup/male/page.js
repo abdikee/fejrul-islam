@@ -133,10 +133,10 @@ export default function MaleSignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-slate-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-slate-200">
-        <div className="container mx-auto px-6 py-4">
+      <div className="bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-800">
+        <div className="container mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
               <div className="w-10 h-10">
@@ -147,13 +147,13 @@ export default function MaleSignupPage() {
                 />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-800">Fejrul Islam</h1>
-                <p className="text-xs text-slate-600">Brothers Registration</p>
+                <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">Fejrul Islam</h1>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Brothers Registration</p>
               </div>
             </Link>
             <Link
               href="/auth/signup"
-              className="flex items-center gap-2 text-slate-600 hover:text-slate-800 transition-colors"
+              className="flex items-center gap-2 text-slate-600 hover:text-slate-800 dark:text-slate-300 dark:hover:text-slate-100 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">Back to Selection</span>
@@ -162,10 +162,10 @@ export default function MaleSignupPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-12">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="max-w-lg mx-auto">
           {/* Registration Card */}
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             {/* Header with Islamic Pattern */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white text-center relative">
               {/* Decorative Islamic Geometric Pattern */}
@@ -189,7 +189,7 @@ export default function MaleSignupPage() {
             </div>
 
             {/* Form */}
-            <div className="p-8">
+            <div className="p-6 sm:p-8">
               {/* Alert Display */}
               {alert && (
                 <Alert
@@ -205,12 +205,12 @@ export default function MaleSignupPage() {
                 {/* Name Fields */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="firstName" className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label htmlFor="firstName" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                       First Name
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <User className="h-5 w-5 text-slate-400" />
+                        <User className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                       </div>
                       <input
                         type="text"
@@ -218,7 +218,7 @@ export default function MaleSignupPage() {
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         placeholder="Ahmed"
                         required
                       />
@@ -226,7 +226,7 @@ export default function MaleSignupPage() {
                   </div>
                   
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label htmlFor="lastName" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                       Last Name
                     </label>
                     <input
@@ -235,7 +235,7 @@ export default function MaleSignupPage() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleInputChange}
-                      className="block w-full px-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="block w-full px-3 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       placeholder="Ali"
                       required
                     />
@@ -244,12 +244,12 @@ export default function MaleSignupPage() {
 
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                     Email Address
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-slate-400" />
+                      <Mail className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                     </div>
                     <input
                       type="email"
@@ -257,7 +257,7 @@ export default function MaleSignupPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       placeholder="ahmed.ali@example.com"
                       required
                     />
@@ -267,7 +267,7 @@ export default function MaleSignupPage() {
                 {/* Phone and Date of Birth */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                       Phone Number
                     </label>
                     <PhoneNumberInput
@@ -275,19 +275,19 @@ export default function MaleSignupPage() {
                       onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
                       required
                       defaultCountry="ET"
-                      selectClassName="h-12 px-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                      inputClassName="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      selectClassName="h-12 px-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      inputClassName="w-full h-12 px-4 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       aria-label="Phone number"
                     />
                   </div>
                   
                   <div>
-                    <label htmlFor="dateOfBirth" className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label htmlFor="dateOfBirth" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                       Date of Birth
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Calendar className="h-5 w-5 text-slate-400" />
+                        <Calendar className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                       </div>
                       <input
                         type="date"
@@ -295,7 +295,7 @@ export default function MaleSignupPage() {
                         name="dateOfBirth"
                         value={formData.dateOfBirth}
                         onChange={handleInputChange}
-                        className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         required
                       />
                     </div>
@@ -304,12 +304,12 @@ export default function MaleSignupPage() {
 
                 {/* City */}
                 <div>
-                  <label htmlFor="city" className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label htmlFor="city" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                     City
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MapPin className="h-5 w-5 text-slate-400" />
+                      <MapPin className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                     </div>
                     <input
                       type="text"
@@ -317,7 +317,7 @@ export default function MaleSignupPage() {
                       name="city"
                       value={formData.city}
                       onChange={handleInputChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      className="block w-full pl-10 pr-3 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                       placeholder="Your city"
                       required
                     />
@@ -327,12 +327,12 @@ export default function MaleSignupPage() {
                 {/* Password Fields */}
                 <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label htmlFor="password" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                       Password
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-slate-400" />
+                        <Lock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                       </div>
                       <input
                         type={showPassword ? 'text' : 'password'}
@@ -340,7 +340,7 @@ export default function MaleSignupPage() {
                         name="password"
                         value={formData.password}
                         onChange={handleInputChange}
-                        className="block w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="block w-full pl-10 pr-10 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         placeholder="Create a strong password"
                         required
                       />
@@ -350,21 +350,21 @@ export default function MaleSignupPage() {
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
-                          <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                          <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300" />
                         ) : (
-                          <Eye className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                          <Eye className="h-5 w-5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300" />
                         )}
                       </button>
                     </div>
                   </div>
                   
                   <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                       Confirm Password
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-slate-400" />
+                        <Lock className="h-5 w-5 text-slate-400 dark:text-slate-500" />
                       </div>
                       <input
                         type={showConfirmPassword ? 'text' : 'password'}
@@ -372,7 +372,7 @@ export default function MaleSignupPage() {
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
-                        className="block w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        className="block w-full pl-10 pr-10 py-3 border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                         placeholder="Confirm your password"
                         required
                       />
@@ -382,9 +382,9 @@ export default function MaleSignupPage() {
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       >
                         {showConfirmPassword ? (
-                          <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                          <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300" />
                         ) : (
-                          <Eye className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                          <Eye className="h-5 w-5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300" />
                         )}
                       </button>
                     </div>
@@ -400,16 +400,16 @@ export default function MaleSignupPage() {
                       type="checkbox"
                       checked={formData.agreeToTerms}
                       onChange={handleInputChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded mt-1"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-600 rounded mt-1"
                       required
                     />
-                    <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-slate-700">
+                    <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-slate-700 dark:text-slate-200">
                       I agree to the{' '}
-                      <Link href="/terms" className="text-blue-600 hover:text-blue-700 underline">
+                      <Link href="/terms" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline">
                         Terms and Conditions
                       </Link>{' '}
                       and{' '}
-                      <Link href="/privacy" className="text-blue-600 hover:text-blue-700 underline">
+                      <Link href="/privacy" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline">
                         Privacy Policy
                       </Link>
                     </label>
@@ -422,9 +422,9 @@ export default function MaleSignupPage() {
                       type="checkbox"
                       checked={formData.subscribeNewsletter}
                       onChange={handleInputChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded mt-1"
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 dark:border-slate-600 rounded mt-1"
                     />
-                    <label htmlFor="subscribeNewsletter" className="ml-2 block text-sm text-slate-700">
+                    <label htmlFor="subscribeNewsletter" className="ml-2 block text-sm text-slate-700 dark:text-slate-200">
                       Subscribe to our newsletter for Islamic learning updates
                     </label>
                   </div>
@@ -440,24 +440,24 @@ export default function MaleSignupPage() {
               </form>
 
               {/* Divider */}
-              <div className="mt-8 pt-6 border-t border-slate-200">
-                <p className="text-center text-sm text-slate-600 mb-4">
+              <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800">
+                <p className="text-center text-sm text-slate-600 dark:text-slate-400 mb-4">
                   Already have an account?
                 </p>
                 <Link
                   href="/auth/login"
-                  className="w-full block text-center py-3 px-4 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                  className="w-full block text-center py-3 px-4 border border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-300 rounded-lg font-semibold hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors"
                 >
                   Sign In to Brothers Portal
                 </Link>
               </div>
 
               {/* Islamic Quote */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800 text-center font-medium mb-1">
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-slate-800 rounded-lg border border-blue-200 dark:border-slate-700">
+                <p className="text-sm text-blue-800 dark:text-slate-100 text-center font-medium mb-1">
                   "وَاعْتَصِمُوا بِحَبْلِ اللَّهِ جَمِيعًا وَلَا تَفَرَّقُوا"
                 </p>
-                <p className="text-xs text-blue-600 text-center italic">
+                <p className="text-xs text-blue-600 dark:text-slate-300 text-center italic">
                   "And hold firmly to the rope of Allah all together and do not become divided" - Quran 3:103
                 </p>
               </div>
@@ -466,7 +466,7 @@ export default function MaleSignupPage() {
 
           {/* Additional Links */}
           <div className="text-center mt-6 space-y-2">
-            <Link href="/auth/signup/female" className="block text-sm text-slate-600 hover:text-slate-800">
+            <Link href="/auth/signup/female" className="block text-sm text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200">
               Register for Sisters Portal instead
             </Link>
             <Link href="/" className="block text-sm text-slate-500 hover:text-slate-700">

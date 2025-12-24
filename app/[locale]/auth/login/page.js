@@ -97,14 +97,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100">
       {/* Header */}
       <AuthHeader />
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 py-16">
+      <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 p-8 text-white text-center relative">
               <div className="absolute inset-0 opacity-10">
                 <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -133,7 +133,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="p-8">
+            <div className="p-6 sm:p-8">
               {alert && (
                 <Alert
                   type={alert.type}
@@ -169,7 +169,7 @@ export default function LoginPage() {
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
+                      className="input-primary block w-full pl-10 pr-3 py-3 rounded-lg focus:ring-2 transition-colors"
                       placeholder="your.email@example.com"
                       required
                     />
@@ -190,7 +190,7 @@ export default function LoginPage() {
                       name="password"
                       value={formData.password}
                       onChange={handleInputChange}
-                      className="block w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
+                      className="input-primary block w-full pl-10 pr-10 py-3 rounded-lg focus:ring-2 transition-colors"
                       placeholder="Enter your password"
                       required
                     />

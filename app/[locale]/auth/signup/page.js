@@ -22,12 +22,12 @@ export default function SignupGenderSelection() {
   }, []);
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100">
       {/* Header */}
       <AuthHeader />
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 py-16">
+      <div className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="max-w-4xl mx-auto">
           {/* Header Section */}
           <div className="text-center mb-12">
@@ -37,7 +37,7 @@ export default function SignupGenderSelection() {
             <h1 className="text-4xl font-serif font-bold text-slate-800 mb-4">
               Join Our Dawah Mission
             </h1>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
               Begin your journey of spreading Islam and providing guidance. Choose your registration portal for a personalized experience.
             </p>
           </div>
@@ -46,7 +46,7 @@ export default function SignupGenderSelection() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Male Students Registration */}
             <Link href={`/auth/signup/male${queryString}`}>
-              <div className="group bg-white rounded-2xl shadow-lg border border-slate-200 p-8 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+              <div className="group bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 p-6 sm:p-8 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
                 <div className="text-center">
                   {/* Islamic Pattern Background */}
                   <div className="relative mb-6">
@@ -61,12 +61,12 @@ export default function SignupGenderSelection() {
                   <h3 className="text-2xl font-bold text-slate-800 mb-3">
                     Brothers Registration
                   </h3>
-                  <p className="text-slate-600 mb-6 leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
                     Join the brotherhood of Islamic callers. Access dawah programs and community outreach initiatives.
                   </p>
                   
                   {/* Features */}
-                  <div className="space-y-2 mb-6 text-sm text-slate-600">
+                  <div className="space-y-2 mb-6 text-sm text-slate-600 dark:text-slate-300">
                     <div className="flex items-center justify-center gap-2">
                       <Star className="w-4 h-4 text-blue-500" />
                       <span>Dawah Training</span>
@@ -95,7 +95,7 @@ export default function SignupGenderSelection() {
 
             {/* Female Students Registration */}
             <Link href={`/auth/signup/female${queryString}`}>
-              <div className="group bg-white rounded-2xl shadow-lg border border-slate-200 p-8 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
+              <div className="group bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 p-6 sm:p-8 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1">
                 <div className="text-center">
                   {/* Islamic Pattern Background */}
                   <div className="relative mb-6">
@@ -110,12 +110,12 @@ export default function SignupGenderSelection() {
                   <h3 className="text-2xl font-bold text-slate-800 mb-3">
                     Sisters Registration
                   </h3>
-                  <p className="text-slate-600 mb-6 leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
                     Join the sisterhood of Islamic callers. Access dawah programs and spiritual guidance initiatives.
                   </p>
                   
                   {/* Features */}
-                  <div className="space-y-2 mb-6 text-sm text-slate-600">
+                  <div className="space-y-2 mb-6 text-sm text-slate-600 dark:text-slate-300">
                     <div className="flex items-center justify-center gap-2">
                       <Star className="w-4 h-4 text-rose-500" />
                       <span>Dawah Training</span>
@@ -144,17 +144,17 @@ export default function SignupGenderSelection() {
           </div>
 
           {/* Islamic Quote */}
-          <div className="text-center mt-12 p-6 bg-white/50 rounded-xl border border-slate-200">
+          <div className="text-center mt-12 p-6 bg-white/50 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-800">
             <p className="text-lg text-slate-700 font-medium mb-2">
               "وَمَنۡ أَحۡسَنُ قَوۡلٗا مِّمَّن دَعَآ إِلَى ٱللَّهِ"
             </p>
-            <p className="text-slate-600 italic">
+            <p className="text-slate-600 dark:text-slate-300 italic">
               "And who is better in speech than one who invites to Allah" - Quran 41:33
             </p>
           </div>
 
           {/* Benefits Section */}
-          <div className="mt-12 bg-gradient-to-r from-emerald-50 to-blue-50 rounded-2xl p-8 border border-emerald-200">
+          <div className="mt-12 bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-slate-900 dark:to-slate-900 rounded-2xl p-6 sm:p-8 border border-emerald-200 dark:border-slate-800">
             <h3 className="text-2xl font-bold text-center text-slate-800 mb-6">
               Why Join Fejrul Islam?
             </h3>
@@ -164,28 +164,28 @@ export default function SignupGenderSelection() {
                   <BookOpen className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-slate-800 mb-2">Dawah Programs</h4>
-                <p className="text-sm text-slate-600">Comprehensive training to effectively invite others to Islam</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">Comprehensive training to effectively invite others to Islam</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Users className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-slate-800 mb-2">Strong Community</h4>
-                <p className="text-sm text-slate-600">Connect with like-minded Muslims in spreading the message</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">Connect with like-minded Muslims in spreading the message</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-rose-600 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Heart className="w-6 h-6 text-white" />
                 </div>
                 <h4 className="font-semibold text-slate-800 mb-2">Spiritual Guidance</h4>
-                <p className="text-sm text-slate-600">Receive and provide Islamic guidance and counseling</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">Receive and provide Islamic guidance and counseling</p>
               </div>
             </div>
           </div>
 
           {/* Footer Links */}
           <div className="text-center mt-8">
-            <p className="text-slate-600 mb-4">
+            <p className="text-slate-600 dark:text-slate-300 mb-4">
               Already have an account?{' '}
               <Link href="/auth/login" className="text-emerald-600 hover:text-emerald-700 font-semibold">
                 Sign in here
