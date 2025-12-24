@@ -6,16 +6,22 @@ export async function POST(request) {
   try {
     // Production safety checks (avoid confusing DB connection errors on Vercel)
     if (process.env.NODE_ENV === 'production') {
-      const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
+      const hasConnectionString = Boolean(
+        process.env.DATABASE_URL ||
+          process.env.POSTGRES_URL ||
+          process.env.POSTGRES_PRISMA_URL ||
+          process.env.POSTGRES_URL_NON_POOLING ||
+          process.env.NEON_DATABASE_URL
+      );
       const dbHost = (process.env.DB_HOST || '').trim();
       const hasDiscreteDbConfig = Boolean(dbHost) && dbHost !== 'localhost' && dbHost !== '127.0.0.1';
 
-      if (!hasDatabaseUrl && !hasDiscreteDbConfig) {
+      if (!hasConnectionString && !hasDiscreteDbConfig) {
         return NextResponse.json(
           {
             success: false,
             message:
-              'Server database is not configured correctly. Please set DATABASE_URL (recommended) or DB_HOST/DB_NAME/DB_USER/DB_PASSWORD for production.'
+              'Server database is not configured correctly. Please set DATABASE_URL (recommended) or POSTGRES_URL (Vercel/Neon), or DB_HOST/DB_NAME/DB_USER/DB_PASSWORD for production.'
           },
           { status: 500 }
         );

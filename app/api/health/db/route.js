@@ -1,6 +1,17 @@
 import { NextResponse } from 'next/server';
 import pool, { query } from '@/lib/db/connection.js';
 
+function pickConnectionString(env) {
+  return (
+    env.DATABASE_URL ||
+    env.POSTGRES_URL ||
+    env.POSTGRES_PRISMA_URL ||
+    env.POSTGRES_URL_NON_POOLING ||
+    env.NEON_DATABASE_URL ||
+    null
+  );
+}
+
 function sanitizeHost(host) {
   if (!host) return null;
   return host.replace(/\s+/g, '');
@@ -25,7 +36,7 @@ function summarizeDatabaseUrl(databaseUrl) {
 
 export async function GET() {
   const nodeEnv = process.env.NODE_ENV;
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = pickConnectionString(process.env);
   const dbHost = sanitizeHost(process.env.DB_HOST);
   const dbSsl = process.env.DB_SSL;
   const jwtSecretSet = Boolean(process.env.JWT_SECRET);
@@ -34,6 +45,13 @@ export async function GET() {
     nodeEnv,
     jwtSecretSet,
     dbSsl,
+    connectionStringEnv: {
+      DATABASE_URL: Boolean(process.env.DATABASE_URL),
+      POSTGRES_URL: Boolean(process.env.POSTGRES_URL),
+      POSTGRES_PRISMA_URL: Boolean(process.env.POSTGRES_PRISMA_URL),
+      POSTGRES_URL_NON_POOLING: Boolean(process.env.POSTGRES_URL_NON_POOLING),
+      NEON_DATABASE_URL: Boolean(process.env.NEON_DATABASE_URL),
+    },
     hasDatabaseUrl: Boolean(databaseUrl),
     databaseUrl: summarizeDatabaseUrl(databaseUrl),
     dbHost: dbHost || null,
