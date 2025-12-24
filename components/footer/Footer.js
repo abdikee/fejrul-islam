@@ -28,8 +28,8 @@ export default function Footer() {
       {/* Quick Access Bar */}
       <div className="bg-emerald-600 text-white py-3">
         <div className="container mx-auto px-6">
-          <div className="flex flex-wrap items-center justify-between text-sm">
-            <div className="flex items-center gap-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-6">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 <span>
@@ -41,7 +41,7 @@ export default function Footer() {
                 <span>Hijri: {getHijriDate()}</span>
               </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
               <Link href="/auth/login" className="hover:text-emerald-200 transition-colors">
                 Member Login
               </Link>

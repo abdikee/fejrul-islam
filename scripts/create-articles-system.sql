@@ -40,7 +40,7 @@ INSERT INTO articles (title, description, content, sector, target_audience, stat
     'Understanding the role and significance of Islamic outreach in contemporary society.',
     'In today''s interconnected world, the importance of dawah (Islamic outreach) cannot be overstated. As Muslims, we are called to share the beautiful message of Islam with wisdom and good counsel.
 
-The Quran reminds us in Surah An-Nahl (16:125): "Invite to the way of your Lord with wisdom and good instruction, and argue with them in a way that is best."
+The Quran reminds us in Surah An-Nahl (16:125): "Call to the way of your Lord with wisdom and good counsel, and argue with them in the best manner."
 
 This verse provides us with the fundamental principles of effective dawah:
 

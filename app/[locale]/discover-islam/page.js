@@ -79,25 +79,25 @@ export default function DiscoverIslamPage() {
         <div className="relative container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             {/* Quranic Verse */}
-            <div className="bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-blue-500/10 rounded-3xl p-8 mb-12 border-2 border-emerald-300/50">
+            <div className="bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-blue-500/10 rounded-3xl p-5 sm:p-8 mb-10 sm:mb-12 border-2 border-emerald-300/50">
               <div className="mb-4">
                 <span className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-full text-sm font-semibold">
                   سورة النحل ١٦:١٢٥ • Surah An-Nahl 16:125
                 </span>
               </div>
-              <p className="text-4xl md:text-5xl text-emerald-800 mb-4 font-quran leading-relaxed">
+              <p className="text-2xl sm:text-4xl md:text-5xl text-emerald-800 mb-4 font-quran leading-relaxed">
                 ٱدۡعُ إِلَىٰ سَبِيلِ رَبِّكَ بِٱلۡحِكۡمَةِ وَٱلۡمَوۡعِظَةِ ٱلۡحَسَنَةِۖ
               </p>
-              <p className="text-xl text-slate-700 italic">
-                "Invite to the way of your Lord with wisdom and good instruction"
+              <p className="text-base sm:text-xl text-slate-700 italic">
+                "Call to the way of your Lord with wisdom and good counsel"
               </p>
             </div>
 
-            <h1 className="text-5xl lg:text-7xl font-bold text-slate-900 mb-8">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold text-slate-900 mb-6 sm:mb-8">
               Discover <span className="text-transparent bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text">Islam</span>
             </h1>
             
-            <p className="text-2xl text-slate-600 leading-relaxed mb-8">
+            <p className="text-lg sm:text-2xl text-slate-600 leading-relaxed mb-8">
               Islam is a path of holistic guidance that transforms the individual and the community.
             </p>
           </div>
@@ -108,8 +108,8 @@ export default function DiscoverIslamPage() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-gradient-to-br from-slate-50 to-emerald-50 rounded-3xl p-10 border border-emerald-200 shadow-lg">
-              <p className="text-xl lg:text-2xl text-slate-700 leading-relaxed text-center">
+            <div className="bg-gradient-to-br from-slate-50 to-emerald-50 rounded-3xl p-6 sm:p-10 border border-emerald-200 shadow-lg">
+              <p className="text-base sm:text-xl lg:text-2xl text-slate-700 leading-relaxed text-center">
                 Islam is a path of holistic guidance that transforms the individual and the community. 
                 It is the <span className="font-bold text-blue-600">Wisdom to outreach</span> (Dawah), 
                 the <span className="font-bold text-rose-600">Compassion to provide spiritual support</span> (Irshad), 
@@ -126,10 +126,10 @@ export default function DiscoverIslamPage() {
       <section className="py-20 bg-gradient-to-br from-slate-50 to-emerald-50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
               Islam Through Our Five Sectors
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-xl text-slate-600 max-w-3xl mx-auto">
               At Fejrul Islam, we explore and practice Islam through five interconnected sectors, 
               each addressing a vital aspect of Muslim life and community.
             </p>
@@ -157,7 +157,7 @@ export default function DiscoverIslamPage() {
                         </div>
                       </div>
                       
-                      <p className="text-slate-600 text-lg leading-relaxed mb-6">
+                      <p className="text-slate-600 text-base sm:text-lg leading-relaxed mb-6">
                         {sector.fullDescription}
                       </p>
                       
@@ -187,7 +187,7 @@ export default function DiscoverIslamPage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
               Core Islamic Values We Embody
             </h2>
           </div>
@@ -218,10 +218,10 @@ export default function DiscoverIslamPage() {
       <section className="py-20 bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 text-white">
         <div className="container mx-auto px-6 text-center">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl lg:text-5xl font-bold mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
               Begin Your Journey
             </h2>
-            <p className="text-xl text-emerald-100 mb-10">
+            <p className="text-base sm:text-xl text-emerald-100 mb-10">
               Whether you're new to Islam or seeking to deepen your understanding, 
               HUMSJ welcomes you to explore the beauty of this faith with us.
             </p>

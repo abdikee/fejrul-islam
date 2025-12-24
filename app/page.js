@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import {
   ArrowRight, BookOpen, Users, Heart, MessageSquare,
@@ -13,7 +12,6 @@ import {
 import EnrollmentButton from '@/components/enrollment/EnrollmentButton';
 
 export default function Home() {
-  const t = useTranslations('Hero');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [stats, setStats] = useState({
     peopleReached: 12847,
@@ -174,25 +172,26 @@ export default function Home() {
                 />
               </div>
               <div className="text-center sm:text-left">
-                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">{t('brandName')}</h2>
-                <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400">{t('brandSubtitle')}</p>
-                <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">{t('brandTagline')}</p>
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">Fejrul Islam</h2>
+                <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400">Dawah & Irshad Sector - HUMSJ</p>
+                <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">Inviting to Islam with Wisdom & Beautiful Preaching</p>
               </div>
             </div>
 
             {/* Main Headline */}
             <div className="space-y-8 mb-12">
               <h1 className="text-4xl sm:text-5xl lg:text-8xl font-bold text-slate-900 dark:text-slate-100 leading-tight">
-                {t('headlinePart1')}
+                Invite to the Way
                 <span className="block">
                   <span className="text-transparent bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 dark:from-emerald-400 dark:via-teal-400 dark:to-blue-400 bg-clip-text">
-                    {t('headlinePart2')}
+                    of Your Lord
                   </span>
                 </span>
               </h1>
               
               <p className="text-lg sm:text-2xl lg:text-3xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-5xl mx-auto">
-                {t('subheadline')}
+                New to Islam? Whether you're a non-Muslim exploring the faith or a Muslim seeking guidance, discover the beautiful message of Islam through wisdom,
+                compassion, and authentic knowledge. Together, we build bridges and transform hearts.
               </p>
             </div>
 

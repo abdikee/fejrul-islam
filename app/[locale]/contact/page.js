@@ -53,7 +53,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-blue-50">
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-4 sm:px-6 py-12">
         {/* Back Button */}
         <Link href="/" className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 mb-8">
           <ArrowLeft className="w-4 h-4" />
@@ -62,10 +62,10 @@ export default function ContactPage() {
 
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-slate-800 mb-4">
+          <h1 className="text-3xl sm:text-5xl font-bold text-slate-800 mb-4">
             Contact Us
           </h1>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl text-slate-600 max-w-3xl mx-auto">
             Get in touch with Fejrul Islam HUMSJ - We're here to help
           </p>
         </div>
@@ -76,7 +76,7 @@ export default function ContactPage() {
             <h2 className="text-2xl font-bold text-slate-800 mb-6">Get In Touch</h2>
             
             <div className="space-y-6 mb-8">
-              <div className="flex items-start gap-4 p-6 bg-white rounded-xl shadow-md border border-slate-200">
+              <div className="flex items-start gap-4 p-4 sm:p-6 bg-white rounded-xl shadow-md border border-slate-200">
                 <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <MapPin className="w-6 h-6 text-emerald-600" />
                 </div>
@@ -89,7 +89,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-6 bg-white rounded-xl shadow-md border border-slate-200">
+              <div className="flex items-start gap-4 p-4 sm:p-6 bg-white rounded-xl shadow-md border border-slate-200">
                 <div className="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Mail className="w-6 h-6 text-teal-600" />
                 </div>
@@ -102,7 +102,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-6 bg-white rounded-xl shadow-md border border-slate-200">
+              <div className="flex items-start gap-4 p-4 sm:p-6 bg-white rounded-xl shadow-md border border-slate-200">
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Phone className="w-6 h-6 text-blue-600" />
                 </div>
@@ -115,7 +115,7 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="flex items-start gap-4 p-6 bg-white rounded-xl shadow-md border border-slate-200">
+              <div className="flex items-start gap-4 p-4 sm:p-6 bg-white rounded-xl shadow-md border border-slate-200">
                 <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Clock className="w-6 h-6 text-purple-600" />
                 </div>
@@ -132,7 +132,7 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg border border-slate-200">
               <h2 className="text-2xl font-bold text-slate-800 mb-6">Send Us a Message</h2>
               
               {status === 'success' ? (
