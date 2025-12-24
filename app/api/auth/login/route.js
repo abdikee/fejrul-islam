@@ -4,6 +4,34 @@ import { signJwtToken } from '@/lib/auth/jwt.js';
 
 export async function POST(request) {
   try {
+    // Production safety checks (avoid confusing DB connection errors on Vercel)
+    if (process.env.NODE_ENV === 'production') {
+      const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
+      const dbHost = (process.env.DB_HOST || '').trim();
+      const hasDiscreteDbConfig = Boolean(dbHost) && dbHost !== 'localhost' && dbHost !== '127.0.0.1';
+
+      if (!hasDatabaseUrl && !hasDiscreteDbConfig) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              'Server database is not configured correctly. Please set DATABASE_URL (recommended) or DB_HOST/DB_NAME/DB_USER/DB_PASSWORD for production.'
+          },
+          { status: 500 }
+        );
+      }
+
+      if (!process.env.JWT_SECRET) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Server authentication is not configured correctly. Please set JWT_SECRET in production.'
+          },
+          { status: 500 }
+        );
+      }
+    }
+
     const { email, password } = await request.json();
 
     // Validate input
