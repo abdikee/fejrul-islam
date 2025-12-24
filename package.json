@@ -10,7 +10,8 @@
         "build": "next build",
         "start": "next start",
         "db:setup": "node scripts/setup-database.js",
-        "db:reset": "node scripts/setup-database.js"
+        "db:reset": "node scripts/setup-database.js",
+        "db:set-credentials": "node scripts/set-default-credentials.js"
     },
     "dependencies": {
         "@hookform/resolvers": "^5.1.1",

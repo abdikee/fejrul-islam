@@ -9,11 +9,11 @@ INSERT INTO learning_sectors (name, description, icon, color) VALUES
 ('Idad Leadership', 'Leadership Training and Development', 'GraduationCap', 'purple');
 
 -- Insert sample users (password is 'password123' hashed with bcrypt)
-INSERT INTO users (email, password_hash, first_name, last_name, gender, department, academic_year, role, level, bio) VALUES
+INSERT INTO users (email, password_hash, first_name, last_name, gender, department, academic_year, role, level, bio, email_verified) VALUES
 ('ahmed.hassan@student.edu', '$2b$10$MqZo1deSvaH7Nwm99TuMlu7P4WlNz2OXiOj/jACAZ3BioSNsjzozu', 'Ahmed', 'Hassan', 'male', 'Computer Science', 3, 'student', 'Level 2: Learner', 'Seeking knowledge and striving to be a better Muslim every day.'),
 ('fatima.mohammed@student.edu', '$2b$10$MqZo1deSvaH7Nwm99TuMlu7P4WlNz2OXiOj/jACAZ3BioSNsjzozu', 'Fatima', 'Mohammed', 'female', 'Medicine', 4, 'student', 'Level 3: Practitioner', 'Dedicated to serving the community through medicine and faith.'),
-('sheikh.abdullah@humsj.edu', '$2b$10$MqZo1deSvaH7Nwm99TuMlu7P4WlNz2OXiOj/jACAZ3BioSNsjzozu', 'Abdullah', 'Omar', 'male', NULL, NULL, 'mentor', 'Senior Mentor', 'Islamic scholar and mentor with 15 years of teaching experience.'),
-('admin@humsj.edu', '$2b$10$MqZo1deSvaH7Nwm99TuMlu7P4WlNz2OXiOj/jACAZ3BioSNsjzozu', 'System', 'Administrator', 'male', NULL, NULL, 'admin', 'Administrator', 'System administrator for HUMSJ platform.');
+('abdurehman@gmail.com', '$2b$10$MqZo1deSvaH7Nwm99TuMlu7P4WlNz2OXiOj/jACAZ3BioSNsjzozu', 'Abdurahman', 'Omar', 'male', NULL, NULL, 'mentor', 'Senior Mentor', 'Islamic scholar and mentor with 15 years of teaching experience.', true),
+('abdikedir@gmail.com', '$2b$10$MqZo1deSvaH7Nwm99TuMlu7P4WlNz2OXiOj/jACAZ3BioSNsjzozu', 'Abdike', 'Administrator', 'male', NULL, NULL, 'admin', 'Administrator', 'System administrator for HUMSJ platform.', true);
 
 -- Insert sample Quran verses
 INSERT INTO quran_verses (surah_number, surah_name_arabic, surah_name_english, verse_number, arabic_text, english_translation, revelation_type) VALUES
