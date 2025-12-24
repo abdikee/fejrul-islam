@@ -25,6 +25,10 @@ export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
   const [bulkAction, setBulkAction] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
 
+  const displayName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Admin';
+  const initials = `${user?.firstName?.[0] ?? ''}${user?.lastName?.[0] ?? ''}` || 'A';
+  const roleLabel = user?.role === 'admin' ? 'Administrator' : (user?.role ? String(user.role) : 'Admin');
+
   // Read filter from URL on mount and when URL changes
   useEffect(() => {
     const filterParam = searchParams.get('filter');
@@ -175,14 +179,18 @@ export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
 
             {/* Admin Brand */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Shield className="w-5 h-5 text-white" />
+              <div className="w-10 h-10">
+                <img
+                  src="/logo.svg"
+                  alt="Fejrul Islam Logo"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div className="hidden md:block">
                 <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Admin Portal
                 </h1>
-                <p className="text-xs text-slate-600">Fejrul Islam HUMSJ</p>
+                <p className="text-xs text-slate-600">Fejrul Islam - HUMSJ Sector</p>
               </div>
             </div>
           </div>
@@ -283,14 +291,14 @@ export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
             <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-md">
                 <span className="text-white font-semibold text-sm">
-                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  {initials}
                 </span>
               </div>
               <div className="hidden md:block">
                 <p className="text-sm font-medium text-slate-800">
-                  {user?.firstName} {user?.lastName}
+                  {displayName}
                 </p>
-                <p className="text-xs bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-medium">System Admin</p>
+                <p className="text-xs bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-medium">{roleLabel}</p>
               </div>
               <button 
                 onClick={handleLogout}

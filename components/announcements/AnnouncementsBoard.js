@@ -1,9 +1,35 @@
 'use client';
 
-import { announcements } from '@/data/announcements';
+import { useEffect, useState } from 'react';
 import { Calendar, Bell } from 'lucide-react';
 
 export default function AnnouncementsBoard() {
+  const [announcements, setAnnouncements] = useState([]);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const res = await fetch('/api/announcements?audience=public&limit=5');
+        const data = await res.json();
+        if (data?.success && Array.isArray(data.announcements)) {
+          setAnnouncements(
+            data.announcements.map((a) => ({
+              id: a.id,
+              title: a.title,
+              description: a.content,
+              date: new Date(a.publish_date || a.created_at).toLocaleDateString(),
+              priority: a.priority === 'urgent' || a.priority === 'high' ? 'high' : 'normal'
+            }))
+          );
+        }
+      } catch (e) {
+        console.error('Public announcements fetch error:', e);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
+
   return (
     <div className="bg-emerald-50 rounded-xl p-6 border border-emerald-200">
       <div className="flex items-center gap-3 mb-6">

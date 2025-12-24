@@ -34,9 +34,11 @@ export default function MentorShell({ user, children }) {
 
   const navTabs = [
     { label: 'Dashboard', href: '/mentor/dashboard' },
-    { label: 'My Students', href: '/mentor/students' },
-    { label: 'Assignments', href: '/mentor/assignments' },
-    { label: 'Reviews', href: '/mentor/submissions' },
+    { label: 'Announcements', href: '/mentor/announcements' },
+    { label: 'Participants', href: '/mentor/students' },
+    { label: 'Messages', href: '/mentor/messages' },
+    { label: 'Programs', href: '/mentor/assignments' },
+    { label: 'Guidance', href: '/mentor/submissions' },
     { label: 'Sessions', href: '/mentor/sessions' },
     { label: 'Sectors', href: '/mentor/sectors' },
     { label: 'Analytics', href: '/mentor/analytics' }
@@ -57,9 +59,9 @@ export default function MentorShell({ user, children }) {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-slate-800">
-                    Assalamu Alaikum, Ustadh {user?.firstName || 'Mentor'}
+                    Assalamu Alaikum, {user?.firstName || 'Dai'}
                   </h1>
-                  <p className="text-sm text-slate-600">Mentor Dashboard • Fejrul Islam HUMSJ</p>
+                  <p className="text-sm text-slate-600">Dai Dashboard • Fejrul Islam</p>
                 </div>
               </div>
             </div>
@@ -70,7 +72,7 @@ export default function MentorShell({ user, children }) {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search students, assignments, submissions..."
+                  placeholder="Search participants, programs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white/80"
@@ -84,7 +86,7 @@ export default function MentorShell({ user, children }) {
               <div className="hidden lg:flex items-center gap-3 mr-4">
                 <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-lg border border-green-200">
                   <Users className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-700">12 Students</span>
+                  <span className="text-sm font-medium text-green-700">12 Participants</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-1 bg-orange-50 rounded-lg border border-orange-200">
                   <FileCheck className="w-4 h-4 text-orange-600" />
@@ -109,9 +111,13 @@ export default function MentorShell({ user, children }) {
               </button>
 
               {/* Settings */}
-              <button className="p-2 hover:bg-green-100 rounded-lg transition-colors">
+              <Link
+                href="/mentor/settings"
+                className="p-2 hover:bg-green-100 rounded-lg transition-colors"
+                title="Settings"
+              >
                 <Settings className="w-5 h-5 text-green-600" />
-              </button>
+              </Link>
 
               {/* Profile */}
               <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
@@ -124,7 +130,7 @@ export default function MentorShell({ user, children }) {
                   <p className="text-sm font-medium text-slate-800">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-xs text-slate-500">Mentor</p>
+                  <p className="text-xs text-slate-500">Dai</p>
                 </div>
                 <button 
                   onClick={handleLogout}
@@ -141,26 +147,26 @@ export default function MentorShell({ user, children }) {
           <div className="border-t border-slate-200 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => alert('Create Assignment feature coming soon!')}
+                <Link
+                  href="/mentor/assignments"
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
                   <Plus className="w-4 h-4" />
-                  New Assignment
-                </button>
-                <button
-                  onClick={() => alert('Schedule Session feature coming soon!')}
+                  New Program
+                </Link>
+                <Link
+                  href="/mentor/sessions"
                   className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
                 >
                   <Calendar className="w-4 h-4" />
-                  Schedule Session
-                </button>
+                  Schedule Guidance
+                </Link>
                 <Link
                   href="/mentor/submissions"
                   className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
                 >
                   <FileCheck className="w-4 h-4" />
-                  Review (5)
+                  Guidance (5)
                 </Link>
               </div>
 
@@ -217,18 +223,18 @@ export default function MentorShell({ user, children }) {
               ))}
             </div>
             <div className="hidden md:flex items-center gap-2">
-              <button
-                onClick={() => alert('Resources section coming soon!')}
+              <Link
+                href="/mentor/resources"
                 className="px-3 py-1 text-xs font-medium text-green-600 border border-green-300 rounded-full hover:bg-green-50 transition-colors"
               >
                 Resources
-              </button>
-              <button
-                onClick={() => alert('Training section coming soon!')}
+              </Link>
+              <Link
+                href="/mentor/training"
                 className="px-3 py-1 text-xs font-medium text-emerald-600 border border-emerald-300 rounded-full hover:bg-emerald-50 transition-colors"
               >
                 Training
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -240,7 +246,7 @@ export default function MentorShell({ user, children }) {
       </main>
 
       {/* Footer */}
-      <MentorFooter />
+      <MentorFooter user={user} />
     </>
   );
 }

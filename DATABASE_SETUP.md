@@ -1,6 +1,6 @@
-# HUMSJ Database Setup Guide
+# Fejrul Islam Database Setup Guide
 
-This guide will help you set up the PostgreSQL database for the HUMSJ Islamic Education Platform.
+This guide will help you set up the PostgreSQL database for the Fejrul Islam Islamic Education Platform.
 
 ## Prerequisites
 
@@ -92,7 +92,7 @@ After setup, you can use these accounts:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Student | ahmed.hassan@student.edu | password123 |
+| Student | ahmed.hassan@student.edu ahmed.hassan@student.edu | password123 |
 | Mentor | sheikh.abdullah@humsj.edu | password123 |
 | Admin | admin@humsj.edu | password123 |
 

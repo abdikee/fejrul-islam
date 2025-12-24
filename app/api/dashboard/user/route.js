@@ -63,6 +63,7 @@ export async function GET(request) {
       lastLogin: user.last_login,
       progress: progress,
       mentor: mentorInfo ? {
+        id: mentorInfo.id,
         name: mentorInfo.name,
         contact: mentorInfo.contact
       } : null,

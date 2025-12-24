@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db/connection';
 import { verifyJwtToken } from '@/lib/auth/jwt.js';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(request) {
   try {
     // Verify admin authentication
@@ -19,13 +22,13 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const limit = parseInt(searchParams.get('limit') || '50');
     const sectorId = searchParams.get('sectorId');
 
     const offset = (page - 1) * limit;
 
-    // Build query conditions
-    let whereConditions = ['c.is_active = true'];
+    // Build query - fetch ALL courses including inactive ones for admin view
+    let whereConditions = [];
     let queryParams = [];
     let paramIndex = 1;
 
@@ -37,14 +40,20 @@ export async function GET(request) {
 
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
-    // Get courses with sector info
+    // Get courses with sector info - handle both schema variations
     const coursesQuery = `
       SELECT 
-        c.id, c.title, c.description, c.level, c.duration_weeks, c.prerequisites,
-        c.learning_objectives, c.created_at,
-        ls.name as sector_name, ls.color as sector_color
+        c.id, c.title, c.description, c.sector_id,
+        COALESCE(c.difficulty_level, c.level, 'Beginner') as level, 
+        COALESCE(c.estimated_weeks, c.duration_weeks, 8) as duration_weeks, 
+        c.prerequisites, c.learning_objectives, c.created_at, 
+        COALESCE(c.is_active, true) as is_active,
+        CASE WHEN COALESCE(c.is_active, true) = true THEN 'published' ELSE 'draft' END as status,
+        COALESCE(s.name, 'General') as sector_name, 
+        COALESCE(s.color, 'blue') as sector_color,
+        0 as enrolled_students
       FROM courses c
-      LEFT JOIN learning_sectors ls ON c.sector_id = ls.id
+      LEFT JOIN sectors s ON c.sector_id = s.id
       ${whereClause}
       ORDER BY c.created_at DESC 
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
@@ -52,12 +61,14 @@ export async function GET(request) {
 
     queryParams.push(limit, offset);
 
-    const [coursesResult, countResult] = await Promise.all([
-      query(coursesQuery, queryParams),
-      query(`SELECT COUNT(*) as total FROM courses c ${whereClause}`, queryParams.slice(0, -2))
-    ]);
+    const coursesResult = await query(coursesQuery, queryParams);
+    
+    // Get total count
+    const countQuery = `SELECT COUNT(*) as total FROM courses c ${whereClause}`;
+    const countParams = whereConditions.length > 0 ? queryParams.slice(0, -2) : [];
+    const countResult = await query(countQuery, countParams);
 
-    const totalCourses = parseInt(countResult.rows[0].total);
+    const totalCourses = parseInt(countResult.rows[0]?.total || 0);
     const totalPages = Math.ceil(totalCourses / limit);
 
     return NextResponse.json({
@@ -75,7 +86,7 @@ export async function GET(request) {
   } catch (error) {
     console.error('Error fetching courses:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch courses' },
+      { success: false, message: 'Failed to fetch courses: ' + error.message },
       { status: 500 }
     );
   }
@@ -97,51 +108,55 @@ export async function POST(request) {
     }
 
     const body = await request.json();
+    console.log('Received course data:', body);
+    
     const { 
       title, description, sectorId, level, durationWeeks, 
-      prerequisites, learningObjectives, instructor 
+      prerequisites, learningObjectives, isActive 
     } = body;
 
     // Validate required fields
-    if (!title || !description || !sectorId) {
+    if (!title || !description) {
       return NextResponse.json(
-        { success: false, message: 'Title, description, and sector are required' },
+        { success: false, message: 'Title and description are required' },
         { status: 400 }
       );
     }
 
     // Generate a unique course code
-    const courseCode = `COURSE-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    const courseCode = `PRG-${Date.now().toString(36).toUpperCase()}`;
 
-    // Create course with correct column names
+    // Insert course - use schema column names (difficulty_level, estimated_weeks)
     const newCourseResult = await query(`
       INSERT INTO courses (
         code, title, description, sector_id, difficulty_level, estimated_weeks, 
         prerequisites, learning_objectives, is_active
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-      RETURNING id, code, title, difficulty_level, estimated_weeks, created_at
+      RETURNING id, code, title, difficulty_level as level, estimated_weeks as duration_weeks, is_active, created_at
     `, [
       courseCode,
       title, 
       description, 
-      parseInt(sectorId), 
+      sectorId ? parseInt(sectorId) : null, 
       level || 'Beginner', 
       durationWeeks ? parseInt(durationWeeks) : 8, 
-      prerequisites, 
-      learningObjectives, 
-      true
+      prerequisites || null, 
+      learningObjectives || null, 
+      isActive !== false
     ]);
+
+    console.log('Course created:', newCourseResult.rows[0]);
 
     return NextResponse.json({
       success: true,
-      message: 'Course created successfully',
+      message: 'Program created successfully',
       course: newCourseResult.rows[0]
     });
 
   } catch (error) {
     console.error('Error creating course:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to create course: ' + error.message },
+      { success: false, message: 'Failed to create program: ' + error.message },
       { status: 500 }
     );
   }
@@ -165,7 +180,7 @@ export async function PUT(request) {
     const body = await request.json();
     const { 
       id, title, description, sectorId, level, durationWeeks, 
-      prerequisites, learningObjectives, instructor, isActive 
+      prerequisites, learningObjectives, isActive 
     } = body;
 
     if (!id) {
@@ -175,19 +190,30 @@ export async function PUT(request) {
       );
     }
 
-    // Update course
+    // Update course using correct column names
     const updateResult = await query(`
       UPDATE courses SET 
-        title = $1, description = $2, sector_id = $3, level = $4, 
-        duration_weeks = $5, prerequisites = $6, learning_objectives = $7, 
-        is_active = $8
+        title = $1, 
+        description = $2, 
+        sector_id = $3, 
+        difficulty_level = $4, 
+        estimated_weeks = $5, 
+        prerequisites = $6, 
+        learning_objectives = $7, 
+        is_active = $8,
+        updated_at = NOW()
       WHERE id = $9
-      RETURNING id, title, level, duration_weeks, is_active
+      RETURNING id, title, difficulty_level as level, estimated_weeks as duration_weeks, is_active
     `, [
-      title, description, parseInt(sectorId), level, 
+      title, 
+      description, 
+      sectorId ? parseInt(sectorId) : null, 
+      level || 'Beginner', 
       durationWeeks ? parseInt(durationWeeks) : null, 
-      prerequisites, learningObjectives ? [learningObjectives] : null, 
-      isActive !== false, id
+      prerequisites || null, 
+      learningObjectives || null, 
+      isActive !== false, 
+      id
     ]);
 
     if (updateResult.rows.length === 0) {
@@ -206,7 +232,7 @@ export async function PUT(request) {
   } catch (error) {
     console.error('Error updating course:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to update course' },
+      { success: false, message: 'Failed to update course: ' + error.message },
       { status: 500 }
     );
   }

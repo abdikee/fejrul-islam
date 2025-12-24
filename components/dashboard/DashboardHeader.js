@@ -152,7 +152,7 @@ const DashboardHeader = ({ user, onMenuClick }) => {
                 <BookOpen className="w-5 h-5 text-emerald-600 mt-1 flex-shrink-0" />
                 <div>
                   <h3 className="font-semibold text-emerald-800 mb-2">Daily Verse</h3>
-                  <p className="text-lg font-arabic text-emerald-900 mb-2 leading-relaxed">
+                  <p className="text-lg font-quran text-emerald-900 mb-2 leading-relaxed">
                     {dailyContent.verse.arabic}
                   </p>
                   <p className="text-sm text-emerald-700 mb-1">

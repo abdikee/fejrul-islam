@@ -3,6 +3,7 @@ import { createUser } from '@/lib/db/utils.js';
 import { signJwtToken } from '@/lib/auth/jwt.js';
 import { generateOTP, sendOTPEmail } from '@/lib/email/emailService.js';
 import { createOTPVerification } from '@/lib/db/verificationUtils.js';
+import { isValidEmail, normalizeAndValidatePhone, normalizeEmail } from '@/lib/validation/contact.js';
 
 export async function POST(request) {
   try {
@@ -12,6 +13,7 @@ export async function POST(request) {
       confirmPassword,
       firstName, 
       lastName, 
+      phone,
       gender, 
       department, 
       academicYear 
@@ -25,11 +27,19 @@ export async function POST(request) {
       );
     }
 
+    const normalizedEmail = normalizeEmail(email);
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!isValidEmail(normalizedEmail)) {
       return NextResponse.json(
         { success: false, message: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    const phoneCheck = normalizeAndValidatePhone(phone, 'ET');
+    if (!phoneCheck.ok) {
+      return NextResponse.json(
+        { success: false, message: phoneCheck.message },
         { status: 400 }
       );
     }
@@ -60,31 +70,48 @@ export async function POST(request) {
 
     // Determine role (for development, we can create mentors by email pattern)
     let role = 'student';
-    if (email.includes('mentor') || email.includes('ustadh') || email.includes('teacher')) {
+    if (normalizedEmail.includes('mentor') || normalizedEmail.includes('ustadh') || normalizedEmail.includes('teacher')) {
       role = 'mentor';
     }
 
     // Create user
     const userData = {
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
       password,
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       gender,
       department: department?.trim() || null,
       academicYear: academicYear ? parseInt(academicYear) : null,
+      phone: phoneCheck.value,
       role
     };
 
     const newUser = await createUser(userData);
 
-    // Email verification disabled - users can access immediately
-    // If you want to enable it later, uncomment the code below:
-    /*
-    const otp = generateOTP();
-    await createOTPVerification(newUser.id, otp);
-    const emailResult = await sendOTPEmail(newUser.email, otp, newUser.first_name);
-    */
+    // Generate email OTP
+    const emailOTP = generateOTP();
+    await createOTPVerification(newUser.id, emailOTP);
+    const emailResult = await sendOTPEmail(newUser.email, emailOTP, newUser.first_name);
+    const devEmailOTP = emailResult?.devOTP;
+
+    // If phone number provided, also send SMS OTP for phone verification
+    let smsResult = null;
+    let devSMSOTP = null;
+    if (phoneCheck.value) {
+      try {
+        const { generateSMSOTP, sendSMSOTP } = await import('@/lib/sms/smsService');
+        const { createPhoneOTPVerification } = await import('@/lib/db/phoneVerificationUtils');
+        
+        const smsOTP = generateSMSOTP();
+        await createPhoneOTPVerification(newUser.id, phoneCheck.value, smsOTP);
+        smsResult = await sendSMSOTP(phoneCheck.value, smsOTP, newUser.first_name);
+        devSMSOTP = smsResult?.devOTP;
+      } catch (smsError) {
+        console.error('SMS OTP error during signup:', smsError);
+        // Don't fail registration if SMS fails
+      }
+    }
 
     // Create JWT token
     const token = signJwtToken(
@@ -100,8 +127,11 @@ export async function POST(request) {
     // Create response
     const response = NextResponse.json({
       success: true,
-      message: 'Account created successfully!',
-      requiresVerification: false, // Changed to false
+      message: 'Account created successfully! Please verify your email to continue.',
+      requiresVerification: true,
+      devEmailOTP: devEmailOTP,
+      devSMSOTP: devSMSOTP,
+      phoneVerificationAvailable: !!phoneCheck.value,
       user: {
         id: newUser.id,
         email: newUser.email,
@@ -112,7 +142,9 @@ export async function POST(request) {
         level: newUser.level,
         department: newUser.department,
         academicYear: newUser.academic_year,
-        emailVerified: true // Set to true by default
+        phone: newUser.phone,
+        emailVerified: false,
+        phoneVerified: false
       }
     });
 

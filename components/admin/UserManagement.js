@@ -14,7 +14,9 @@ import {
   Download,
   Mail,
   Shield,
-  GraduationCap
+  GraduationCap,
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 import UserFormModal from './UserFormModal';
 
@@ -119,26 +121,66 @@ export default function UserManagement() {
     }
   };
 
-  // Handle user deletion
-  const handleDeleteUser = async (userId) => {
-    if (!confirm('Are you sure you want to deactivate this user?')) return;
+  // Handle user deletion (Soft or Permanent)
+  const handleDeleteUser = async (userId, type = 'soft') => {
+    const message = type === 'permanent' 
+      ? 'Are you sure you want to PERMANENTLY delete this user? This action cannot be undone.' 
+      : 'Are you sure you want to deactivate this user?';
+
+    if (!confirm(message)) return;
 
     try {
-      const response = await fetch(`/api/admin/users?userId=${userId}`, {
+      const response = await fetch(`/api/admin/users?userId=${userId}&type=${type}`, {
         method: 'DELETE',
-        credentials: 'include' // Include cookies for authentication
+        credentials: 'include'
       });
 
       const data = await response.json();
       if (data.success) {
         fetchUsers(pagination.currentPage);
-        alert('User deactivated successfully!');
+        alert(data.message);
       } else {
-        alert('Error deactivating user: ' + data.message);
+        alert('Error: ' + data.message);
       }
     } catch (error) {
-      console.error('Error deactivating user:', error);
-      alert('Error deactivating user');
+      console.error('Error deleting user:', error);
+      alert('Error deleting user');
+    }
+  };
+
+  // Handle user restoration
+  const handleRestoreUser = async (user) => {
+    if (!confirm('Are you sure you want to reactivate this user?')) return;
+
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          userId: user.id, 
+          isActive: true,
+          // Pass required fields to satisfy validation if needed, or ensure API handles partial updates
+          firstName: user.first_name,
+          lastName: user.last_name,
+          gender: user.gender,
+          department: user.department,
+          academicYear: user.academic_year,
+          role: user.role,
+          phone: user.phone
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        fetchUsers(pagination.currentPage);
+        alert('User reactivated successfully!');
+      } else {
+        alert('Error reactivating user: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error reactivating user:', error);
+      alert('Error reactivating user');
     }
   };
 
@@ -430,6 +472,7 @@ export default function UserManagement() {
                       <button 
                         onClick={() => alert('View functionality coming soon')}
                         className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
+                        title="View Details"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -439,15 +482,37 @@ export default function UserManagement() {
                           setShowEditModal(true);
                         }}
                         className="p-1 text-slate-400 hover:text-green-600 transition-colors"
+                        title="Edit User"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button 
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="p-1 text-slate-400 hover:text-red-600 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      
+                      {user.is_active ? (
+                        <button 
+                          onClick={() => handleDeleteUser(user.id, 'soft')}
+                          className="p-1 text-slate-400 hover:text-orange-600 transition-colors"
+                          title="Deactivate User"
+                        >
+                          <UserX className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <>
+                          <button 
+                            onClick={() => handleRestoreUser(user)}
+                            className="p-1 text-slate-400 hover:text-green-600 transition-colors"
+                            title="Reactivate User"
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteUser(user.id, 'permanent')}
+                            className="p-1 text-slate-400 hover:text-red-600 transition-colors"
+                            title="Permanently Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

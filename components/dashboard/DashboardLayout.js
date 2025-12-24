@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   Bell, Settings, Menu, X, Home, BookOpen, 
   Calendar, Users, MessageCircle, User, LogOut,
-  Shield, Heart
+  Shield, Heart, MessageSquare
 } from 'lucide-react';
 
 export default function DashboardLayout({ children, user, colorScheme }) {
@@ -19,10 +19,11 @@ export default function DashboardLayout({ children, user, colorScheme }) {
 
   const navigationItems = [
     { icon: Home, label: 'Dashboard', href: `/dashboard/${user?.gender}` },
-    { icon: BookOpen, label: 'My Courses', href: '/courses' },
+    { icon: BookOpen, label: 'My Programs', href: '/courses' },
     { icon: Calendar, label: 'Schedule', href: '/schedule' },
+    { icon: MessageSquare, label: 'Messages', href: '/dashboard/messages' },
     { icon: Users, label: user?.gender === 'female' ? 'Sisters Circle' : 'Brotherhood', href: '/community' },
-    { icon: MessageCircle, label: 'Mentorship', href: '/mentorship' },
+    { icon: MessageCircle, label: 'Guidance', href: '/mentorship' },
     { icon: User, label: 'Profile', href: '/profile' }
   ];
 
@@ -109,7 +110,7 @@ export default function DashboardLayout({ children, user, colorScheme }) {
                   <h1 className="text-lg font-bold text-slate-800">
                     {user?.gender === 'female' ? 'Sisters Dashboard' : 'Brothers Dashboard'}
                   </h1>
-                  <p className="text-sm text-slate-600">Fejrul Islam HUMSJ</p>
+                  <p className="text-sm text-slate-600">Fejrul Islam - HUMSJ Sector</p>
                 </div>
               </div>
             </div>

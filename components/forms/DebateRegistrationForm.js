@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { MessageSquare, Check, Brain, Target, Award } from 'lucide-react';
 import { debateTopics } from '@/data/library';
+import PhoneNumberInput from '@/components/ui/PhoneNumberInput';
 
 const DebateRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -134,13 +135,13 @@ const DebateRegistrationForm = () => {
             </div>
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">Phone Number *</label>
-              <input
-                type="tel"
-                name="phone"
+              <PhoneNumberInput
                 value={formData.phone}
-                onChange={handleChange}
+                onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
                 required
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                defaultCountry="ET"
+                selectClassName="h-12 px-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                inputClassName="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
             <div>

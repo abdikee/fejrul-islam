@@ -77,11 +77,11 @@ ON CONFLICT (email) DO NOTHING;
 
 INSERT INTO learning_sectors (name, description, color, icon, is_active, created_at)
 VALUES 
-('Qirat & Ilm', 'Quranic recitation and Islamic sciences', 'teal', 'book', true, NOW()),
-('Tarbiya & Idad', 'Character development and youth preparation', 'blue', 'heart', true, NOW()),
-('Comparative Religion', 'Study of world religions and Islamic perspective', 'purple', 'globe', true, NOW()),
-('Literature', 'Islamic literature, poetry, and historical texts', 'green', 'pen', true, NOW()),
-('Ziyara', 'Visitation etiquette and spiritual journeys', 'orange', 'mosque', true, NOW())
+('Dawah & Outreach', 'Spreading Islam with wisdom and beautiful preaching', 'emerald', 'message-square', true, NOW()),
+('Irshad & Counseling', 'Spiritual guidance and Islamic counseling', 'blue', 'compass', true, NOW()),
+('Interfaith Dialogue', 'Building bridges of understanding with non-Muslims', 'purple', 'globe', true, NOW()),
+('Community Development', 'Strengthening Muslim communities', 'orange', 'users', true, NOW()),
+('Islamic Resources', 'Knowledge and materials for dawah work', 'teal', 'book', true, NOW())
 ON CONFLICT (name) DO NOTHING;
 
 -- ============================================

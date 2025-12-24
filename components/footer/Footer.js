@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Mail, Phone, MapPin, Clock, Calendar } from 'lucide-react';
 import { useRealtimeContext } from '@/components/realtime/RealtimeProvider';
 
@@ -67,22 +66,20 @@ export default function Footer() {
             <div>
               <div className="flex items-center mb-4">
                 <div className="w-10 h-10 mr-3">
-                  <Image
-                    src="/images/humsj-logo.svg"
-                    alt="HUMSJ Logo"
-                    width={40}
-                    height={40}
-                    className="w-full h-full opacity-90"
+                  <img
+                    src="/logo.svg"
+                    alt="Fejrul Islam Logo"
+                    className="w-full h-full object-contain opacity-90"
                   />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-emerald-400">Fejrul Islam HUMSJ</h3>
-                  <p className="text-sm text-slate-400">Haramaya University Muslim Students' Jama'a</p>
+                  <h3 className="text-lg font-bold text-emerald-400">Fejrul Islam</h3>
+                  <p className="text-sm text-slate-400">Dawah & Irshad Sector - HUMSJ</p>
                 </div>
               </div>
               
               <p className="text-slate-400 mb-4 leading-relaxed">
-                Fostering Islamic education, character development, and academic excellence.
+                Inviting to Islam with wisdom and beautiful preaching, providing spiritual guidance and support.
               </p>
 
               {/* Contact Info */}
@@ -107,7 +104,9 @@ export default function Footer() {
               <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
               <ul className="space-y-2">
                 <li><Link href="/" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Home</Link></li>
+                <li><Link href="/discover-islam" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Discover Islam</Link></li>
                 <li><Link href="/about" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">About Us</Link></li>
+                <li><Link href="/contact" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Contact</Link></li>
                 <li><Link href="/auth/login" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Login</Link></li>
                 <li><Link href="/auth/signup" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Sign Up</Link></li>
               </ul>
@@ -115,13 +114,13 @@ export default function Footer() {
 
             {/* Our Sectors */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Our Sectors</h4>
+              <h4 className="text-lg font-semibold text-white mb-4">Our Five Sectors</h4>
               <ul className="space-y-2">
-                <li>Qirat & Ilm</li>
-                <li>Literature</li>
-                <li>Tarbiya & Idad</li>
-                <li>Dawah</li>
-                <li>Ziyara</li>
+                <li><Link href="/sectors/qirat-ilm" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Qirat & Ilm</Link></li>
+                <li><Link href="/sectors/literature-history" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Literature & History</Link></li>
+                <li><Link href="/sectors/dawah-comparative-religion" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Dawah & Comparative Religion</Link></li>
+                <li><Link href="/sectors/tarbiya-idad" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Tarbiya & Idad</Link></li>
+                <li><Link href="/sectors/ziyara" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Ziyara</Link></li>
               </ul>
             </div>
           </div>
@@ -129,7 +128,7 @@ export default function Footer() {
           {/* Copyright */}
           <div className="mt-8 pt-6 border-t border-slate-700 text-center">
             <p className="text-sm text-slate-400">
-              © {currentYear} Haramaya University Muslim Students' Jama'a. All rights reserved.
+              © {currentYear} Fejrul Islam - Dawah & Irshad Sector, HUMSJ. All rights reserved.
             </p>
             <p className="text-xs text-slate-500 mt-1">
               Built by A2K for the Muslim Ummah

@@ -34,13 +34,9 @@ export default function AdminLayout({ children, showAnalytics = false, showActiv
         }
       } catch (error) {
         console.error('Error fetching user:', error);
-        // Use mock data for development
-        setUser({
-          firstName: 'System',
-          lastName: 'Admin',
-          email: 'admin@humsj.edu.et',
-          role: 'admin'
-        });
+        // If we can't verify the session, don't render admin UI with fake data.
+        const returnUrl = encodeURIComponent(`${window.location.pathname}${window.location.search}`);
+        window.location.href = `/auth/login?returnUrl=${returnUrl}`;
       }
     };
     

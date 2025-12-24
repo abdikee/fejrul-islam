@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Users, FileText, BarChart3, Settings, 
   Shield, Database, Bell, Calendar, MessageSquare, LogOut, 
   X, BookOpen, Megaphone, Upload, Compass, GraduationCap,
-  UserCheck, Activity, TrendingUp, Cog
+  UserCheck, Activity, TrendingUp, Cog, Mail
 } from 'lucide-react';
 
 export default function AdminSidebar({ isOpen, onClose }) {
@@ -45,17 +45,17 @@ export default function AdminSidebar({ isOpen, onClose }) {
           enabled: true
         },
         {
-          name: 'Students',
+          name: 'Participants',
           href: '/admin/students',
           icon: GraduationCap,
-          description: 'Student management',
+          description: 'Participant management',
           enabled: true
         },
         {
-          name: 'Mentors',
+          name: 'Dais (Callers)',
           href: '/admin/mentors',
           icon: UserCheck,
-          description: 'Mentor management',
+          description: 'Dai management',
           enabled: true
         }
       ]
@@ -71,10 +71,10 @@ export default function AdminSidebar({ isOpen, onClose }) {
           enabled: true
         },
         {
-          name: 'Courses',
+          name: 'Programs',
           href: '/admin/courses',
           icon: BookOpen,
-          description: 'Course management',
+          description: 'Dawah programs',
           enabled: true
         },
         {
@@ -88,14 +88,14 @@ export default function AdminSidebar({ isOpen, onClose }) {
           name: 'Resources',
           href: '/admin/resources',
           icon: Upload,
-          description: 'Learning resources',
+          description: 'Dawah resources',
           enabled: true
         },
         {
           name: 'Sectors',
           href: '/admin/sectors',
           icon: Compass,
-          description: 'Educational sectors',
+          description: 'Dawah & Irshad sectors',
           enabled: true
         }
       ]
@@ -108,27 +108,42 @@ export default function AdminSidebar({ isOpen, onClose }) {
           href: '/admin/analytics',
           icon: BarChart3,
           description: 'System analytics',
-          enabled: true
+          enabled: true,
+          match: 'exact'
         },
         {
           name: 'User Activity',
-          href: '/admin/analytics',
+          href: '/admin/analytics/activity',
           icon: Activity,
-          description: 'User engagement (Coming Soon)',
-          enabled: false
+          description: 'User engagement and recent activity',
+          enabled: true
         },
         {
           name: 'Performance Reports',
-          href: '/admin/analytics',
+          href: '/admin/analytics/performance',
           icon: TrendingUp,
-          description: 'System performance (Coming Soon)',
-          enabled: false
+          description: 'System performance and health reports',
+          enabled: true
         }
       ]
     },
     {
       title: 'System',
       items: [
+        {
+          name: 'Messages',
+          href: '/admin/messages',
+          icon: MessageSquare,
+          description: 'Student communications inbox',
+          enabled: true
+        },
+        {
+          name: 'Contact Inquiries',
+          href: '/admin/contact-submissions',
+          icon: Mail,
+          description: 'Public contact form submissions',
+          enabled: true
+        },
         {
           name: 'Settings',
           href: '/admin/settings',
@@ -159,10 +174,10 @@ export default function AdminSidebar({ isOpen, onClose }) {
         },
         {
           name: 'Database',
-          href: '/admin/settings',
+          href: '/admin/database',
           icon: Database,
-          description: 'Database management (Coming Soon)',
-          enabled: false
+          description: 'Database status and tools',
+          enabled: true
         }
       ]
     }
@@ -183,12 +198,16 @@ export default function AdminSidebar({ isOpen, onClose }) {
       {/* Logo & Admin Badge */}
       <div className="flex items-center justify-between p-6 border-b border-blue-700">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg">
-            <Shield className="w-5 h-5 text-white" />
+          <div className="w-8 h-8">
+            <img
+              src="/logo.svg"
+              alt="Fejrul Islam Logo"
+              className="w-full h-full object-contain"
+            />
           </div>
           <div>
             <h2 className="font-bold text-white">Admin Portal</h2>
-            <p className="text-xs text-blue-200">HUMSJ System</p>
+            <p className="text-xs text-blue-200">Fejrul Islam - HUMSJ Sector</p>
           </div>
         </div>
         {isOpen && (
@@ -208,7 +227,12 @@ export default function AdminSidebar({ isOpen, onClose }) {
             <div className="space-y-1">
               {section.items.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href && item.enabled;
+                const matchMode = item.match || 'prefix';
+                const isActive = item.enabled && (
+                  matchMode === 'exact'
+                    ? pathname === item.href
+                    : (pathname === item.href || pathname.startsWith(`${item.href}/`))
+                );
                 
                 if (!item.enabled) {
                   // Disabled item - show but not clickable

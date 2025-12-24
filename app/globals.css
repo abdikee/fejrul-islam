@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* Import Arabic fonts */
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Noto+Sans+Arabic:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Amiri+Quran&family=Noto+Sans+Arabic:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
@@ -57,7 +57,78 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
+
+/* Dark mode specific styles */
+@layer components {
+  /* Background gradients for dark mode */
+  .bg-gradient-light {
+    @apply bg-gradient-to-br from-slate-50 via-white to-emerald-50;
+  }
+  
+  .bg-gradient-dark {
+    @apply dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-emerald-950;
+  }
+
+  /* Card styles */
+  .card-light {
+    @apply bg-white border-slate-200 shadow-lg;
+  }
+  
+  .card-dark {
+    @apply dark:bg-slate-800 dark:border-slate-700 dark:shadow-2xl;
+  }
+
+  /* Text colors */
+  .text-primary-light {
+    @apply text-slate-900;
+  }
+  
+  .text-primary-dark {
+    @apply dark:text-slate-100;
+  }
+  
+  .text-secondary-light {
+    @apply text-slate-600;
+  }
+  
+  .text-secondary-dark {
+    @apply dark:text-slate-400;
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 dark:from-emerald-500 dark:to-teal-500 dark:hover:from-emerald-600 dark:hover:to-teal-600;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-slate-700 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700;
+  }
+
+  /* Input styles */
+  .input-primary {
+    @apply bg-white border-slate-300 text-slate-900 placeholder-slate-500 focus:border-emerald-500 focus:ring-emerald-500 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-100 dark:placeholder-slate-400 dark:focus:border-emerald-400 dark:focus:ring-emerald-400;
+  }
+
+  /* Header styles */
+  .header-light {
+    @apply bg-white border-slate-200 shadow-sm;
+  }
+  
+  .header-dark {
+    @apply dark:bg-slate-900 dark:border-slate-800 dark:shadow-lg;
+  }
+
+  /* Navigation styles */
+  .nav-link {
+    @apply text-slate-700 hover:text-emerald-600 dark:text-slate-300 dark:hover:text-emerald-400 transition-colors;
+  }
+
+  /* Islamic gradient for dark mode */
+  .islamic-gradient-dark {
+    @apply dark:bg-gradient-to-r dark:from-emerald-700 dark:via-teal-700 dark:to-blue-700;
   }
 }
 
@@ -65,8 +136,30 @@
 .font-arabic {
   font-family: 'Amiri', 'Noto Sans Arabic', serif;
   direction: rtl;
-  text-align: right;
+  text-align: center;
+  line-height: 2;
+  letter-spacing: 0.02em;
+}
+
+/* Beautiful Quranic verse styling */
+.quran-verse {
+  font-family: 'Amiri', 'Traditional Arabic', serif;
+  direction: rtl;
+  text-align: center;
+  line-height: 2.2;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark .quran-verse {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.quran-translation {
+  font-style: italic;
+  text-align: center;
   line-height: 1.8;
+  font-weight: 500;
 }
 
 /* Islamic styling utilities */
@@ -74,8 +167,19 @@
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
+.dark .islamic-gradient {
+  background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+}
+
 .islamic-border {
   border-image: linear-gradient(45deg, #059669, #10b981, #059669) 1;
+}
+
+.verse-divider {
+  height: 2px;
+  width: 120px;
+  background: linear-gradient(to right, transparent, currentColor, transparent);
+  margin: 1.5rem auto;
 }
 
 /* Custom scrollbar */
@@ -84,17 +188,22 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-slate-100;
+  @apply bg-slate-100 dark:bg-slate-800;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-fejr-emerald rounded-full;
+  @apply bg-emerald-600 dark:bg-emerald-500 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-emerald-700;
+  @apply bg-emerald-700 dark:bg-emerald-400;
 }
 
+/* Dark mode specific scrollbar for Firefox */
+html.dark {
+  scrollbar-width: thin;
+  scrollbar-color: #059669 #1e293b;
+}
 
 /* Toast animations */
 @keyframes slide-in-right {
@@ -110,4 +219,35 @@
 
 .animate-slide-in-right {
   animation: slide-in-right 0.3s ease-out;
+}
+
+/* Dark mode transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Dark mode image filters */
+.dark img {
+  filter: brightness(0.9) contrast(1.1);
+}
+
+.dark .logo-image {
+  filter: brightness(1) contrast(1);
+}
+
+/* Dark mode selection */
+::selection {
+  @apply bg-emerald-200 text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100;
+}
+
+/* Dark mode focus styles */
+.dark *:focus {
+  outline-color: #10b981;
+}
+
+/* Prose styles for dark mode */
+.prose-dark {
+  @apply dark:prose-invert dark:prose-headings:text-slate-100 dark:prose-p:text-slate-300 dark:prose-strong:text-slate-200 dark:prose-code:text-emerald-400;
 }

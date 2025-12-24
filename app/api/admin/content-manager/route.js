@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import pool from '@/lib/db/connection.js';
 import { verifyAuth } from '@/lib/auth/middleware';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // Get all content
 export async function GET(request) {
   try {

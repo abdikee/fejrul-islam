@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { 
   LayoutDashboard, 
   Users, 
@@ -28,7 +27,7 @@ export default function IslamicAdminSidebar({ user, activeTab, setActiveTab, isO
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
     } finally {
-      window.location.href = '/';
+      window.location.href = '/auth/login';
     }
   };
 
@@ -151,12 +150,12 @@ export default function IslamicAdminSidebar({ user, activeTab, setActiveTab, isO
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center">
               <span className="text-white font-bold">
-                {user.firstName?.[0]}{user.lastName?.[0]}
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-amber-100 truncate">
-                {user.firstName} {user.lastName}
+                {`${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Admin'}
               </p>
               <p className="text-amber-300 text-xs font-medium">مدير النظام • System Amir</p>
             </div>
@@ -318,13 +317,14 @@ export default function IslamicAdminSidebar({ user, activeTab, setActiveTab, isO
 
             {/* Mobile Logout */}
             <div className="mt-6 pt-4 border-t border-amber-500/20">
-              <Link
-                href="/api/auth/logout"
-                className="flex items-center gap-3 px-3 py-3 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl transition-all"
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-3 py-3 text-red-300 hover:bg-red-500/20 hover:text-red-200 rounded-xl transition-all"
               >
                 <LogOut className="w-5 h-5" />
                 <span className="font-medium">Logout</span>
-              </Link>
+              </button>
             </div>
           </div>
         </div>

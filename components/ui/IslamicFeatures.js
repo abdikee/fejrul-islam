@@ -165,15 +165,11 @@ const IslamicFeatures = () => {
       {/* Header with Logo */}
       <div className="text-center">
         <div className="inline-flex items-center justify-center w-24 h-24 mb-6">
-          <div className="w-full h-full rounded-full border-4 border-emerald-600 bg-white flex items-center justify-center">
-            {/* Logo placeholder - you can replace this with the actual logo */}
-            <div className="relative">
-              <BookOpen className="w-8 h-8 text-emerald-600" />
-              <div className="absolute -top-2 -right-1">
-                <Sun className="w-4 h-4 text-amber-500" />
-              </div>
-            </div>
-          </div>
+          <img
+            src="/logo.svg"
+            alt="Fejrul Islam Logo"
+            className="w-full h-full object-contain"
+          />
         </div>
         <h2 className="text-3xl font-serif font-bold text-slate-800 mb-4">
           Islamic Digital Companion

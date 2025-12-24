@@ -21,6 +21,23 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const includeProgress = searchParams.get('progress') === 'true';
 
+    // Determine enrolled course IDs across possible schemas.
+    // Some parts of the app use student_course_progress while older parts use user_progress.
+    const enrolledIdSet = new Set();
+    try {
+      const r = await query('SELECT course_id FROM student_course_progress WHERE user_id = $1', [user.id]);
+      for (const row of r.rows || []) enrolledIdSet.add(Number(row.course_id));
+    } catch (e) {
+      if (String(e?.code) !== '42P01') throw e; // ignore missing table
+    }
+    try {
+      const r = await query('SELECT course_id FROM user_progress WHERE user_id = $1', [user.id]);
+      for (const row of r.rows || []) enrolledIdSet.add(Number(row.course_id));
+    } catch (e) {
+      if (String(e?.code) !== '42P01') throw e; // ignore missing table
+    }
+    const enrolledIds = Array.from(enrolledIdSet).filter((v) => Number.isFinite(v));
+
     // Get comprehensive student dashboard data
     const [
       enrolledCourses,
@@ -29,8 +46,7 @@ export async function GET(request) {
       announcements,
       sectors,
       userProgress,
-      recentActivity,
-      studyPlan
+      recentActivity
     ] = await Promise.all([
       // Enrolled courses
       query(`
@@ -59,14 +75,12 @@ export async function GET(request) {
         LEFT JOIN learning_sectors ls ON c.sector_id = ls.id
         LEFT JOIN resources r ON c.sector_id = r.sector_id
         WHERE c.is_active = true 
-        AND c.id NOT IN (
-          SELECT course_id FROM user_progress WHERE user_id = $1
-        )
+        AND NOT (c.id = ANY($1::int[]))
         GROUP BY c.id, c.title, c.description, c.level, c.duration_weeks,
                  ls.name, ls.color, ls.icon
         ORDER BY c.created_at DESC
         LIMIT 10
-      `, [user.id]),
+      `, [enrolledIds]),
 
       // Recent resources
       query(`
@@ -140,31 +154,6 @@ export async function GET(request) {
         ORDER BY up.last_accessed DESC
         LIMIT 10
       `, [user.id]),
-
-      // Study plan (mock for now)
-      query(`
-        SELECT 
-          c.id, c.title, c.level, c.duration_weeks,
-          ls.name as sector_name, ls.color as sector_color,
-          up.progress_percentage,
-          CASE 
-            WHEN up.completed_at IS NOT NULL THEN 'completed'
-            WHEN up.progress_percentage > 0 THEN 'in_progress'
-            ELSE 'planned'
-          END as status
-        FROM courses c
-        LEFT JOIN learning_sectors ls ON c.sector_id = ls.id
-        LEFT JOIN user_progress up ON c.id = up.course_id AND up.user_id = $1
-        WHERE c.is_active = true
-        ORDER BY 
-          CASE 
-            WHEN up.completed_at IS NOT NULL THEN 3
-            WHEN up.progress_percentage > 0 THEN 1
-            ELSE 2
-          END,
-          c.created_at DESC
-        LIMIT 20
-      `, [user.id])
     ]);
 
     // Calculate statistics
@@ -178,48 +167,52 @@ export async function GET(request) {
     };
 
     // Get recommendations based on user activity and popular content
-    const recommendations = await query(`
-      -- Courses in sectors where user is active
-      (SELECT 
-        'course' as type,
-        c.id, c.title, c.description, c.level,
-        ls.name as sector_name, ls.color as sector_color,
-        'sector_match' as reason
-      FROM courses c
-      JOIN learning_sectors ls ON c.sector_id = ls.id
-      WHERE c.sector_id IN (
-        SELECT DISTINCT c2.sector_id 
-        FROM courses c2 
-        JOIN user_progress up ON c2.id = up.course_id 
-        WHERE up.user_id = $1
+    const recommendations = await query(
+      `
+      (
+        SELECT
+          'course' as type,
+          c.id, c.title, c.description, c.level,
+          ls.name as sector_name, ls.color as sector_color,
+          'sector_match' as reason
+        FROM courses c
+        JOIN learning_sectors ls ON c.sector_id = ls.id
+        WHERE c.sector_id IN (
+          SELECT DISTINCT c2.sector_id
+          FROM courses c2
+          JOIN user_progress up2 ON c2.id = up2.course_id
+          WHERE up2.user_id = $1
+        )
+        AND c.id NOT IN (
+          SELECT course_id FROM user_progress WHERE user_id = $1
+        )
+        AND c.is_active = true
+        ORDER BY c.created_at DESC
+        LIMIT 3
       )
-      AND c.id NOT IN (
-        SELECT course_id FROM user_progress WHERE user_id = $1
-      )
-      AND c.is_active = true
-      LIMIT 3)
-      
       UNION ALL
-      
-      -- Popular resources
-      (SELECT 
-        'resource' as type,
-        r.id, r.title, r.description, r.resource_type as level,
-        ls.name as sector_name, ls.color as sector_color,
-        'popular' as reason
-      FROM resources r
-      LEFT JOIN learning_sectors ls ON r.sector_id = ls.id
-      ORDER BY r.download_count DESC
-      LIMIT 3)
-      
-      ORDER BY type, reason
-    `, [user.id, user.id]);
+      (
+        SELECT
+          'resource' as type,
+          r.id, r.title, r.description, r.resource_type as level,
+          ls.name as sector_name, ls.color as sector_color,
+          'popular' as reason
+        FROM resources r
+        JOIN learning_sectors ls ON r.sector_id = ls.id
+        WHERE r.access_level = 'public'
+        ORDER BY r.download_count DESC, r.created_at DESC
+        LIMIT 3
+      )
+      LIMIT 6
+    `,
+      [user.id]
+    );
 
     return NextResponse.json({
       success: true,
       user: {
         id: user.id,
-        name: `${user.first_name} ${user.last_name}`,
+        name: user.name,
         email: user.email,
         gender: user.gender,
         role: user.role
@@ -231,7 +224,6 @@ export async function GET(request) {
         announcements: announcements.rows,
         sectors: sectors.rows,
         recentActivity: recentActivity.rows,
-        studyPlan: studyPlan.rows,
         recommendations: recommendations.rows
       },
       stats,
@@ -334,13 +326,39 @@ export async function POST(request) {
 
     switch (action) {
       case 'enroll_course':
-        // Enroll in a course
-        await query(`
-          INSERT INTO user_progress (user_id, course_id, progress_percentage, enrolled_at)
-          VALUES ($1, $2, 0, NOW())
-          ON CONFLICT (user_id, course_id) DO NOTHING
-        `, [decoded.userId, courseId]);
-        
+        // Enroll in a course.
+        // Prefer the newer schema (student_course_progress) so /api/courses/my-courses reflects enrollments.
+        try {
+          await query(
+            `
+            INSERT INTO student_course_progress (
+              user_id,
+              course_id,
+              course_status,
+              progress_percentage,
+              enrollment_date
+            )
+            SELECT $1, $2, 'not_started', 0, NOW()
+            WHERE NOT EXISTS (
+              SELECT 1 FROM student_course_progress WHERE user_id = $1 AND course_id = $2
+            )
+          `,
+            [decoded.userId, courseId]
+          );
+        } catch (e) {
+          // Fallback to legacy schema used in some parts of the app
+          if (String(e?.code) !== '42P01') throw e;
+
+          await query(
+            `
+            INSERT INTO user_progress (user_id, course_id, progress_percentage, enrolled_at)
+            VALUES ($1, $2, 0, NOW())
+            ON CONFLICT (user_id, course_id) DO NOTHING
+          `,
+            [decoded.userId, courseId]
+          );
+        }
+
         result = { message: 'Successfully enrolled in course', courseId };
         break;
 

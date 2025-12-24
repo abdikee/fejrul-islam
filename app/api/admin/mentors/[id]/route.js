@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth/middleware.js';
 import pool from '@/lib/db/connection.js';
 import bcrypt from 'bcryptjs';
+import { isValidEmail, normalizeAndValidatePhone, normalizeEmail } from '@/lib/validation/contact.js';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // PUT - Update mentor
 export async function PUT(request, { params }) {
@@ -41,12 +45,19 @@ export async function PUT(request, { params }) {
       values.push(lastName);
     }
     if (email) {
+      const normalizedEmail = normalizeEmail(email);
+      if (!isValidEmail(normalizedEmail)) {
+        return NextResponse.json(
+          { success: false, message: 'Invalid email format' },
+          { status: 400 }
+        );
+      }
       updateFields.push(`email = $${paramCount++}`);
-      values.push(email.toLowerCase());
+      values.push(normalizedEmail);
     }
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
-      updateFields.push(`password = $${paramCount++}`);
+      updateFields.push(`password_hash = $${paramCount++}`);
       values.push(hashedPassword);
     }
     if (gender) {
@@ -54,8 +65,15 @@ export async function PUT(request, { params }) {
       values.push(gender);
     }
     if (phone !== undefined) {
+      const phoneCheck = normalizeAndValidatePhone(phone, 'ET');
+      if (!phoneCheck.ok) {
+        return NextResponse.json(
+          { success: false, message: phoneCheck.message },
+          { status: 400 }
+        );
+      }
       updateFields.push(`phone = $${paramCount++}`);
-      values.push(phone || null);
+      values.push(phoneCheck.value);
     }
     if (specialization !== undefined) {
       updateFields.push(`specialization = $${paramCount++}`);
@@ -76,7 +94,7 @@ export async function PUT(request, { params }) {
     values.push(id);
     const query = `
       UPDATE users 
-      SET ${updateFields.join(', ')}
+      SET ${updateFields.join(', ')}, updated_at = CURRENT_TIMESTAMP
       WHERE id = $${paramCount} AND role = 'mentor'
       RETURNING id, email, first_name, last_name, gender, phone, specialization, bio
     `;

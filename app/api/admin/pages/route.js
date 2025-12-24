@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db/connection';
 import { verifyJwtToken } from '@/lib/auth/jwt.js';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 async function requireAdmin(request) {
   const token = request.cookies.get('auth-token')?.value;
   if (!token) {

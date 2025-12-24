@@ -154,6 +154,7 @@ export default function CreateAnnouncementModal({ isOpen, onClose, onSuccess }) 
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             >
               <option value="all">All Users</option>
+              <option value="public">Public (Website Visitors)</option>
               <option value="students">Students Only</option>
               <option value="mentors">Mentors Only</option>
               <option value="male">Male Students</option>

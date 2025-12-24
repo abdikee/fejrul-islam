@@ -30,7 +30,7 @@ export const jemeaHistory = [
   {
     year: '2012',
     title: 'Digital Transformation',
-    description: 'HUMSJ launched its first website and digital resources platform.',
+    description: 'Fejrul Islam launched its first website and digital resources platform.',
     milestone: false,
     category: 'technology'
   },

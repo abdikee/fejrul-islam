@@ -9,28 +9,28 @@ export default function StudentFooter({ user }) {
   const footerLinks = {
     learning: [
       { name: 'My Courses', href: '/dashboard/courses' },
-      { name: 'Study Plan', href: '/dashboard/study-plan' },
+      { name: 'Available Courses', href: '/dashboard/courses' },
       { name: 'Schedule', href: '/dashboard/schedule' },
       { name: 'Resources', href: '/dashboard/resources' }
     ],
     sectors: [
-      { name: 'Tarbiya & Idad', href: '/sectors/tarbiya-idad' },
-      { name: 'Literature', href: '/sectors/literature' },
-      { name: 'Comparative Religion', href: '/sectors/comparative-religion' },
-      { name: 'Ziyara', href: '/sectors/ziyara' },
-      { name: 'Qirat & Ilm', href: '/sectors/qirat-ilm' }
+      { name: 'Tarbiya & Idad', href: '/dashboard/sectors/tarbiya-idad' },
+      { name: 'Literature', href: '/dashboard/sectors/literature' },
+      { name: 'Comparative Religion', href: '/dashboard/sectors/comparative-religion' },
+      { name: 'Ziyara (Student Welfare)', href: '/dashboard/sectors/ziyara' },
+      { name: 'Qirat & Ilm', href: '/dashboard/qirat' }
     ],
     community: [
-      { name: 'Study Groups', href: '/study-groups' },
-      { name: 'Mentorship', href: '/mentorship' },
-      { name: 'Events', href: '/events' },
+      { name: 'Study Groups', href: '/dashboard/study-groups' },
+      { name: 'Mentorship', href: '/dashboard/mentorship' },
+      { name: 'Events', href: '/dashboard/events' },
       { name: 'Announcements', href: '/dashboard/announcements' }
     ],
     support: [
-      { name: 'Help Center', href: '/help' },
-      { name: 'Contact Mentor', href: '/mentor/contact' },
+      { name: 'Help Center', href: '/dashboard/help' },
+      { name: 'Contact Mentor', href: '/dashboard/contact-mentor' },
       { name: 'Settings', href: '/dashboard/settings' },
-      { name: 'Feedback', href: '/feedback' }
+      { name: 'Feedback', href: '/dashboard/feedback' }
     ]
   };
 

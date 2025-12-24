@@ -1,0 +1,29 @@
+{
+  "Index": {
+    "title": "Fejrul Islam HUMSJ",
+    "welcome": "Welcome to Fejrul Islam",
+    "description": "Faith, Knowledge, and Character Development Platform"
+  },
+  "Navigation": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "signup": "Sign Up",
+    "dashboard": "Dashboard"
+  },
+  "Common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "submit": "Submit",
+    "cancel": "Cancel"
+  },
+  "Hero": {
+    "brandName": "Fejrul Islam",
+    "brandSubtitle": "Dawah & Irshad Sector - HUMSJ",
+    "brandTagline": "Inviting to Islam with Wisdom & Beautiful Preaching",
+    "headlinePart1": "Invite to the Path",
+    "headlinePart2": "of Your Lord",
+    "subheadline": "Join Fejrul Islam's Dawah and Irshad mission in spreading the beautiful message of Islam through wisdom, compassion, and authentic guidance. Together, we build bridges and transform hearts."
+  }
+}

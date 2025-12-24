@@ -1,0 +1,50 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle -->
+  <circle cx="50" cy="50" r="48" fill="none" stroke="#059669" stroke-width="3"/>
+  
+  <!-- Sun rays radiating from top -->
+  <g transform="translate(50,25)">
+    <path d="M-20,0 L-15,5 L-20,10 Z" fill="url(#sunGradient)" transform="rotate(-30)"/>
+    <path d="M-15,0 L-10,5 L-15,10 Z" fill="url(#sunGradient)" transform="rotate(-15)"/>
+    <path d="M-10,0 L-5,5 L-10,10 Z" fill="url(#sunGradient)" transform="rotate(0)"/>
+    <path d="M-5,0 L0,5 L-5,10 Z" fill="url(#sunGradient)" transform="rotate(15)"/>
+    <path d="M0,0 L5,5 L0,10 Z" fill="url(#sunGradient)" transform="rotate(30)"/>
+    <path d="M5,0 L10,5 L5,10 Z" fill="url(#sunGradient)" transform="rotate(45)"/>
+    <path d="M10,0 L15,5 L10,10 Z" fill="url(#sunGradient)" transform="rotate(60)"/>
+  </g>
+  
+  <!-- Open book base -->
+  <path d="M15 40 L50 35 L85 40 L85 75 L50 70 L15 75 Z" fill="#059669"/>
+  
+  <!-- Book pages/spine -->
+  <path d="M15 40 L50 35 L50 70 L15 75 Z" fill="#047857"/>
+  <path d="M50 35 L85 40 L85 75 L50 70 Z" fill="#065f46"/>
+  
+  <!-- Center divider -->
+  <line x1="50" y1="35" x2="50" y2="70" stroke="white" stroke-width="1"/>
+  
+  <!-- Islamic dome/minaret silhouette in the center -->
+  <g transform="translate(50,50)">
+    <!-- Dome -->
+    <path d="M-8,-5 Q0,-12 8,-5 L8,5 L-8,5 Z" fill="white"/>
+    <!-- Minaret base -->
+    <rect x="-2" y="5" width="4" height="8" fill="white"/>
+    <!-- Crescent on top -->
+    <path d="M-1,-12 Q2,-15 4,-12 Q2,-10 -1,-12" fill="white"/>
+  </g>
+  
+  <!-- Pen nib at bottom center -->
+  <g transform="translate(50,65)">
+    <path d="M-3,0 L0,8 L3,0 Z" fill="#059669"/>
+    <circle cx="0" cy="6" r="1.5" fill="#059669"/>
+  </g>
+  
+  <!-- Gradient definitions -->
+  <defs>
+    <linearGradient id="sunGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FCD34D;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

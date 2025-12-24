@@ -8,6 +8,9 @@ export default function IslamicAdminHeader({ user, onMenuClick, currentTime }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [hijriDate, setHijriDate] = useState('');
 
+  const displayName = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Admin';
+  const roleLabel = user?.role === 'admin' ? 'Administrator' : (user?.role ? String(user.role) : 'Admin');
+
   useEffect(() => {
     // Calculate approximate Hijri date (simplified)
     const getHijriDate = () => {
@@ -98,11 +101,11 @@ export default function IslamicAdminHeader({ user, onMenuClick, currentTime }) {
             
             <div className="hidden md:block">
               <h1 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>أهلاً وسهلاً، {user.firstName}</span>
+                <span>أهلاً وسهلاً، {user?.firstName ?? 'Admin'}</span>
                 <TimeIcon className={`w-5 h-5 ${timeGreeting.color}`} />
               </h1>
               <p className="text-white/70 text-sm">
-                System Administrator • {timeGreeting.text} • HUMSJ Platform
+                {roleLabel} • {timeGreeting.text} • Fejrul Islam
               </p>
             </div>
           </div>
@@ -161,12 +164,12 @@ export default function IslamicAdminHeader({ user, onMenuClick, currentTime }) {
           <div className="flex items-center gap-3 pl-4 border-l border-amber-500/30">
             <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-sm">
-                {user.firstName?.[0]}{user.lastName?.[0]}
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
               </span>
             </div>
             <div className="hidden md:block text-right">
               <p className="text-amber-100 font-semibold text-sm">
-                {user.firstName} {user.lastName}
+                {displayName}
               </p>
               <p className="text-amber-300/80 text-xs">مدير النظام • Administrator</p>
             </div>
@@ -213,7 +216,7 @@ export default function IslamicAdminHeader({ user, onMenuClick, currentTime }) {
       {/* Islamic Blessing */}
       <div className="mt-3 text-center">
         <p className="text-amber-200/80 text-xs font-medium">
-          بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ • In the name of Allah, the Most Gracious, the Most Merciful
+          بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ • In the name of Allah, the Most Gracious, the Most Merciful
         </p>
       </div>
     </header>

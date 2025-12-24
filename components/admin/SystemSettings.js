@@ -16,8 +16,8 @@ import {
 
 export default function SystemSettings() {
   const [settings, setSettings] = useState({
-    siteName: 'HUMSJ Platform',
-    siteDescription: 'Haramaya University Muslim Students\' Jama\'a',
+    siteName: 'Fejrul Islam Platform',
+    siteDescription: 'Fejrul Islam - Dawah & Irshad Sector, HUMSJ',
     maintenanceMode: false,
     registrationEnabled: true,
     emailNotifications: true,

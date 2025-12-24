@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { MessageCircle, BookOpen, Heart, GraduationCap, TrendingUp } from 'lucide-react';
 
 const ProgressTracker = ({ progress }) => {
@@ -156,9 +157,9 @@ const ProgressTracker = ({ progress }) => {
               </div>
 
               {/* Action Button */}
-              <button className={`mt-3 w-full py-2 px-4 ${colors.progress} text-white font-semibold rounded-lg hover:opacity-90 transition-opacity`}>
+              <Link href="/dashboard/learning" className={`mt-3 w-full py-2 px-4 ${colors.progress} text-white font-semibold rounded-lg hover:opacity-90 transition-opacity block text-center`}>
                 Continue Learning
-              </button>
+              </Link>
             </div>
           );
         })}

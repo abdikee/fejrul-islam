@@ -4,6 +4,9 @@ import pool from '@/lib/db/connection.js';
 import { verifyAuth } from '@/lib/auth/middleware';
 import { signJwtToken } from '@/lib/auth/jwt';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function POST(request) {
   try {
     // Verify admin authentication

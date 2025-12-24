@@ -36,9 +36,12 @@ export async function POST(request) {
     );
 
     // Create response
+    const requiresVerification = user.email_verified !== true;
+
     const response = NextResponse.json({
       success: true,
-      message: 'Login successful',
+      message: requiresVerification ? 'Login successful. Please verify your email to continue.' : 'Login successful',
+      requiresVerification,
       user: {
         id: user.id,
         email: user.email,
@@ -48,11 +51,16 @@ export async function POST(request) {
         role: user.role,
         level: user.level,
         department: user.department,
-        academicYear: user.academic_year
+        academicYear: user.academic_year,
+        emailVerified: user.email_verified === true
       },
-      redirectUrl: user.role === 'mentor' ? '/mentor/dashboard' : 
-                   user.role === 'admin' ? '/admin/dashboard' : 
-                   `/dashboard/${user.gender}`
+      redirectUrl: requiresVerification
+        ? '/auth/verify-email'
+        : user.role === 'mentor'
+          ? '/mentor/dashboard'
+          : user.role === 'admin'
+            ? '/admin/dashboard'
+            : `/dashboard/${user.gender}`
     });
 
     // Set HTTP-only cookie

@@ -64,6 +64,7 @@ module.exports = {
         sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
         serif: ['var(--font-merriweather)', 'Merriweather', 'serif'],
         arabic: ['Amiri', 'Noto Naskh Arabic', 'serif'],
+        quran: ['Amiri Quran', 'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -86,5 +87,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 }

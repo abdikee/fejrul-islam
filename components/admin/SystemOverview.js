@@ -206,7 +206,7 @@ export default function SystemOverview({ setActiveTab }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">System Overview</h1>
-          <p className="text-slate-600">Monitor and manage your HUMSJ platform</p>
+          <p className="text-slate-600">Monitor and manage your Fejrul Islam platform</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Clock className="w-4 h-4" />

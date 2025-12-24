@@ -3,7 +3,7 @@
 /**
  * HUMSJ Database Setup Script
  * 
- * This script sets up the PostgreSQL database for the HUMSJ platform.
+ * This script sets up the PostgreSQL database for the Fejrul Islam platform.
  * Run this script after installing PostgreSQL and creating the database.
  * 
  * Usage: node scripts/setup-database.js

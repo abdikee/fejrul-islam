@@ -19,10 +19,12 @@ CREATE TABLE users (
     profile_photo VARCHAR(255),
     bio TEXT,
     phone VARCHAR(20),
+    specialization VARCHAR(255),
     date_of_birth DATE,
     enrollment_date DATE DEFAULT CURRENT_DATE,
     is_active BOOLEAN DEFAULT true,
     last_login TIMESTAMP,
+    email_verified BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

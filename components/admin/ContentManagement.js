@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { BookOpen, Bell, FileText, Plus, Edit, Trash2, Save, X, Globe } from 'lucide-react';
+import { BookOpen, Bell, FileText, Plus, Edit, Trash2, Save, X, Globe, Eye } from 'lucide-react';
 
 export default function ContentManagement() {
   const searchParams = useSearchParams();
@@ -10,6 +10,7 @@ export default function ContentManagement() {
   const [announcements, setAnnouncements] = useState([]);
   const [courses, setCourses] = useState([]);
   const [resources, setResources] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -24,7 +25,7 @@ export default function ContentManagement() {
   // Set initial tab from URL parameter
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && ['announcements', 'courses', 'resources', 'pages'].includes(tabParam)) {
+    if (tabParam && ['announcements', 'courses', 'resources', 'articles', 'pages'].includes(tabParam)) {
       setActiveTab(tabParam);
     }
   }, [searchParams]);
@@ -54,6 +55,12 @@ export default function ContentManagement() {
         });
         const data = await res.json();
         if (data.success) setResources(data.resources);
+      } else if (activeTab === 'articles') {
+        const res = await fetch('/api/admin/articles', {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (data.success) setArticles(data.articles);
       } else if (activeTab === 'pages') {
         const res = await fetch('/api/admin/pages', {
           credentials: 'include'
@@ -78,6 +85,8 @@ export default function ContentManagement() {
       let body = editingItem ? { ...formData } : { ...formData };
       if (activeTab === 'announcements' && editingItem) {
         body = { ...formData, announcementId: editingItem.id };
+      } else if (activeTab === 'articles' && editingItem) {
+        body = { ...formData, id: editingItem.id };
       } else if (activeTab === 'pages' && editingItem) {
         body = { ...formData, id: editingItem.id };
       }
@@ -116,7 +125,9 @@ export default function ContentManagement() {
         ? `/api/admin/pages?id=${id}`
         : activeTab === 'announcements'
           ? `/api/admin/announcements?announcementId=${id}`
-          : `/api/admin/${activeTab}?id=${id}`;
+          : activeTab === 'articles'
+            ? `/api/admin/articles?id=${id}`
+            : `/api/admin/${activeTab}?id=${id}`;
 
       const res = await fetch(endpoint, {
         method: 'DELETE',
@@ -157,6 +168,7 @@ export default function ContentManagement() {
   const filteredAnnouncements = getFilteredData(announcements);
   const filteredCourses = getFilteredData(courses);
   const filteredResources = getFilteredData(resources);
+  const filteredArticles = getFilteredData(articles);
   const filteredPages = getFilteredData(pages);
 
   return (
@@ -217,6 +229,18 @@ export default function ContentManagement() {
         </button>
 
         <button
+          onClick={() => setActiveTab('articles')}
+          className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
+            activeTab === 'articles'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          <FileText className="w-5 h-5" />
+          Articles
+        </button>
+
+        <button
           onClick={() => setActiveTab('pages')}
           className={`flex items-center gap-2 px-4 py-2 border-b-2 transition-colors ${
             activeTab === 'pages'
@@ -247,6 +271,7 @@ export default function ContentManagement() {
                 {activeTab === 'announcements' && <AnnouncementForm formData={formData} setFormData={setFormData} />}
                 {activeTab === 'courses' && <CourseForm formData={formData} setFormData={setFormData} />}
                 {activeTab === 'resources' && <ResourceForm formData={formData} setFormData={setFormData} />}
+                {activeTab === 'articles' && <ArticleForm formData={formData} setFormData={setFormData} />}
                 {activeTab === 'pages' && <PageForm formData={formData} setFormData={setFormData} />}
 
                 <div className="flex gap-3 pt-4">
@@ -297,6 +322,14 @@ export default function ContentManagement() {
             {activeTab === 'resources' && (
               <ResourcesList 
                 resources={filteredResources} 
+                onEdit={handleEdit} 
+                onDelete={handleDelete}
+                activeFilter={activeFilter}
+              />
+            )}
+            {activeTab === 'articles' && (
+              <ArticlesList 
+                articles={filteredArticles} 
                 onEdit={handleEdit} 
                 onDelete={handleDelete}
                 activeFilter={activeFilter}
@@ -561,6 +594,118 @@ function ResourceForm({ formData, setFormData }) {
   );
 }
 
+// Article Form Component
+function ArticleForm({ formData, setFormData }) {
+  return (
+    <>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Article Title *</label>
+        <input
+          type="text"
+          required
+          value={formData.title || ''}
+          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+        <textarea
+          required
+          rows={3}
+          value={formData.description || ''}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Brief description of the article"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Content *</label>
+        <textarea
+          required
+          rows={10}
+          value={formData.content || ''}
+          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+          placeholder="Enter the full article content here..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Sector</label>
+          <select
+            value={formData.sector || ''}
+            onChange={(e) => setFormData({ ...formData, sector: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select Sector</option>
+            <option value="Qirat & Ilm">Qirat & Ilm</option>
+            <option value="Literature & History">Literature & History</option>
+            <option value="Dawah & Comparative Religion">Dawah & Comparative Religion</option>
+            <option value="Tarbiya & Idad">Tarbiya & Idad</option>
+            <option value="Ziyara">Ziyara</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Target Audience</label>
+          <select
+            value={formData.targetAudience || 'all'}
+            onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Users</option>
+            <option value="students">Students Only</option>
+            <option value="mentors">Mentors Only</option>
+            <option value="male">Male Students</option>
+            <option value="female">Female Students</option>
+          </select>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
+          <input
+            type="text"
+            value={formData.author || 'Fejrul Islam'}
+            onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <select
+            value={formData.status || 'draft'}
+            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="draft">Draft</option>
+            <option value="review">Pending Review</option>
+            <option value="published">Published</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+        <input
+          type="url"
+          value={formData.imageUrl || ''}
+          onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+          placeholder="https://example.com/image.jpg"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+    </>
+  );
+}
+
 // Website Pages Form Component
 function PageForm({ formData, setFormData }) {
   return (
@@ -727,6 +872,76 @@ function ResourcesList({ resources, onEdit, onDelete, activeFilter }) {
               </div>
             </div>
             <div className="flex gap-2 ml-4">
+              <button
+                onClick={() => onEdit(item)}
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onDelete(item.id)}
+                className="p-2 text-red-600 hover:bg-red-50 rounded"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ArticlesList({ articles, onEdit, onDelete, activeFilter }) {
+  if (articles.length === 0) {
+    return (
+      <div className="p-8 text-center text-gray-500">
+        {activeFilter === 'all' ? 'No articles yet' : `No ${activeFilter} articles found`}
+      </div>
+    );
+  }
+
+  return (
+    <div className="divide-y">
+      {articles.map((item) => (
+        <div key={item.id} className="p-4 hover:bg-gray-50">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="font-semibold text-gray-900">{item.title}</h3>
+                <span className={`px-2 py-1 rounded text-xs font-medium ${
+                  item.status === 'published' ? 'bg-green-100 text-green-700' :
+                  item.status === 'draft' ? 'bg-gray-100 text-gray-700' :
+                  item.status === 'review' ? 'bg-yellow-100 text-yellow-700' :
+                  'bg-red-100 text-red-700'
+                }`}>
+                  {item.status}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+              <div className="flex gap-3 text-xs text-gray-500">
+                {item.sector && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">{item.sector}</span>
+                )}
+                <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded">{item.target_audience}</span>
+                <span>By: {item.author}</span>
+                <span>Views: {item.views || 0}</span>
+                <span>Likes: {item.likes || 0}</span>
+                <span>{new Date(item.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+            <div className="flex gap-2 ml-4">
+              {item.status === 'published' && (
+                <a
+                  href={`/articles/${item.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 text-green-600 hover:bg-green-50 rounded"
+                  title="View Article"
+                >
+                  <Eye className="w-4 h-4" />
+                </a>
+              )}
               <button
                 onClick={() => onEdit(item)}
                 className="p-2 text-blue-600 hover:bg-blue-50 rounded"

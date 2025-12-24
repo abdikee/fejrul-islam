@@ -6,10 +6,13 @@ import Footer from '@/components/footer/Footer';
 
 export default function ConditionalLayout({ children }) {
   const pathname = usePathname();
-  const isAdminRoute = pathname?.startsWith('/admin');
-  const isMentorRoute = pathname?.startsWith('/mentor');
-  const isDashboardRoute = pathname?.startsWith('/dashboard');
-  const isAuthRoute = pathname?.startsWith('/auth');
+  // Remove locale prefix (e.g. /en, /ar, /om, /am)
+  const pathWithoutLocale = pathname.replace(/^\/(en|ar|om|am)/, '') || '/';
+
+  const isAdminRoute = pathWithoutLocale.startsWith('/admin');
+  const isMentorRoute = pathWithoutLocale.startsWith('/mentor');
+  const isDashboardRoute = pathWithoutLocale.startsWith('/dashboard');
+  const isAuthRoute = pathWithoutLocale.startsWith('/auth');
 
   if (isAdminRoute || isMentorRoute || isDashboardRoute || isAuthRoute) {
     // Admin, mentor, student dashboard, and auth routes: no navbar/footer, full screen

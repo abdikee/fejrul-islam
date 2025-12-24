@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db/connection';
 import { verifyJwtToken } from '@/lib/auth/jwt.js';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(request) {
   try {
     // Verify admin authentication
@@ -54,86 +57,11 @@ export async function GET(request) {
       query(`
         SELECT 
           COUNT(*) as total_resources,
-          SUM(download_count) as total_downloads,
-          COUNT(CASE WHEN created_at > NOW() - INTERVAL '30 days' THEN 1 END) as new_resources_month,
-          SUM(file_size) as total_storage_bytes
-        FROM resources
-      `),
-      
-      // Announcements statistics
-      query(`
-        SELECT 
-          COUNT(*) as total_announcements,
-          COUNT(CASE WHEN is_active = true AND (expire_date IS NULL OR expire_date > NOW()) THEN 1 END) as active_announcements,
-          COUNT(CASE WHEN priority = 'urgent' AND is_active = true THEN 1 END) as urgent_announcements
-        FROM announcements
-      `),
-      
-      // Sectors statistics
-      query(`
-        SELECT 
-          ls.id, ls.name, ls.color,
-          COUNT(c.id) as course_count,
-          COUNT(r.id) as resource_count
-        FROM learning_sectors ls
-        LEFT JOIN courses c ON ls.id = c.sector_id AND c.is_active = true
-        LEFT JOIN resources r ON ls.id = r.sector_id
-        GROUP BY ls.id, ls.name, ls.color
-        ORDER BY course_count DESC
-      `),
-      
-      // Recent activity (last 50 activities)
-      query(`
-        (SELECT 'user_registration' as activity_type, 
-                CONCAT(first_name, ' ', last_name) as description,
-                created_at as activity_time,
-                'success' as status,
-                gender
-         FROM users 
-         WHERE role != 'admin' AND created_at > NOW() - INTERVAL '7 days'
-         ORDER BY created_at DESC LIMIT 15)
-        UNION ALL
-        (SELECT 'course_created' as activity_type,
-                CONCAT('New course: ', title) as description,
-                created_at as activity_time,
-                'success' as status,
-                'system' as gender
-         FROM courses 
-         WHERE created_at > NOW() - INTERVAL '7 days'
-         ORDER BY created_at DESC LIMIT 15)
-        UNION ALL
-        (SELECT 'announcement_published' as activity_type,
-                CONCAT('Announcement: ', title) as description,
-                publish_date as activity_time,
-                'info' as status,
-                target_audience as gender
-         FROM announcements 
-         WHERE publish_date > NOW() - INTERVAL '7 days' AND is_active = true
-         ORDER BY publish_date DESC LIMIT 10)
-        UNION ALL
-        (SELECT 'resource_uploaded' as activity_type,
-                CONCAT('Resource uploaded: ', title) as description,
-                created_at as activity_time,
-                'success' as status,
-                'system' as gender
-         FROM resources 
-         WHERE created_at > NOW() - INTERVAL '7 days'
-         ORDER BY created_at DESC LIMIT 10)
-        ORDER BY activity_time DESC LIMIT 50
-      `),
-      
-      // System health metrics
-      query(`
-        SELECT 
-          'database' as component,
-          'healthy' as status,
-          NOW() as last_check
-        UNION ALL
-        SELECT 
-          'storage' as component,
-          CASE 
-            WHEN SUM(file_size) > 10737418240 THEN 'warning'  -- 10GB
-            ELSE 'healthy' 
+
+          return NextResponse.json(
+            { success: false, message: 'Failed to fetch dashboard stats' },
+            { status: 500 }
+          );
           END as status,
           NOW() as last_check
         FROM resources

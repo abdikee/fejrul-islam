@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Star, BookOpen, Play, Award, ChevronRight } from 'lucide-react';
 import IslamicPattern from '@/components/ui/IslamicPattern';
 
@@ -96,11 +97,11 @@ export default function AmanahHeroSection({ user, colorScheme, examMode }) {
             {/* Quick Action Button */}
             {!examMode && (
               <div className="flex items-center gap-4">
-                <button className={`${colorScheme.buttonPrimary} text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all`}>
+                <Link href="/dashboard/learning" className={`${colorScheme.buttonPrimary} text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all`}>
                   <Play className="w-5 h-5" />
                   Continue Learning
                   <ChevronRight className="w-4 h-4" />
-                </button>
+                </Link>
                 
                 <div className="text-sm text-slate-600">
                   <p className="font-medium">Last studied:</p>

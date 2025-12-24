@@ -1,6 +1,6 @@
-# HUMSJ Learning Management System
+# Fejrul Islam - Dawah & Irshad Platform
 
-Islamic Learning Management System for Fejrul Islam HUMSJ
+Islamic Dawah and Irshad (Outreach & Guidance) Platform - A sector of Haramaya University Muslim Students Jem'a (HUMSJ)
 
 ---
 
@@ -74,27 +74,27 @@ app/
 ## 🎯 Features
 
 ### Admin Portal
-- User management (students, mentors, admins)
-- Course management (CRUD)
+- User management (participants, dais, admins)
+- Program management (CRUD)
 - Announcement management
 - Resource management
 - Sector management
 - Audit logs
 - Real-time updates
 
-### Student Dashboard
-- Course enrollment
+### Participant Dashboard
+- Program enrollment
 - Real-time announcements (15s polling)
 - Real-time resources (30s polling)
-- Real-time courses (10s polling)
+- Real-time programs (10s polling)
 - Progress tracking
 - Gender-specific dashboards
 
-### Mentor Portal
-- Student management
+### Dai (Mentor) Portal
+- Participant management
 - Dashboard with stats
-- Assignments (structure ready)
-- Sessions management
+- Guidance sessions
+- Community engagement
 - Analytics
 
 ---

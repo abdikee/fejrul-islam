@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Upload, FileText } from 'lucide-react';
 
 export default function CreateResourceModal({ isOpen, onClose, onSuccess }) {
@@ -10,20 +10,82 @@ export default function CreateResourceModal({ isOpen, onClose, onSuccess }) {
     resourceType: 'PDF',
     filePath: '',
     sectorId: '',
+    courseId: '',
     accessLevel: 'public',
     fileSize: ''
   });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+
+    const loadCourses = async () => {
+      try {
+        const res = await fetch('/api/admin/courses?limit=200', { credentials: 'include' });
+        const data = await res.json();
+        if (!cancelled && data?.success && Array.isArray(data.courses)) {
+          setCourses(data.courses);
+        }
+      } catch {
+        // Optional; ignore.
+      }
+    };
+
+    loadCourses();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
+
+  const uploadFileIfNeeded = async () => {
+    if (!selectedFile) return null;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', selectedFile);
+
+      const res = await fetch('/api/admin/uploads', {
+        method: 'POST',
+        body: fd,
+        credentials: 'include'
+      });
+
+      const data = await res.json();
+      if (!data?.success || !data?.url) {
+        throw new Error(data?.message || 'Upload failed');
+      }
+      return data;
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      let filePath = formData.filePath;
+      let fileSize = formData.fileSize;
+
+      if (selectedFile) {
+        const uploaded = await uploadFileIfNeeded();
+        filePath = uploaded.url;
+        fileSize = uploaded.size;
+      }
+
       const response = await fetch('/api/admin/resources', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          filePath,
+          fileSize
+        })
       });
 
       const data = await response.json();
@@ -37,9 +99,11 @@ export default function CreateResourceModal({ isOpen, onClose, onSuccess }) {
           resourceType: 'PDF',
           filePath: '',
           sectorId: '',
+          courseId: '',
           accessLevel: 'public',
           fileSize: ''
         });
+        setSelectedFile(null);
       } else {
         onSuccess(data.message || 'Failed to create resource', 'error');
       }
@@ -127,12 +191,24 @@ export default function CreateResourceModal({ isOpen, onClose, onSuccess }) {
 
           {/* File Path */}
           <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Upload File (optional)</label>
+            <input
+              type="file"
+              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              If selected, the file will be uploaded on submit.
+            </p>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              File Path/URL <span className="text-red-500">*</span>
+              File Path/URL {!selectedFile && <span className="text-red-500">*</span>}
             </label>
             <input
               type="text"
-              required
+              required={!selectedFile}
               value={formData.filePath}
               onChange={(e) => setFormData({ ...formData, filePath: e.target.value })}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -160,6 +236,28 @@ export default function CreateResourceModal({ isOpen, onClose, onSuccess }) {
               <option value="4">Comparative Religion</option>
               <option value="5">Ziyara</option>
             </select>
+          </div>
+
+          {/* Course (optional) */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Target Course (optional)
+            </label>
+            <select
+              value={formData.courseId}
+              onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="">No specific course</option>
+              {courses.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-slate-500 mt-1">
+              Attach this resource directly to a course.
+            </p>
           </div>
 
           {/* File Size */}
@@ -204,10 +302,10 @@ export default function CreateResourceModal({ isOpen, onClose, onSuccess }) {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || uploading || (!selectedFile && !formData.filePath)}
               className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating...' : 'Create Resource'}
+              {uploading ? 'Uploading...' : loading ? 'Creating...' : 'Create Resource'}
             </button>
           </div>
         </form>

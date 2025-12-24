@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth/middleware.js';
 import pool from '@/lib/db/connection.js';
 import bcrypt from 'bcryptjs';
+import { isValidEmail, normalizeAndValidatePhone, normalizeEmail } from '@/lib/validation/contact.js';
+
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // GET - Fetch all mentors
 export async function GET(request) {
@@ -71,9 +75,25 @@ export async function POST(request) {
       );
     }
 
+    const normalizedEmail = normalizeEmail(email);
+    if (!isValidEmail(normalizedEmail)) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
+
+    const phoneCheck = normalizeAndValidatePhone(phone, 'ET');
+    if (!phoneCheck.ok) {
+      return NextResponse.json(
+        { success: false, message: phoneCheck.message },
+        { status: 400 }
+      );
+    }
+
     // Check if email already exists
     const checkQuery = 'SELECT id FROM users WHERE email = $1';
-    const checkResult = await pool.query(checkQuery, [email.toLowerCase()]);
+    const checkResult = await pool.query(checkQuery, [normalizedEmail]);
     
     if (checkResult.rows.length > 0) {
       return NextResponse.json(
@@ -88,19 +108,19 @@ export async function POST(request) {
     // Insert mentor
     const insertQuery = `
       INSERT INTO users (
-        email, password, first_name, last_name, gender, role,
+        email, password_hash, first_name, last_name, gender, role,
         phone, specialization, bio, is_active, email_verified
       ) VALUES ($1, $2, $3, $4, $5, 'mentor', $6, $7, $8, true, true)
-      RETURNING id, email, first_name, last_name, gender, phone, specialization, bio, created_at
+      RETURNING id, email, first_name, last_name, gender, phone, specialization, bio, is_active, created_at
     `;
 
     const result = await pool.query(insertQuery, [
-      email.toLowerCase(),
+      normalizedEmail,
       hashedPassword,
       firstName,
       lastName,
       gender,
-      phone || null,
+      phoneCheck.value,
       specialization || null,
       bio || null
     ]);

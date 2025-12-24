@@ -10,12 +10,16 @@ export default function AuthHeader() {
         <div className="flex items-center justify-between">
           {/* Logo - Left Side */}
           <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
-              <GraduationCap className="w-7 h-7 text-white" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg p-1">
+              <img 
+                src="/logo.svg" 
+                alt="Fejrul Islam Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-800">Fejrul Islam HUMSJ</h1>
-              <p className="text-sm text-slate-600">Haramaya University Muslim Students Jem'a</p>
+              <h1 className="text-2xl font-bold text-slate-800">Fejrul Islam</h1>
+              <p className="text-sm text-slate-600">Dawah & Irshad Sector - HUMSJ</p>
             </div>
           </Link>
 

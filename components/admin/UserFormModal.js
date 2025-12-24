@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import PhoneNumberInput from '@/components/ui/PhoneNumberInput';
 
 export default function UserFormModal({ isOpen, onClose, onSubmit, user = null, title }) {
   const [formData, setFormData] = useState({
@@ -223,12 +224,13 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user = null, 
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Phone
               </label>
-              <input
-                type="tel"
-                name="phone"
+              <PhoneNumberInput
                 value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                onChange={(phone) => setFormData(prev => ({ ...prev, phone }))}
+                defaultCountry="ET"
+                selectClassName="h-12 px-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                inputClassName="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                aria-label="Phone number"
               />
             </div>
           </div>

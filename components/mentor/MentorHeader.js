@@ -40,14 +40,18 @@ export default function MentorHeader({ user }) {
             {/* Logo & Greeting */}
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
-                  <GraduationCap className="w-6 h-6 text-white" />
+                <div className="w-12 h-12">
+                  <img
+                    src="/logo.svg"
+                    alt="Fejrul Islam Logo"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-slate-800">
                     Assalamu Alaikum, Ustadh {user?.firstName || 'Mentor'}
                   </h1>
-                  <p className="text-sm text-slate-600">Mentor Dashboard • Fejrul Islam HUMSJ</p>
+                  <p className="text-sm text-slate-600">Mentor Dashboard • Fejrul Islam</p>
                 </div>
               </div>
             </div>

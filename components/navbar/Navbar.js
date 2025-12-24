@@ -3,16 +3,13 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { Menu, X, LogIn, UserPlus } from 'lucide-react';
-import Image from 'next/image';
+import LanguageSwitcher from '@/components/site/LanguageSwitcher';
 
 const navigation = [
   { name: 'Home', href: '/' },
-  { name: 'Study Plan', href: '/study-plan' },
-  { name: 'Sectors', href: '/sectors' },
-  { name: 'Schedule', href: '/schedule' },
-  { name: 'Faculty Members', href: '/faculty' },
-  { name: 'Knowledge Series', href: '/knowledge-series' },
-  { name: 'About Us', href: '/about' },
+  { name: 'Discover Islam', href: '/discover-islam' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' },
 ];
 
 export default function Navbar() {
@@ -24,13 +21,11 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 text-emerald-600 font-bold text-xl">
-            <div className="w-10 h-10 relative">
-              <Image
-                src="/images/humsj-logo.svg"
-                alt="HUMSJ Logo"
-                width={40}
-                height={40}
-                className="w-full h-full"
+            <div className="w-10 h-10">
+              <img
+                src="/logo.svg"
+                alt="Fejrul Islam Logo"
+                className="w-full h-full object-contain"
               />
             </div>
             <div className="hidden sm:flex flex-col">
@@ -54,6 +49,7 @@ export default function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <LanguageSwitcher />
             <Link
               href="/auth/login"
               className="flex items-center gap-2 px-4 py-2 text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors font-medium"
@@ -96,6 +92,9 @@ export default function Navbar() {
             
             {/* Mobile Auth Buttons */}
             <div className="mt-4 pt-4 border-t border-slate-200 space-y-2">
+              <div className="px-4 py-2">
+                <LanguageSwitcher />
+              </div>
               <Link
                 href="/auth/login"
                 className="flex items-center gap-2 px-4 py-3 text-slate-700 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"

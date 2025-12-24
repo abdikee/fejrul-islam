@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { 
   User, 
   BookOpen, 
@@ -17,6 +16,15 @@ import {
 } from 'lucide-react';
 
 const DashboardSidebar = ({ user, isOpen, onClose }) => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/auth/login';
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   const navigationItems = [
     {
       title: 'Dashboard',
@@ -78,9 +86,9 @@ const DashboardSidebar = ({ user, isOpen, onClose }) => {
       title: 'Support',
       items: [
         {
-          name: 'Confidential Counseling',
+          name: 'Support & Messages',
           icon: MessageSquare,
-          href: '/counseling',
+          href: '/dashboard/feedback',
           color: 'text-green-600',
           private: true
         },
@@ -117,13 +125,12 @@ const DashboardSidebar = ({ user, isOpen, onClose }) => {
         {/* Header */}
         <div className="p-6 border-b border-slate-200">
           <div className="flex items-center gap-3 mb-4">
-            <Image
-              src="/images/humsj-logo.svg"
-              alt="HUMSJ Logo"
-              width={32}
-              height={32}
+            <img
+              src="/logo.svg"
+              alt="Fejrul Islam Logo"
+              className="w-8 h-8 object-contain"
             />
-            <span className="font-bold text-slate-800">HUMSJ Dashboard</span>
+            <span className="font-bold text-slate-800">Fejrul Islam Dashboard</span>
           </div>
           
           {/* User Profile */}
@@ -207,14 +214,17 @@ const DashboardSidebar = ({ user, isOpen, onClose }) => {
         {/* Footer */}
         <div className="p-4 border-t border-slate-200 space-y-2">
           <Link
-            href="/settings"
+            href="/dashboard/settings"
             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors text-slate-600"
             onClick={onClose}
           >
             <Settings className="w-5 h-5" />
             <span className="font-medium">Settings</span>
           </Link>
-          <button className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors text-red-600 w-full text-left">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors text-red-600 w-full text-left"
+          >
             <LogOut className="w-5 h-5" />
             <span className="font-medium">Sign Out</span>
           </button>

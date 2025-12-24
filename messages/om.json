@@ -1,0 +1,29 @@
+{
+  "Index": {
+    "title": "Fajrul Islaam HUMSJ",
+    "welcome": "Baga nagaan dhuftan gara Fajrul Islaam",
+    "description": "Waltajjii Iimaanaa, Beekumsaa fi Ijaarsa Amalaa"
+  },
+  "Navigation": {
+    "home": "Fuula Duraa",
+    "about": "Waa'ee Keenya",
+    "contact": "Nu Quunnamaa",
+    "login": "Seeni",
+    "signup": "Galmaa'i",
+    "dashboard": "Daashboordii"
+  },
+  "Common": {
+    "loading": "Fe'aa jira...",
+    "error": "Dogoggorri uumameera",
+    "submit": "Ergi",
+    "cancel": "Haqi"
+  },
+  "Hero": {
+    "brandName": "Fajrul Islaam",
+    "brandSubtitle": "Damee Da'awaa fi Irshaadaa - HUMSJ",
+    "brandTagline": "Gara Islaamaatti Beekumsaa fi Gorsa Gaariin Waamuu",
+    "headlinePart1": "Gara Karaa",
+    "headlinePart2": "Gooftaa Kee Waami",
+    "subheadline": "Ergaa Islaamaa bareedaa beekumsa, gara-laafinaa fi qajeelfama dhugaa ta'een babal'isuuf hojii Da'awaa fi Irshaadaa Fajrul Islaamitti makamaa. Waliin taanee riqicha ijaarra, onnee jijjiirra."
+  }
+}

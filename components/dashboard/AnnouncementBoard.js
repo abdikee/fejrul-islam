@@ -8,47 +8,60 @@ export default function AnnouncementBoard({ colorScheme }) {
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
-    // Mock announcements data - replace with API call
-    const mockAnnouncements = [
-      {
-        id: 1,
-        title: 'Midterm Examinations Schedule Released',
-        category: 'academic',
-        content: 'The midterm examination schedule for all sectors has been published. Please check your respective sector pages for detailed timing.',
-        timestamp: '2024-12-21T10:30:00Z',
-        priority: 'high',
-        author: 'Academic Committee'
-      },
-      {
-        id: 2,
-        title: 'Weekly Ziyara Program - Community Outreach',
-        category: 'spiritual',
-        content: 'Join us for this week\'s community outreach program. We will be visiting local orphanages and elderly care centers.',
-        timestamp: '2024-12-21T09:15:00Z',
-        priority: 'medium',
-        author: 'Ziyara Department'
-      },
-      {
-        id: 3,
-        title: 'HUMSJ History Documentation Project',
-        category: 'community',
-        content: 'We are collecting stories and memories from alumni to document our organization\'s rich history. Share your experiences!',
-        timestamp: '2024-12-20T16:45:00Z',
-        priority: 'low',
-        author: 'Literature Sector'
-      },
-      {
-        id: 4,
-        title: 'New Qirat & Ilm Course Registration Open',
-        category: 'academic',
-        content: 'Registration is now open for the advanced Tajweed course. Limited seats available. Register before December 25th.',
-        timestamp: '2024-12-20T14:20:00Z',
-        priority: 'high',
-        author: 'Qirat & Ilm Department'
+    const mapAnnouncementTypeToCategory = (announcementType) => {
+      switch (announcementType) {
+        case 'course':
+          return 'academic';
+        case 'schedule':
+        case 'event':
+        case 'workshop':
+          return 'community';
+        case 'system':
+          return 'community';
+        default:
+          return 'community';
       }
-    ];
-    
-    setAnnouncements(mockAnnouncements);
+    };
+
+    const mapPriority = (priority) => {
+      switch (priority) {
+        case 'urgent':
+          return 'high';
+        case 'high':
+          return 'high';
+        case 'normal':
+          return 'medium';
+        case 'low':
+          return 'low';
+        default:
+          return 'medium';
+      }
+    };
+
+    const fetchAnnouncements = async () => {
+      try {
+        const res = await fetch('/api/announcements?limit=10');
+        const data = await res.json();
+        if (data?.success && Array.isArray(data.announcements)) {
+          const mapped = data.announcements.map((a) => ({
+            id: a.id,
+            title: a.title,
+            category: mapAnnouncementTypeToCategory(a.announcement_type),
+            content: a.content,
+            timestamp: a.publish_date || a.created_at,
+            priority: mapPriority(a.priority),
+            author: 'Admin'
+          }));
+          setAnnouncements(mapped);
+        }
+      } catch (e) {
+        console.error('Dashboard announcements fetch error:', e);
+      }
+    };
+
+    fetchAnnouncements();
+    const interval = setInterval(fetchAnnouncements, 300000);
+    return () => clearInterval(interval);
   }, []);
 
   const categories = [
