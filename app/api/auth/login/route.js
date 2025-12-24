@@ -76,8 +76,24 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Login error:', error);
+
+    const message = String(error?.message || '').toLowerCase();
+    const looksLikeDb =
+      message.includes('econnrefused') ||
+      message.includes('enotfound') ||
+      message.includes('password authentication failed') ||
+      message.includes('no pg_hba.conf entry') ||
+      message.includes('error authenticating user') ||
+      message.includes('postgres') ||
+      message.includes('connect');
+
     return NextResponse.json(
-      { success: false, message: 'Internal server error' },
+      {
+        success: false,
+        message: looksLikeDb
+          ? 'Server database is not configured correctly. Please check production DB environment variables.'
+          : 'Internal server error'
+      },
       { status: 500 }
     );
   }
