@@ -83,7 +83,7 @@ export default function CreateSectorModal({ isOpen, onClose, onSuccess, editData
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -119,7 +119,7 @@ export default function CreateSectorModal({ isOpen, onClose, onSuccess, editData
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Color Theme
             </label>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {colors.map((color) => (
                 <button
                   key={color.value}

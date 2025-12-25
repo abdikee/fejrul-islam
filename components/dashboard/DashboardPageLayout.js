@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Bell, Settings, Menu, X, Home, BookOpen, Calendar, Users, LogOut, Shield, Heart, MessageSquare } from 'lucide-react';
 import StudentFooter from './StudentFooter';
-import PhoneVerificationBanner from '@/components/auth/PhoneVerificationBanner';
 
 // Context to share user data across dashboard pages
 const DashboardContext = createContext(null);
@@ -94,9 +93,6 @@ export default function DashboardPageLayout({
   return (
     <DashboardContext.Provider value={{ user, genderColors, loading }}>
       <div className={`min-h-screen bg-gradient-to-br ${genderColors.bgGradient}`}>
-        {/* Phone Verification Banner */}
-        <PhoneVerificationBanner user={user} />
-
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <div className="lg:hidden fixed inset-0 z-50">

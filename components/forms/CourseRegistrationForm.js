@@ -38,7 +38,7 @@ const CourseRegistrationForm = () => {
 
   if (submitted) {
     return (
-      <div className=\"max-w-2xl mx-auto p-8 bg-white rounded-xl shadow-lg border-2 border-emerald-200\">
+      <div className=\"max-w-2xl mx-4 sm:mx-auto p-4 sm:p-6 md:p-8 bg-white rounded-xl shadow-lg border-2 border-emerald-200\">
         <div className=\"text-center\">
           <div className=\"inline-flex p-4 bg-emerald-100 rounded-full mb-4\">
             <Check className=\"w-12 h-12 text-emerald-600\" />
@@ -92,7 +92,7 @@ const CourseRegistrationForm = () => {
   }
 
   return (
-    <div className=\"max-w-3xl mx-auto\">
+    <div className=\"max-w-3xl mx-auto px-4 sm:px-6\">
       {/* Progress Indicator */}
       <div className=\"mb-8\">
         <div className=\"flex items-center justify-between mb-2\">
@@ -104,7 +104,7 @@ const CourseRegistrationForm = () => {
                 {s}
               </div>
               {s < 3 && (
-                <div className={`h-1 w-16 md:w-32 mx-2 ${
+                <div className={`h-1 w-8 sm:w-16 md:w-32 mx-2 ${
                   step > s ? 'bg-emerald-600' : 'bg-slate-200'
                 }`}></div>
               )}
@@ -118,7 +118,7 @@ const CourseRegistrationForm = () => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className=\"bg-white p-8 rounded-xl shadow-lg border border-slate-200\">
+      <form onSubmit={handleSubmit} className=\"bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg border border-slate-200\">
         {/* Step 1: Personal Information */}
         {step === 1 && (
           <div className=\"space-y-6\">

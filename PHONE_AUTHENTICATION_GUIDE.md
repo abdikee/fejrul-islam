@@ -1,8 +1,14 @@
 # Phone Authentication System - Fejrul Islam
 
+## Status (December 2025)
+
+Phone/email OTP verification has been removed/disabled in this project. The related UI flows and DB utilities were removed, and the API endpoints now respond with HTTP `410` (Gone).
+
+This document is kept for historical reference only and no longer reflects the current behavior.
+
 ## Overview
 
-The Fejrul Islam system now includes comprehensive phone number authentication with country code support and SMS OTP verification. This ensures all phone numbers are properly formatted, validated, and verified for enhanced security.
+The system includes phone number input with country code support. OTP-based SMS verification described below is no longer active.
 
 ## Features Implemented
 
@@ -39,20 +45,19 @@ app/
 │   ├── ui/
 │   │   └── PhoneNumberInput.jsx          # Main phone input component
 │   └── auth/
-│       ├── PhoneVerification.js          # Complete verification flow
-│       ├── PhoneVerificationBanner.js    # System-wide notification
-│       └── EmailVerificationBanner.js    # Existing email verification
+│       ├── PhoneVerificationBanner.js    # (Disabled) verification messaging
+│       └── EmailVerificationBanner.js    # (Disabled) verification messaging
 ├── lib/
 │   ├── sms/
 │   │   └── smsService.js                 # SMS sending and validation
 │   ├── db/
-│   │   └── phoneVerificationUtils.js     # Database operations
+│   │   └── (removed) phone verification DB helpers
 │   └── validation/
 │       └── contact.js                    # Phone validation utilities
 ├── app/
 │   ├── api/auth/
-│   │   ├── send-phone-otp/route.js       # Send SMS OTP endpoint
-│   │   └── verify-phone-otp/route.js     # Verify SMS OTP endpoint
+│   │   ├── send-phone-otp/route.js       # (Disabled) returns 410
+│   │   └── verify-phone-otp/route.js     # (Disabled) returns 410
 │   └── auth/
 │       └── verify-phone/page.js          # Phone verification page
 └── scripts/
@@ -60,6 +65,8 @@ app/
 ```
 
 ## API Endpoints
+
+Note: these endpoints are currently disabled and respond with HTTP `410`.
 
 ### **POST /api/auth/send-phone-otp**
 Send SMS OTP to phone number
@@ -115,14 +122,7 @@ import PhoneNumberInput from '@/components/ui/PhoneNumberInput';
 
 ### **2. Complete Verification Flow**
 ```jsx
-import PhoneVerification from '@/components/auth/PhoneVerification';
-
-<PhoneVerification
-  user={user}
-  onVerificationComplete={(phone) => {
-    console.log('Phone verified:', phone);
-  }}
-/>
+// Removed/disabled: Phone OTP verification flow
 ```
 
 ### **3. Verification Status Banner**
@@ -134,12 +134,7 @@ import PhoneVerificationBanner from '@/components/auth/PhoneVerificationBanner';
 
 ## Database Setup
 
-Run the phone verification setup script:
-
-```bash
-# Add phone verification tables and columns
-psql -d fejrul_islam -f scripts/add-phone-verification.sql
-```
+Note: OTP verification is disabled, so the phone verification DB setup is no longer required.
 
 **Tables Created:**
 - `phone_verifications`: SMS OTP storage

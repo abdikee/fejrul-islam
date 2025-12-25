@@ -92,17 +92,15 @@ export default function FemaleSignupPage() {
         setAlert({
           type: 'success',
           title: 'Registration Successful!',
-          message: data.requiresVerification
-            ? 'Account created. Please verify your email to continue.'
-            : (redirectUrl ? 'Redirecting to complete enrollment...' : 'Welcome to the Sisterhood! Redirecting to your dashboard...')
+          message: redirectUrl ? 'Redirecting to complete enrollment...' : 'Welcome to the Sisterhood! Redirecting to your dashboard...'
         });
         
         // Redirect to sector page for enrollment or dashboard
         setTimeout(() => {
-          if (data.requiresVerification) {
-            window.location.href = '/auth/verify-email';
-          } else if (redirectUrl && shouldEnroll) {
+          if (redirectUrl && shouldEnroll) {
             window.location.href = redirectUrl;
+          } else if (data.redirectUrl) {
+            window.location.href = data.redirectUrl;
           } else {
             window.location.href = '/dashboard/female';
           }
@@ -167,7 +165,7 @@ export default function FemaleSignupPage() {
           {/* Registration Card */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             {/* Header with Islamic Pattern */}
-            <div className="bg-gradient-to-r from-rose-600 to-rose-700 p-8 text-white text-center relative">
+            <div className="bg-gradient-to-r from-rose-600 to-rose-700 p-6 sm:p-8 text-white text-center relative">
               {/* Decorative Islamic Floral Pattern */}
               <div className="absolute inset-0 opacity-10">
                 <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -206,7 +204,7 @@ export default function FemaleSignupPage() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name Fields */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="firstName" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                       First Name
@@ -268,7 +266,7 @@ export default function FemaleSignupPage() {
                 </div>
 
                 {/* Phone and Date of Birth */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2">
                       Phone Number

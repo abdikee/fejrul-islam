@@ -76,7 +76,7 @@ export default function CreateAnnouncementModal({ isOpen, onClose, onSuccess }) 
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -108,7 +108,7 @@ export default function CreateAnnouncementModal({ isOpen, onClose, onSuccess }) 
           </div>
 
           {/* Type and Priority */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
                 Type

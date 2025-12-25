@@ -194,23 +194,6 @@ function SettingsContent() {
                         inputClassName="w-full h-12 px-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                         aria-label="Phone number"
                       />
-                      {user?.phone && !user?.phone_verified && (
-                        <div className="mt-2">
-                          <Link
-                            href="/auth/verify-phone"
-                            className="inline-flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 font-medium"
-                          >
-                            <AlertCircle className="w-4 h-4" />
-                            Verify your phone number
-                          </Link>
-                        </div>
-                      )}
-                      {user?.phone_verified && (
-                        <div className="mt-2 flex items-center gap-2 text-sm text-emerald-600">
-                          <CheckCircle className="w-4 h-4" />
-                          Phone number verified
-                        </div>
-                      )}
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">Date of Birth</label>

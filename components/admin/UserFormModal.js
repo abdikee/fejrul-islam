@@ -91,9 +91,9 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user = null, 
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           {/* Name Fields */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 First Name *
@@ -155,7 +155,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user = null, 
           )}
 
           {/* Gender and Role */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Gender *
@@ -205,7 +205,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user = null, 
           </div>
 
           {/* Academic Year and Phone */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 Academic Year
@@ -252,7 +252,7 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user = null, 
           )}
 
           {/* Buttons */}
-          <div className="flex items-center gap-3 pt-4">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}

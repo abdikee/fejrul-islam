@@ -101,8 +101,8 @@ const DuatVettingForm = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 rounded-t-xl">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 sm:p-6 md:p-8 rounded-t-xl">
         <div className="flex items-center gap-4 mb-4">
           <MessageCircle className="w-12 h-12" />
           <div>
@@ -115,7 +115,7 @@ const DuatVettingForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-b-xl shadow-lg border-x border-b border-slate-200 space-y-8">
+      <form onSubmit={handleSubmit} className="bg-white p-4 sm:p-6 md:p-8 rounded-b-xl shadow-lg border-x border-b border-slate-200 space-y-8">
         
         {/* Personal Information */}
         <section>
@@ -300,7 +300,7 @@ const DuatVettingForm = () => {
 
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-3">Language Skills (Check all that apply)</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 {['English', 'Arabic', 'Amharic', 'Oromo'].map(lang => (
                   <label key={lang} className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -337,7 +337,7 @@ const DuatVettingForm = () => {
 
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-3">Weekly Availability (Select all that apply) *</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 {['Weekday Evenings', 'Weekend Mornings', 'Weekend Afternoons', 'Friday After Jumuah'].map(time => (
                   <label key={time} className="flex items-center gap-2 cursor-pointer">
                     <input

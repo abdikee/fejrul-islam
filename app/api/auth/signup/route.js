@@ -1,12 +1,48 @@
 import { NextResponse } from 'next/server';
 import { createUser } from '@/lib/db/utils.js';
 import { signJwtToken } from '@/lib/auth/jwt.js';
-import { generateOTP, sendOTPEmail } from '@/lib/email/emailService.js';
-import { createOTPVerification } from '@/lib/db/verificationUtils.js';
 import { isValidEmail, normalizeAndValidatePhone, normalizeEmail } from '@/lib/validation/contact.js';
+import pool from '@/lib/db/connection.js';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   try {
+    // Production safety checks (avoid confusing DB/JWT errors on Vercel)
+    if (process.env.NODE_ENV === 'production') {
+      const hasConnectionString = Boolean(
+        process.env.DATABASE_URL ||
+          process.env.POSTGRES_URL ||
+          process.env.POSTGRES_PRISMA_URL ||
+          process.env.POSTGRES_URL_NON_POOLING ||
+          process.env.NEON_DATABASE_URL
+      );
+      const dbHost = (process.env.DB_HOST || '').trim();
+      const hasDiscreteDbConfig = Boolean(dbHost) && dbHost !== 'localhost' && dbHost !== '127.0.0.1';
+
+      if (!hasConnectionString && !hasDiscreteDbConfig) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              'Server database is not configured correctly. Please set DATABASE_URL (recommended) or POSTGRES_URL (Vercel/Neon), or DB_HOST/DB_NAME/DB_USER/DB_PASSWORD for production.'
+          },
+          { status: 500 }
+        );
+      }
+
+      if (!process.env.JWT_SECRET) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'Server authentication is not configured correctly. Please set JWT_SECRET in production.'
+          },
+          { status: 500 }
+        );
+      }
+    }
+
     const { 
       email, 
       password, 
@@ -89,29 +125,13 @@ export async function POST(request) {
 
     const newUser = await createUser(userData);
 
-    // Generate email OTP
-    const emailOTP = generateOTP();
-    await createOTPVerification(newUser.id, emailOTP);
-    const emailResult = await sendOTPEmail(newUser.email, emailOTP, newUser.first_name);
-    const devEmailOTP = emailResult?.devOTP;
-
-    // If phone number provided, also send SMS OTP for phone verification
-    let smsResult = null;
-    let devSMSOTP = null;
-    if (phoneCheck.value) {
-      try {
-        const { generateSMSOTP, sendSMSOTP } = await import('@/lib/sms/smsService');
-        const { createPhoneOTPVerification } = await import('@/lib/db/phoneVerificationUtils');
-        
-        const smsOTP = generateSMSOTP();
-        await createPhoneOTPVerification(newUser.id, phoneCheck.value, smsOTP);
-        smsResult = await sendSMSOTP(phoneCheck.value, smsOTP, newUser.first_name);
-        devSMSOTP = smsResult?.devOTP;
-      } catch (smsError) {
-        console.error('SMS OTP error during signup:', smsError);
-        // Don't fail registration if SMS fails
-      }
-    }
+    // Verification feature removed: mark the new user as email-verified immediately.
+    // Don't reference phone_verified here because older DB schemas may not have that column.
+    const verifyResult = await pool.query(
+      'UPDATE users SET email_verified = true WHERE id = $1 RETURNING email_verified',
+      [newUser.id]
+    );
+    const verifiedRow = verifyResult.rows?.[0] || {};
 
     // Create JWT token
     const token = signJwtToken(
@@ -127,11 +147,14 @@ export async function POST(request) {
     // Create response
     const response = NextResponse.json({
       success: true,
-      message: 'Account created successfully! Please verify your email to continue.',
-      requiresVerification: true,
-      devEmailOTP: devEmailOTP,
-      devSMSOTP: devSMSOTP,
-      phoneVerificationAvailable: !!phoneCheck.value,
+      message: 'Account created successfully!',
+      requiresVerification: false,
+      redirectUrl:
+        role === 'mentor'
+          ? '/mentor/dashboard'
+          : role === 'admin'
+            ? '/admin/dashboard'
+            : `/dashboard/${gender}`,
       user: {
         id: newUser.id,
         email: newUser.email,
@@ -143,7 +166,7 @@ export async function POST(request) {
         department: newUser.department,
         academicYear: newUser.academic_year,
         phone: newUser.phone,
-        emailVerified: false,
+        emailVerified: verifiedRow.email_verified === true,
         phoneVerified: false
       }
     });
@@ -171,13 +194,26 @@ export async function POST(request) {
       );
     }
     
-    // Return more detailed error in development
-    const errorMessage = process.env.NODE_ENV === 'development' 
-      ? `Internal server error: ${error.message}`
-      : 'Internal server error';
-    
+    const message = String(error?.message || '').toLowerCase();
+    const looksLikeDb =
+      message.includes('econnrefused') ||
+      message.includes('enotfound') ||
+      message.includes('password authentication failed') ||
+      message.includes('no pg_hba.conf entry') ||
+      message.includes('error creating user') ||
+      message.includes('postgres') ||
+      message.includes('connect');
+
+    // In production, avoid leaking internals but give actionable config hints.
     return NextResponse.json(
-      { success: false, message: errorMessage },
+      {
+        success: false,
+        message: looksLikeDb
+          ? 'Server database is not configured correctly. Please check production DB environment variables.'
+          : process.env.NODE_ENV === 'development'
+            ? `Internal server error: ${error.message}`
+            : 'Internal server error'
+      },
       { status: 500 }
     );
   }

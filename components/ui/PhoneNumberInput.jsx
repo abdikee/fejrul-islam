@@ -109,7 +109,7 @@ export default function PhoneNumberInput({
   };
 
   return (
-    <div className={`flex gap-2 ${containerClassName}`}>
+    <div className={`flex flex-col sm:flex-row gap-2 min-w-0 ${containerClassName}`}>
       <select
         value={country}
         onChange={(e) => {
@@ -118,10 +118,10 @@ export default function PhoneNumberInput({
           emit(next, nationalNumber);
         }}
         disabled={disabled}
-        className={
+        className={`${
           selectClassName ||
           'h-12 px-3 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent'
-        }
+        } w-full sm:w-auto`}
         aria-label="Country code"
       >
         {options.map((opt) => (
@@ -131,7 +131,7 @@ export default function PhoneNumberInput({
         ))}
       </select>
 
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <input
           type="tel"
           value={nationalNumber}

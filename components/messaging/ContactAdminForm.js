@@ -160,7 +160,7 @@ export default function ContactAdminForm({ onClose }) {
           </select>
         </div>
 
-        <div className="flex gap-3 pt-2">
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <button
             type="submit"
             disabled={sending || !formData.message.trim()}

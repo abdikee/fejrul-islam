@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { authenticateUser } from '@/lib/db/utils.js';
 import { signJwtToken } from '@/lib/auth/jwt.js';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     // Production safety checks (avoid confusing DB connection errors on Vercel)
@@ -69,13 +72,11 @@ export async function POST(request) {
       { expiresIn: '7d' }
     );
 
-    // Create response
-    const requiresVerification = user.email_verified !== true;
-
+    // Create response (email/phone verification feature removed)
     const response = NextResponse.json({
       success: true,
-      message: requiresVerification ? 'Login successful. Please verify your email to continue.' : 'Login successful',
-      requiresVerification,
+      message: 'Login successful',
+      requiresVerification: false,
       user: {
         id: user.id,
         email: user.email,
@@ -86,11 +87,10 @@ export async function POST(request) {
         level: user.level,
         department: user.department,
         academicYear: user.academic_year,
-        emailVerified: user.email_verified === true
+        emailVerified: true
       },
-      redirectUrl: requiresVerification
-        ? '/auth/verify-email'
-        : user.role === 'mentor'
+      redirectUrl:
+        user.role === 'mentor'
           ? '/mentor/dashboard'
           : user.role === 'admin'
             ? '/admin/dashboard'
