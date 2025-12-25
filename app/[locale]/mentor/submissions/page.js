@@ -2,17 +2,23 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { 
   FileCheck, Search, Filter, Clock, CheckCircle, 
   XCircle, ArrowLeft, Eye, Download
 } from 'lucide-react';
-import MentorFooter from '@/components/mentor/MentorFooter';
+import MentorPageTemplate from '@/components/mentor/MentorPageTemplate';
 
 export default function Submissions() {
   const [user, setUser] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('pending');
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+  const mentorBase = `${localePrefix}/mentor`;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,73 +61,11 @@ export default function Submissions() {
   const filteredSubmissions = submissions.filter(s => filterStatus === 'all' || s.status === filterStatus);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      <header className="bg-white/95 backdrop-blur-sm border-b border-green-200 sticky top-0 z-40">
-        <div className="container mx-auto px-4 lg:px-6 py-4">
-          <div className="flex items-center gap-4">
-            <Link href="/mentor/dashboard" className="p-2 hover:bg-green-100 rounded-lg transition-colors">
-              <ArrowLeft className="w-5 h-5 text-green-600" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-800">Reviews & Submissions</h1>
-              <p className="text-sm text-slate-600">Review student submissions</p>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <nav className="bg-green-50 border-b border-green-200 sticky top-16 z-30">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center gap-1 overflow-x-auto">
-              <Link
-                href="/mentor/dashboard"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/mentor/students"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                My Students
-              </Link>
-              <Link
-                href="/mentor/assignments"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Assignments
-              </Link>
-              <Link
-                href="/mentor/submissions"
-                className="px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-lg whitespace-nowrap"
-              >
-                Reviews
-              </Link>
-              <Link
-                href="/mentor/sessions"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Sessions
-              </Link>
-              <Link
-                href="/mentor/sectors"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Sectors
-              </Link>
-              <Link
-                href="/mentor/analytics"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Analytics
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <main className="container mx-auto px-4 lg:px-6 py-6">
+    <MentorPageTemplate
+      title="Reviews & Submissions"
+      description="Review student submissions"
+      icon={FileCheck}
+    >
         <div className="bg-white rounded-2xl p-6 border border-green-200 mb-6">
           <div className="flex gap-4">
             <select
@@ -156,7 +100,7 @@ export default function Submissions() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Link href={`/mentor/submissions/${submission.id}`} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm flex items-center gap-2">
+                  <Link href={`${mentorBase}/submissions/${submission.id}`} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm flex items-center gap-2">
                     <Eye className="w-4 h-4" />
                     Review
                   </Link>
@@ -165,9 +109,6 @@ export default function Submissions() {
             </div>
           ))}
         </div>
-      </main>
-
-      <MentorFooter user={user} />
-    </div>
+    </MentorPageTemplate>
   );
 }

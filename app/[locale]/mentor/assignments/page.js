@@ -2,28 +2,26 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { 
   BookOpen, Search, Filter, Plus, Calendar, 
   Users, Clock, ArrowLeft, Edit, Trash2
 } from 'lucide-react';
-import MentorFooter from '@/components/mentor/MentorFooter';
+import MentorPageTemplate from '@/components/mentor/MentorPageTemplate';
 
 export default function Assignments() {
-  const [user, setUser] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+  const mentorBase = `${localePrefix}/mentor`;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const authResponse = await fetch('/api/auth/me');
-        const authData = await authResponse.json();
-        
-        if (authData.success) {
-          setUser(authData.user);
-        }
-
         // Mock data for development
         setAssignments([
           { id: 1, title: 'Tafseer Analysis', course: 'Quranic Studies', dueDate: '2025-01-15', submissions: 8, total: 12, status: 'active' },
@@ -32,7 +30,6 @@ export default function Assignments() {
         ]);
       } catch (error) {
         console.error('Error fetching data:', error);
-        setUser({ firstName: 'Ahmad', lastName: 'Ibrahim', role: 'mentor' });
       } finally {
         setLoading(false);
       }
@@ -53,85 +50,20 @@ export default function Assignments() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      {/* Header */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-green-200 sticky top-0 z-40">
-        <div className="container mx-auto px-4 lg:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/mentor/dashboard" className="p-2 hover:bg-green-100 rounded-lg transition-colors">
-                <ArrowLeft className="w-5 h-5 text-green-600" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-800">Assignments</h1>
-                <p className="text-sm text-slate-600">Create and manage assignments</p>
-              </div>
-            </div>
-            <button 
-              onClick={() => alert('Create Assignment feature coming soon!')}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              New Assignment
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Navigation Bar */}
-      <nav className="bg-green-50 border-b border-green-200 sticky top-16 z-30">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center gap-1 overflow-x-auto">
-              <Link
-                href="/mentor/dashboard"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/mentor/students"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                My Students
-              </Link>
-              <Link
-                href="/mentor/assignments"
-                className="px-4 py-2 text-sm font-medium text-green-700 bg-green-100 rounded-lg whitespace-nowrap"
-              >
-                Assignments
-              </Link>
-              <Link
-                href="/mentor/submissions"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Reviews
-              </Link>
-              <Link
-                href="/mentor/sessions"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Sessions
-              </Link>
-              <Link
-                href="/mentor/sectors"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Sectors
-              </Link>
-              <Link
-                href="/mentor/analytics"
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-green-700 hover:bg-green-100 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Analytics
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-4 lg:px-6 py-6">
+    <MentorPageTemplate
+      title="Assignments"
+      description="Create and manage assignments"
+      icon={BookOpen}
+      actions={
+        <Link
+          href={`${mentorBase}/assignments/new`}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          New Assignment
+        </Link>
+      }
+    >
         {/* Search Bar */}
         <div className="bg-white rounded-2xl p-6 border border-green-200 mb-6">
           <div className="flex gap-4">
@@ -181,7 +113,7 @@ export default function Assignments() {
                 </div>
                 
                 <div className="flex gap-2">
-                  <Link href={`/mentor/assignments/${assignment.id}/edit`} className="p-2 hover:bg-green-100 rounded-lg transition-colors">
+                  <Link href={`${mentorBase}/assignments/${assignment.id}/edit`} className="p-2 hover:bg-green-100 rounded-lg transition-colors" aria-label="Edit assignment">
                     <Edit className="w-4 h-4 text-green-600" />
                   </Link>
                   <button className="p-2 hover:bg-red-100 rounded-lg transition-colors">
@@ -195,7 +127,7 @@ export default function Assignments() {
                   <div className="text-sm text-slate-600">
                     Submission Progress: {Math.round((assignment.submissions / assignment.total) * 100)}%
                   </div>
-                  <Link href={`/mentor/assignments/${assignment.id}`} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
+                  <Link href={`${mentorBase}/assignments/${assignment.id}`} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
                     View Details
                   </Link>
                 </div>
@@ -203,9 +135,6 @@ export default function Assignments() {
             </div>
           ))}
         </div>
-      </main>
-
-      <MentorFooter user={user} />
-    </div>
+    </MentorPageTemplate>
   );
 }

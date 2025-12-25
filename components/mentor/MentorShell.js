@@ -12,6 +12,10 @@ import MentorFooter from './MentorFooter';
 
 export default function MentorShell({ user, children }) {
   const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+  const mentorBase = `${localePrefix}/mentor`;
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState(3);
@@ -33,15 +37,15 @@ export default function MentorShell({ user, children }) {
   const isActive = (path) => pathname === path;
 
   const navTabs = [
-    { label: 'Dashboard', href: '/mentor/dashboard' },
-    { label: 'Announcements', href: '/mentor/announcements' },
-    { label: 'Participants', href: '/mentor/students' },
-    { label: 'Messages', href: '/mentor/messages' },
-    { label: 'Programs', href: '/mentor/assignments' },
-    { label: 'Guidance', href: '/mentor/submissions' },
-    { label: 'Sessions', href: '/mentor/sessions' },
-    { label: 'Sectors', href: '/mentor/sectors' },
-    { label: 'Analytics', href: '/mentor/analytics' }
+    { label: 'Dashboard', href: `${mentorBase}/dashboard` },
+    { label: 'Announcements', href: `${mentorBase}/announcements` },
+    { label: 'Students', href: `${mentorBase}/students` },
+    { label: 'Messages', href: `${mentorBase}/messages` },
+    { label: 'Assignments', href: `${mentorBase}/assignments` },
+    { label: 'Reviews', href: `${mentorBase}/submissions` },
+    { label: 'Sessions', href: `${mentorBase}/sessions` },
+    { label: 'Sectors', href: `${mentorBase}/sectors` },
+    { label: 'Analytics', href: `${mentorBase}/analytics` }
   ];
 
   return (
@@ -59,9 +63,9 @@ export default function MentorShell({ user, children }) {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-slate-800">
-                    Assalamu Alaikum, {user?.firstName || 'Dai'}
+                    Assalamu Alaikum, {user?.firstName || 'Mentor'}
                   </h1>
-                  <p className="text-sm text-slate-600">Dai Dashboard • Fejrul Islam</p>
+                  <p className="text-sm text-slate-600">Mentor Dashboard • HUMSJ</p>
                 </div>
               </div>
             </div>
@@ -112,7 +116,7 @@ export default function MentorShell({ user, children }) {
 
               {/* Settings */}
               <Link
-                href="/mentor/settings"
+                href={`${mentorBase}/settings`}
                 className="p-2 hover:bg-green-100 rounded-lg transition-colors"
                 title="Settings"
               >
@@ -130,7 +134,7 @@ export default function MentorShell({ user, children }) {
                   <p className="text-sm font-medium text-slate-800">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-xs text-slate-500">Dai</p>
+                  <p className="text-xs text-slate-500">Mentor</p>
                 </div>
                 <button 
                   onClick={handleLogout}
@@ -148,21 +152,21 @@ export default function MentorShell({ user, children }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Link
-                  href="/mentor/assignments"
+                  href={`${mentorBase}/assignments/new`}
                   className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
                   <Plus className="w-4 h-4" />
-                  New Program
+                  New Assignment
                 </Link>
                 <Link
-                  href="/mentor/sessions"
+                  href={`${mentorBase}/sessions/schedule`}
                   className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
                 >
                   <Calendar className="w-4 h-4" />
-                  Schedule Guidance
+                  Schedule Session
                 </Link>
                 <Link
-                  href="/mentor/submissions"
+                  href={`${mentorBase}/submissions`}
                   className="flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
                 >
                   <FileCheck className="w-4 h-4" />
@@ -224,13 +228,13 @@ export default function MentorShell({ user, children }) {
             </div>
             <div className="hidden md:flex items-center gap-2">
               <Link
-                href="/mentor/resources"
+                href={`${mentorBase}/resources`}
                 className="px-3 py-1 text-xs font-medium text-green-600 border border-green-300 rounded-full hover:bg-green-50 transition-colors"
               >
                 Resources
               </Link>
               <Link
-                href="/mentor/training"
+                href={`${mentorBase}/training`}
                 className="px-3 py-1 text-xs font-medium text-emerald-600 border border-emerald-300 rounded-full hover:bg-emerald-50 transition-colors"
               >
                 Training

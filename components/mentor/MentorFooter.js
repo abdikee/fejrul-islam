@@ -1,42 +1,48 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { GraduationCap, Users, FileCheck, BookOpen, Calendar, Heart, Award, MessageSquare, Settings, BarChart3, Compass } from 'lucide-react';
 
 export default function MentorFooter({ user }) {
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+  const mentorBase = `${localePrefix}/mentor`;
   const currentYear = new Date().getFullYear();
   
   const footerLinks = {
     mentorship: [
-      { name: 'My Students', href: '/mentor/students' },
-      { name: 'Assignments', href: '/mentor/assignments' },
-      { name: 'Review Submissions', href: '/mentor/submissions' },
-      { name: 'Schedule Sessions', href: '/mentor/sessions' }
+      { name: 'My Students', href: `${mentorBase}/students` },
+      { name: 'Assignments', href: `${mentorBase}/assignments` },
+      { name: 'Review Submissions', href: `${mentorBase}/submissions` },
+      { name: 'Schedule Sessions', href: `${mentorBase}/sessions` }
     ],
     management: [
-      { name: 'Student Progress', href: '/mentor/progress' },
-      { name: 'Performance Analytics', href: '/mentor/analytics' },
-      { name: 'Reports & Insights', href: '/mentor/reports' },
-      { name: 'Attendance Tracking', href: '/mentor/attendance' }
+      { name: 'Student Progress', href: `${mentorBase}/progress` },
+      { name: 'Performance Analytics', href: `${mentorBase}/analytics` },
+      { name: 'Reports & Insights', href: `${mentorBase}/reports` },
+      { name: 'Attendance Tracking', href: `${mentorBase}/attendance` }
     ],
     sectors: [
-      { name: 'Tarbiya & Idad', href: '/mentor/sectors/tarbiya-idad' },
-      { name: 'Literature', href: '/mentor/sectors/literature' },
-      { name: 'Comparative Religion', href: '/mentor/sectors/comparative-religion' },
-      { name: 'Ziyara', href: '/mentor/sectors/ziyara' },
-      { name: 'Qirat & Ilm', href: '/mentor/sectors/qirat-ilm' }
+      { name: 'Tarbiya & Idad', href: `${mentorBase}/sectors/tarbiya-idad` },
+      { name: 'Literature', href: `${mentorBase}/sectors/literature` },
+      { name: 'Comparative Religion', href: `${mentorBase}/sectors/comparative-religion` },
+      { name: 'Ziyara', href: `${mentorBase}/sectors/ziyara` },
+      { name: 'Qirat & Ilm', href: `${mentorBase}/sectors/qirat-ilm` }
     ],
     resources: [
-      { name: 'Teaching Resources', href: '/mentor/resources' },
-      { name: 'Assessment Tools', href: '/mentor/assessments' },
-      { name: 'Curriculum Guide', href: '/mentor/curriculum' },
-      { name: 'Best Practices', href: '/mentor/best-practices' }
+      { name: 'Teaching Resources', href: `${mentorBase}/resources` },
+      { name: 'Assessment Tools', href: `${mentorBase}/assessments` },
+      { name: 'Curriculum Guide', href: `${mentorBase}/curriculum` },
+      { name: 'Best Practices', href: `${mentorBase}/best-practices` }
     ],
     support: [
-      { name: 'Mentor Handbook', href: '/mentor/handbook' },
-      { name: 'Training Materials', href: '/mentor/training' },
-      { name: 'Technical Support', href: '/mentor/support' },
-      { name: 'Feedback & Reports', href: '/mentor/feedback' }
+      { name: 'Mentor Handbook', href: `${mentorBase}/handbook` },
+      { name: 'Training Materials', href: `${mentorBase}/training` },
+      { name: 'Technical Support', href: `${mentorBase}/support` },
+      { name: 'Feedback & Reports', href: `${mentorBase}/feedback` }
     ]
   };
 
@@ -163,13 +169,13 @@ export default function MentorFooter({ user }) {
               </p>
             </div>
             <div className="flex items-center gap-4 text-sm">
-              <Link href="/mentor/privacy" className="hover:text-white/80 transition-colors">
+              <Link href={`${mentorBase}/privacy`} className="hover:text-white/80 transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/mentor/terms" className="hover:text-white/80 transition-colors">
+              <Link href={`${mentorBase}/terms`} className="hover:text-white/80 transition-colors">
                 Mentor Guidelines
               </Link>
-              <Link href="/mentor/contact" className="hover:text-white/80 transition-colors">
+              <Link href={`${mentorBase}/contact`} className="hover:text-white/80 transition-colors">
                 Contact Admin
               </Link>
             </div>

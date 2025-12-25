@@ -1,21 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Compass, BookOpen, Users, TrendingUp } from 'lucide-react';
 import MentorPageTemplate from '@/components/mentor/MentorPageTemplate';
 
 export default function Sectors() {
   const [sectors, setSectors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+  const mentorBase = `${localePrefix}/mentor`;
 
   useEffect(() => {
     // Mock data
     setSectors([
-      { id: 1, name: 'Qirat & Ilm', students: 45, courses: 10, avgProgress: 78, color: 'emerald' },
-      { id: 2, name: 'Tarbiya & Idad', students: 38, courses: 8, avgProgress: 82, color: 'blue' },
-      { id: 3, name: 'Dawah & Comparative Religion', students: 32, courses: 7, avgProgress: 75, color: 'purple' },
-      { id: 4, name: 'Literature & History', students: 28, courses: 9, avgProgress: 80, color: 'orange' },
-      { id: 5, name: 'Ziyara & Khidma', students: 25, courses: 6, avgProgress: 85, color: 'teal' },
+      { id: 1, slug: 'qirat-ilm', name: 'Qirat & Ilm', students: 45, courses: 10, avgProgress: 78, color: 'emerald' },
+      { id: 2, slug: 'tarbiya-idad', name: 'Tarbiya & Idad', students: 38, courses: 8, avgProgress: 82, color: 'blue' },
+      { id: 3, slug: 'comparative-religion', name: 'Dawah & Comparative Religion', students: 32, courses: 7, avgProgress: 75, color: 'purple' },
+      { id: 4, slug: 'literature', name: 'Literature & History', students: 28, courses: 9, avgProgress: 80, color: 'orange' },
+      { id: 5, slug: 'ziyara', name: 'Ziyara & Khidma', students: 25, courses: 6, avgProgress: 85, color: 'teal' },
     ]);
     setLoading(false);
   }, []);
@@ -73,9 +80,12 @@ export default function Sectors() {
               </div>
             </div>
 
-            <button className="w-full mt-4 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors">
+            <Link
+              href={`${mentorBase}/sectors/${sector.slug}`}
+              className="block w-full mt-4 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors text-center"
+            >
               View Details
-            </button>
+            </Link>
           </div>
         ))}
       </div>
