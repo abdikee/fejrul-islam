@@ -35,6 +35,18 @@ export default function MessagesPage() {
     }
   }, [user, filter]);
 
+  useEffect(() => {
+    if (!user) return;
+
+    const intervalId = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchMessages();
+      }
+    }, 15000);
+
+    return () => clearInterval(intervalId);
+  }, [user, filter]);
+
   const fetchMessages = async () => {
     try {
       setLoading(true);

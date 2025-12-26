@@ -213,6 +213,7 @@ export function usePrayerTimes() {
 export function useNotifications(userId) {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const lastServerUnreadCountRef = useRef(null);
 
   useEffect(() => {
     // Listen for various real-time events
@@ -261,6 +262,61 @@ export function useNotifications(userId) {
       window.removeEventListener('habit-updated', handleHabitUpdated);
     };
   }, []);
+
+  useEffect(() => {
+    if (!userId) {
+      lastServerUnreadCountRef.current = null;
+      return;
+    }
+
+    let isCancelled = false;
+    let intervalId;
+
+    const pollUnreadMessages = async () => {
+      try {
+        const response = await fetch('/api/messages?type=unread&limit=1', {
+          credentials: 'include'
+        });
+        if (!response.ok) return;
+
+        const data = await response.json();
+        if (!data?.success) return;
+
+        const serverUnread = Number(data.unreadCount ?? 0);
+        const prevServerUnread = lastServerUnreadCountRef.current;
+
+        if (prevServerUnread === null) {
+          lastServerUnreadCountRef.current = serverUnread;
+          return;
+        }
+
+        if (serverUnread > prevServerUnread && !isCancelled) {
+          addNotification({
+            id: Date.now(),
+            type: 'message',
+            title: 'New Message',
+            message: serverUnread - prevServerUnread > 1
+              ? `You have ${serverUnread - prevServerUnread} new messages`
+              : 'You have a new message',
+            timestamp: new Date(),
+            read: false
+          });
+        }
+
+        lastServerUnreadCountRef.current = serverUnread;
+      } catch {
+        // Ignore transient network errors
+      }
+    };
+
+    pollUnreadMessages();
+    intervalId = setInterval(pollUnreadMessages, 15000);
+
+    return () => {
+      isCancelled = true;
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [userId]);
 
   const addNotification = (notification) => {
     setNotifications(prev => [notification, ...prev.slice(0, 9)]); // Keep last 10

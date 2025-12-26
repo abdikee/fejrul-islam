@@ -1,14 +1,18 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useRealtime, usePrayerTimes, useNotifications } from '@/hooks/use-realtime';
+import { useAuth } from '@/hooks/useAuth';
 
 const RealtimeContext = createContext();
 
 export function RealtimeProvider({ children, userId }) {
-  const realtime = useRealtime(userId);
+  const { user } = useAuth();
+  const resolvedUserId = useMemo(() => userId ?? user?.id ?? null, [userId, user?.id]);
+
+  const realtime = useRealtime(resolvedUserId);
   const prayerTimes = usePrayerTimes();
-  const notifications = useNotifications(userId);
+  const notifications = useNotifications(resolvedUserId);
   
   const [isOnline, setIsOnline] = useState(true);
 
@@ -31,7 +35,7 @@ export function RealtimeProvider({ children, userId }) {
     ...prayerTimes,
     ...notifications,
     isOnline,
-    userId
+    userId: resolvedUserId
   };
 
   return (

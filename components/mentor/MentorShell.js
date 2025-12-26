@@ -34,9 +34,9 @@ export default function MentorShell({ user, children }) {
     }
   };
 
-  const isActive = (path) => pathname === path;
+  const isActive = (path) => pathname === path || pathname?.startsWith(`${path}/`);
 
-  const navTabs = [
+  const sidebarItems = [
     { label: 'Dashboard', href: `${mentorBase}/dashboard` },
     { label: 'Announcements', href: `${mentorBase}/announcements` },
     { label: 'Students', href: `${mentorBase}/students` },
@@ -45,13 +45,14 @@ export default function MentorShell({ user, children }) {
     { label: 'Reviews', href: `${mentorBase}/submissions` },
     { label: 'Sessions', href: `${mentorBase}/sessions` },
     { label: 'Sectors', href: `${mentorBase}/sectors` },
-    { label: 'Analytics', href: `${mentorBase}/analytics` }
+    { label: 'Analytics', href: `${mentorBase}/analytics` },
+    { label: 'Resources', href: `${mentorBase}/resources` }
   ];
 
   return (
     <>
       {/* Top Header */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-green-200 sticky top-0 z-50 shadow-sm">
+      <header className="bg-white border-b border-green-200 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 lg:px-6">
           {/* Top Row */}
           <div className="flex items-center justify-between py-4">
@@ -207,47 +208,34 @@ export default function MentorShell({ user, children }) {
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <nav className="bg-green-50 border-b border-green-200 sticky top-[180px] z-40">
-        <div className="container mx-auto px-4 lg:px-6">
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center gap-1 overflow-x-auto">
-              {navTabs.map((tab) => (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap ${
-                    isActive(tab.href)
-                      ? 'text-green-800 bg-green-100'
-                      : 'text-slate-600 hover:text-green-700 hover:bg-green-100'
-                  }`}
-                >
-                  {tab.label}
-                </Link>
-              ))}
+      {/* Content + Sidebar */}
+      <div className="container mx-auto px-4 lg:px-6 py-6">
+        <div className="flex gap-6">
+          <aside className="hidden lg:block w-64 shrink-0">
+            <div className="bg-white border border-green-200 rounded-2xl p-3 sticky top-[180px]">
+              <nav className="space-y-1">
+                {sidebarItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`block px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive(item.href)
+                        ? 'bg-green-100 text-green-800'
+                        : 'text-slate-700 hover:bg-green-50 hover:text-green-800'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
             </div>
-            <div className="hidden md:flex items-center gap-2">
-              <Link
-                href={`${mentorBase}/resources`}
-                className="px-3 py-1 text-xs font-medium text-green-600 border border-green-300 rounded-full hover:bg-green-50 transition-colors"
-              >
-                Resources
-              </Link>
-              <Link
-                href={`${mentorBase}/training`}
-                className="px-3 py-1 text-xs font-medium text-emerald-600 border border-emerald-300 rounded-full hover:bg-emerald-50 transition-colors"
-              >
-                Training
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+          </aside>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 lg:px-6 py-6">
-        {children}
-      </main>
+          <main className="flex-1 min-w-0">
+            {children}
+          </main>
+        </div>
+      </div>
 
       {/* Footer */}
       <MentorFooter user={user} />
