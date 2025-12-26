@@ -15,8 +15,11 @@ import {
   Calendar,
   MessageSquare
 } from 'lucide-react';
+import notify from '@/lib/notify';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
 
 export default function SystemOverview({ setActiveTab }) {
+  const confirmDialog = useConfirm();
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -135,7 +138,7 @@ export default function SystemOverview({ setActiveTab }) {
         if (setActiveTab) {
           setActiveTab('users');
         } else {
-          alert('Navigate to User Management section');
+          notify.info('Navigate to User Management section');
         }
       }
     },
@@ -148,7 +151,7 @@ export default function SystemOverview({ setActiveTab }) {
         if (setActiveTab) {
           setActiveTab('content');
         } else {
-          alert('Navigate to Content Management to send announcements');
+          notify.info('Navigate to Content Management to send announcements');
         }
       }
     },
@@ -157,10 +160,15 @@ export default function SystemOverview({ setActiveTab }) {
       description: 'Create backup of database and system files',
       icon: Database,
       color: 'bg-purple-500',
-      action: () => {
-        const confirmed = confirm('Are you sure you want to create a system backup? This may take several minutes.');
+      action: async () => {
+        const confirmed = await confirmDialog({
+          title: 'Create System Backup',
+          description: 'Are you sure you want to create a system backup? This may take several minutes.',
+          confirmText: 'Start Backup',
+          cancelText: 'Cancel',
+        });
         if (confirmed) {
-          alert('System backup initiated. You will be notified when complete.');
+          notify.success('System backup initiated. You will be notified when complete.');
           // TODO: Implement actual backup functionality
         }
       }
@@ -174,7 +182,7 @@ export default function SystemOverview({ setActiveTab }) {
         if (setActiveTab) {
           setActiveTab('analytics');
         } else {
-          alert('Navigate to Analytics & Reports section');
+          notify.info('Navigate to Analytics & Reports section');
         }
       }
     }

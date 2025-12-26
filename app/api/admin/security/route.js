@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { query } from '@/lib/db/connection';
 import { verifyJwtToken } from '@/lib/auth/jwt.js';
+import crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -77,7 +78,7 @@ export async function GET(request) {
         GROUP BY role, gender
       `),
 
-      // Security events (mock data structure)
+      // Security events
       query(`
         SELECT 
           'login_attempt' as event_type,
@@ -249,66 +250,11 @@ export async function GET(request) {
 
   } catch (error) {
     console.error('Error fetching security data:', error);
-    
-    // Return mock security data for development
-    return NextResponse.json({
-      success: true,
-      security: {
-        metrics: {
-          totalLoginAttempts: 1247,
-          successfulLogins: 1189,
-          failedLoginAttempts: 58,
-          activeSessions: 89,
-          securityAlerts: 3,
-          riskLevel: 'low'
-        },
-        loginAttempts: [
-          { hour: new Date(), total_attempts: 45, successful_logins: 42, failed_attempts: 3 },
-          { hour: new Date(Date.now() - 3600000), total_attempts: 38, successful_logins: 36, failed_attempts: 2 }
-        ],
-        activeSessions: [
-          { role: 'student', gender: 'male', active_count: 45, most_recent_login: new Date() },
-          { role: 'student', gender: 'female', active_count: 38, most_recent_login: new Date() },
-          { role: 'mentor', gender: 'male', active_count: 4, most_recent_login: new Date() },
-          { role: 'mentor', gender: 'female', active_count: 2, most_recent_login: new Date() }
-        ],
-        securityEvents: [
-          {
-            event_type: 'login_attempt',
-            user_name: 'Ahmad Ibrahim',
-            email: 'ahmad@student.humsj.edu.et',
-            event_time: new Date(),
-            status: 'success',
-            role: 'student',
-            gender: 'male'
-          }
-        ],
-        systemAccess: [
-          { role: 'student', total_users: 1180, active_24h: 89, active_7d: 456, never_logged_in: 23 },
-          { role: 'mentor', total_users: 67, active_24h: 12, active_7d: 45, never_logged_in: 2 },
-          { role: 'admin', total_users: 5, active_24h: 2, active_7d: 4, never_logged_in: 0 }
-        ],
-        insights: [
-          {
-            type: 'info',
-            title: 'Security Status Good',
-            description: 'All security metrics within normal ranges',
-            action: 'Continue monitoring'
-          }
-        ],
-        recommendations: [
-          {
-            category: 'Authentication',
-            title: 'Enable Two-Factor Authentication',
-            description: 'Implement 2FA for admin and mentor accounts',
-            priority: 'high',
-            status: 'pending'
-          }
-        ]
-      },
-      timeRange: '24h',
-      timestamp: new Date().toISOString()
-    });
+
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch security data' },
+      { status: 500 }
+    );
   }
 }
 
@@ -357,7 +303,7 @@ export async function POST(request) {
 
       case 'reset_user_password':
         // Reset user password (generate temporary password)
-        const tempPassword = Math.random().toString(36).slice(-8);
+        const tempPassword = crypto.randomBytes(9).toString('base64url');
         await query(`
           UPDATE users 
           SET password_reset_required = true, temp_password = $1, password_reset_at = NOW()

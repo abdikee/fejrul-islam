@@ -1,9 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Heart, BookOpen, Users, MessageCircle, Calendar, Award, Compass, GraduationCap, Scroll, Mosque } from 'lucide-react';
 
 export default function StudentFooter({ user }) {
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+
+  const withLocale = (href) => {
+    if (!href || typeof href !== 'string') return href;
+    if (!href.startsWith('/')) return href;
+    if (localePrefix && href.startsWith(`${localePrefix}/`)) return href;
+    return `${localePrefix}${href}`;
+  };
+
   const currentYear = new Date().getFullYear();
   
   const footerLinks = {
@@ -85,7 +98,7 @@ export default function StudentFooter({ user }) {
               {footerLinks.learning.map((link, index) => (
                 <li key={index}>
                   <Link 
-                    href={link.href}
+                    href={withLocale(link.href)}
                     className={`text-sm text-slate-600 ${genderColorScheme.hoverColor} transition-colors`}
                   >
                     {link.name}
@@ -105,7 +118,7 @@ export default function StudentFooter({ user }) {
               {footerLinks.sectors.map((link, index) => (
                 <li key={index}>
                   <Link 
-                    href={link.href}
+                    href={withLocale(link.href)}
                     className={`text-sm text-slate-600 ${genderColorScheme.hoverColor} transition-colors`}
                   >
                     {link.name}
@@ -125,7 +138,7 @@ export default function StudentFooter({ user }) {
               {footerLinks.community.map((link, index) => (
                 <li key={index}>
                   <Link 
-                    href={link.href}
+                    href={withLocale(link.href)}
                     className={`text-sm text-slate-600 ${genderColorScheme.hoverColor} transition-colors`}
                   >
                     {link.name}
@@ -145,7 +158,7 @@ export default function StudentFooter({ user }) {
               {footerLinks.support.map((link, index) => (
                 <li key={index}>
                   <Link 
-                    href={link.href}
+                    href={withLocale(link.href)}
                     className={`text-sm text-slate-600 ${genderColorScheme.hoverColor} transition-colors`}
                   >
                     {link.name}

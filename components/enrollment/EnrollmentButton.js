@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { LogIn, UserPlus, Loader2 } from 'lucide-react';
+import notify from '@/lib/notify';
 
 /**
  * Simple enrollment button that handles authentication and enrollment flow
@@ -77,11 +78,11 @@ export default function EnrollmentButton({
         router.push(dashboardUrl);
       } else {
         console.error('Enrollment failed:', enrollData);
-        alert(`Enrollment failed: ${enrollData.message}\n\nProgram: ${programName}\nID: ${programId}\nType: ${programType}`);
+        notify.error(enrollData.message || 'Enrollment failed. Please try again.');
       }
     } catch (error) {
       console.error('Enrollment error:', error);
-      alert('Enrollment failed. Please try again.');
+      notify.error('Enrollment failed. Please try again.');
     } finally {
       setEnrolling(false);
     }

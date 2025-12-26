@@ -25,5 +25,52 @@
     "headlinePart1": "ادعُ إلى سبيل",
     "headlinePart2": "ربك",
     "subheadline": "انضم إلى مهمة فجر الإسلام للدعوة والإرشاد في نشر رسالة الإسلام الجميلة من خلال الحكمة والرحمة والتوجيه الصحيح. معاً نبني الجسور ونغير القلوب."
+  },
+  "Dashboard": {
+    "Sidebar": {
+      "title": "لوحة تحكم فجر الإسلام",
+      "dashboard": "لوحة التحكم",
+      "learningSectors": "قطاعات التعلم",
+      "dawahComparative": "الدعوة ومقارنة الأديان",
+      "irshadQirat": "الإرشاد (القراءات والعلم)",
+      "tarbiyaCharacter": "التربية والأخلاق",
+      "idadLeadership": "إعداد القيادة",
+      "resources": "المصادر",
+      "resourceLibrary": "مكتبة المصادر",
+      "literatureHistory": "الأدب والتاريخ",
+      "support": "الدعم",
+      "supportMessages": "الدعم والرسائل",
+      "studentWelfare": "رعاية الطلاب",
+      "settings": "الإعدادات",
+      "signOut": "تسجيل الخروج"
+    },
+    "Footer": {
+      "brandTitle": "فجر الإسلام",
+      "brandSubtitle": "بوابة طلاب HUMSJ",
+      "brandDescription": "تمكين الطلاب المسلمين من خلال التعليم الإسلامي الشامل والتطور الروحي.",
+      "sistersWing": "جناح الأخوات",
+      "brothersWing": "جناح الإخوة",
+      "learning": "التعلم",
+      "myCourses": "دوراتي",
+      "availableCourses": "الدورات المتاحة",
+      "schedule": "الجدول",
+      "resources": "المصادر",
+      "sectors": "القطاعات",
+      "tarbiyaIdad": "التربية والإعداد",
+      "literature": "الأدب",
+      "comparativeReligion": "مقارنة الأديان",
+      "ziyaraWelfare": "الزيارة (رعاية الطلاب)",
+      "qiratIlm": "القراءات والعلم",
+      "community": "المجتمع",
+      "studyGroups": "مجموعات الدراسة",
+      "mentorship": "الإرشاد",
+      "events": "الفعاليات",
+      "announcements": "الإعلانات",
+      "support": "الدعم",
+      "helpCenter": "مركز المساعدة",
+      "contactMentor": "تواصل مع المرشد",
+      "settings": "الإعدادات",
+      "feedback": "الملاحظات"
+    }
   }
 }

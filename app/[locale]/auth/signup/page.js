@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { UserPlus, Users, ArrowRight, BookOpen, Heart, Star } from 'lucide-react';
 import AuthHeader from '@/components/auth/AuthHeader';
-import MainFooter from '@/components/layout/MainFooter';
+import Footer from '@/components/footer/Footer';
 
 export default function SignupGenderSelection() {
   const [queryString, setQueryString] = useState('');
@@ -199,7 +199,7 @@ export default function SignupGenderSelection() {
       </div>
 
       {/* Footer */}
-      <MainFooter />
+      <Footer />
     </div>
   );
 }

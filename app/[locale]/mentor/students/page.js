@@ -8,13 +8,50 @@ import {
   Download, UserPlus
 } from 'lucide-react';
 import MentorPageTemplate from '@/components/mentor/MentorPageTemplate';
+import notify from '@/lib/notify';
+import { usePrompt } from '@/components/ui/PromptProvider';
 
 export default function MyStudents() {
+  const promptDialog = usePrompt();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+
+  const assignStudent = async () => {
+    const studentEmail = await promptDialog({
+      title: 'Assign Student',
+      description: 'Enter student email to assign:',
+      confirmText: 'Assign',
+      cancelText: 'Cancel',
+      placeholder: 'student@example.com',
+    });
+    if (!studentEmail) return;
+
+    try {
+      const response = await fetch('/api/mentor/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ studentEmail })
+      });
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to assign student');
+      }
+
+      notify.success('Student assigned successfully');
+
+      // Refresh list
+      const studentsResponse = await fetch('/api/mentor/students', { credentials: 'include' });
+      const studentsData = await studentsResponse.json();
+      if (studentsData.success) setStudents(studentsData.students);
+    } catch (err) {
+      console.error('Assign student error:', err);
+      notify.error(err?.message || 'Failed to assign student');
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,13 +67,8 @@ export default function MyStudents() {
         }
       } catch (err) {
         console.error('Error fetching data:', err);
-        setError(err.message);
-        // Mock data for development
-        setStudents([
-          { id: 1, name: 'Fatima Hassan', email: 'fatima@student.edu', progress: 85, status: 'active', courses: 4 },
-          { id: 2, name: 'Omar Abdullah', email: 'omar@student.edu', progress: 72, status: 'active', courses: 3 },
-          { id: 3, name: 'Aisha Mohamed', email: 'aisha@student.edu', progress: 91, status: 'active', courses: 5 },
-        ]);
+        setError(err.message || 'Failed to fetch students');
+        setStudents([]);
       } finally {
         setLoading(false);
       }
@@ -60,7 +92,7 @@ export default function MyStudents() {
       error={error}
       actions={
         <button
-          onClick={() => alert('Add Student feature coming soon!')}
+          onClick={assignStudent}
           className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
           <UserPlus className="w-4 h-4" />

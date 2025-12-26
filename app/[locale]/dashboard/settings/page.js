@@ -17,6 +17,8 @@ function SettingsContent() {
   const [activeTab, setActiveTab] = useState('profile');
   const [showPassword, setShowPassword] = useState(false);
   const { toasts, removeToast, success, error } = useToast();
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [settings, setSettings] = useState({
     profile: {
       firstName: '',
@@ -52,6 +54,7 @@ function SettingsContent() {
 
   useEffect(() => {
     if (user) {
+      setPhotoPreview(user.profilePhoto || null);
       setSettings(prev => ({
         ...prev,
         profile: {
@@ -63,6 +66,44 @@ function SettingsContent() {
       }));
     }
   }, [user]);
+
+  const handlePhotoSelected = async (file) => {
+    try {
+      if (!file) return;
+      if (!file.type?.startsWith('image/')) {
+        error('Please select an image file.');
+        return;
+      }
+
+      setUploadingPhoto(true);
+
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+      });
+
+      const res = await fetch('/api/dashboard/user', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ profilePhoto: dataUrl })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || data.message || 'Failed to update profile photo');
+      }
+
+      setPhotoPreview(data.profilePhoto || dataUrl);
+      success('Profile photo updated successfully.');
+    } catch (e) {
+      error(e.message || 'Failed to update profile photo');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   const handleSave = async (section) => {
     try {
@@ -140,15 +181,26 @@ function SettingsContent() {
 
                   {/* Profile Picture */}
                   <div className="flex items-center gap-6">
-                    <div className={`w-24 h-24 bg-gradient-to-br from-${genderColors.primary}-400 to-${genderColors.secondary}-500 rounded-full flex items-center justify-center`}>
-                      <User className="w-12 h-12 text-white" />
+                    <div className={`w-24 h-24 bg-gradient-to-br from-${genderColors.primary}-400 to-${genderColors.secondary}-500 rounded-full flex items-center justify-center overflow-hidden`}>
+                      {photoPreview ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <User className="w-12 h-12 text-white" />
+                      )}
                     </div>
                     <div>
                       <h3 className="font-semibold text-slate-800 mb-2">Profile Picture</h3>
-                      <button className={`flex items-center gap-2 px-4 py-2 border border-${genderColors.primary}-300 text-${genderColors.primary}-600 rounded-xl hover:bg-${genderColors.primary}-50 transition-colors`}>
+                      <label className={`inline-flex items-center gap-2 px-4 py-2 border border-${genderColors.primary}-300 text-${genderColors.primary}-600 rounded-xl hover:bg-${genderColors.primary}-50 transition-colors cursor-pointer ${uploadingPhoto ? 'opacity-60 pointer-events-none' : ''}`}>
                         <Camera className="w-4 h-4" />
-                        Change Photo
-                      </button>
+                        {uploadingPhoto ? 'Updating…' : 'Change Photo'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => handlePhotoSelected(e.target.files?.[0] || null)}
+                        />
+                      </label>
                     </div>
                   </div>
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import Footer from '@/components/footer/Footer';
 
 export default function VerifyPhonePage() {
   return (
@@ -50,6 +51,8 @@ export default function VerifyPhonePage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

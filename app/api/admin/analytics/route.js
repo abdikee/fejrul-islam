@@ -126,7 +126,7 @@ export async function GET(request) {
           WHERE created_at >= $1
           GROUP BY DATE(created_at))
           ORDER BY date DESC
-        `, [startDate, startDate, startDate]),
+        `, [startDate]),
         
         // Most popular content
         query(`
@@ -224,27 +224,38 @@ export async function GET(request) {
 
     // System Analytics
     if (metric === 'all' || metric === 'system') {
-      // Generate mock system metrics for demo
-      const systemMetrics = {
-        performance: {
-          avgResponseTime: Math.floor(Math.random() * 200) + 100, // 100-300ms
-          uptime: 99.9,
-          errorRate: Math.random() * 0.5, // 0-0.5%
-          throughput: Math.floor(Math.random() * 1000) + 500 // 500-1500 req/min
+      const [dbTime, activeSessions, totals, resourceBytes] = await Promise.all([
+        query('SELECT NOW() as db_time'),
+        query("SELECT COUNT(*)::int as count FROM users WHERE last_login > NOW() - INTERVAL '1 hour'"),
+        query(`
+          SELECT
+            (SELECT COUNT(*)::int FROM users WHERE role != 'admin') as users,
+            (SELECT COUNT(*)::int FROM courses WHERE is_active = true) as courses,
+            (SELECT COUNT(*)::int FROM resources) as resources,
+            (SELECT COUNT(*)::int FROM announcements WHERE is_active = true) as announcements
+        `),
+        query('SELECT COALESCE(SUM(file_size), 0)::bigint as total_bytes FROM resources')
+      ]);
+
+      analytics.system = {
+        database: {
+          dbTime: dbTime.rows[0]?.db_time ?? null
+        },
+        usage: {
+          activeSessionsLastHour: activeSessions.rows[0]?.count ?? 0,
+          totals: totals.rows[0] ?? { users: 0, courses: 0, resources: 0, announcements: 0 }
         },
         storage: {
-          totalUsed: Math.floor(Math.random() * 5000) + 2000, // MB
-          totalAvailable: 10000, // MB
-          growthRate: Math.floor(Math.random() * 10) + 5 // 5-15% per month
+          resourcesBytes: resourceBytes.rows[0]?.total_bytes ?? 0,
+          totalAvailableBytes: null
         },
-        security: {
-          loginAttempts: Math.floor(Math.random() * 100) + 50,
-          failedLogins: Math.floor(Math.random() * 10) + 2,
-          activeSessions: Math.floor(Math.random() * 200) + 100
+        performance: {
+          avgResponseTimeMs: null,
+          errorRate: null,
+          throughputPerMinute: null,
+          uptimePercent: null
         }
       };
-
-      analytics.system = systemMetrics;
     }
 
     // Generate insights based on data
@@ -284,49 +295,10 @@ export async function GET(request) {
 
   } catch (error) {
     console.error('Error fetching analytics:', error);
-    
-    // Return mock analytics for development
-    return NextResponse.json({
-      success: true,
-      analytics: {
-        users: {
-          growth: [
-            { date: '2024-01-20', new_users: 15, male_users: 8, female_users: 7 },
-            { date: '2024-01-19', new_users: 12, male_users: 6, female_users: 6 },
-            { date: '2024-01-18', new_users: 18, male_users: 9, female_users: 9 }
-          ],
-          summary: { totalUsers: 1247, newUsersInRange: 45 }
-        },
-        content: {
-          sectorDistribution: [
-            { sector_name: 'Tarbiya & Idad', color: 'blue', course_count: 45, resource_count: 89, total_downloads: 1250 },
-            { sector_name: 'Literature', color: 'green', course_count: 32, resource_count: 67, total_downloads: 980 }
-          ],
-          summary: { totalContent: 480, totalDownloads: 5847 }
-        },
-        engagement: {
-          downloads: [
-            { date: '2024-01-20', downloads: 125 },
-            { date: '2024-01-19', downloads: 98 }
-          ],
-          summary: { totalDownloads: 5847, activeAnnouncements: 12 }
-        },
-        system: {
-          performance: { avgResponseTime: 150, uptime: 99.9, errorRate: 0.2, throughput: 750 },
-          storage: { totalUsed: 3500, totalAvailable: 10000, growthRate: 8 },
-          security: { loginAttempts: 75, failedLogins: 3, activeSessions: 150 }
-        }
-      },
-      insights: [
-        {
-          type: 'positive',
-          title: 'Strong User Growth',
-          description: '45 new users registered in the last 30d',
-          action: 'Consider expanding content offerings'
-        }
-      ],
-      timeRange: '30d',
-      generatedAt: new Date().toISOString()
-    });
+
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch analytics data' },
+      { status: 500 }
+    );
   }
 }

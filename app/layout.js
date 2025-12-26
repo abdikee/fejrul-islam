@@ -1,6 +1,9 @@
 import './globals.css';
 
 import { cookies } from 'next/headers';
+import GlobalToaster from '@/components/ui/GlobalToaster';
+import { ConfirmProvider } from '@/components/ui/ConfirmProvider';
+import { PromptProvider } from '@/components/ui/PromptProvider';
 
 export const metadata = {
   title: 'Fejrul Islam HUMSJ',
@@ -19,7 +22,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang={lang}>
       <body className="font-sans antialiased bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors">
-        {children}
+        {/* Global in-page notifications (toasts) */}
+        <GlobalToaster />
+        {/* App-wide confirm and prompt dialog providers */}
+        <ConfirmProvider>
+          <PromptProvider>
+            {children}
+          </PromptProvider>
+        </ConfirmProvider>
       </body>
     </html>
   );

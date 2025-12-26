@@ -1,21 +1,39 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Calendar, Plus, Video, Users, Clock } from 'lucide-react';
 import MentorPageTemplate from '@/components/mentor/MentorPageTemplate';
 
 export default function Sessions() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+  const mentorBase = `${localePrefix}/mentor`;
 
   useEffect(() => {
-    // Mock data
-    setSessions([
-      { id: 1, title: 'Usrah Circle Meeting', date: '2025-01-15T18:00', type: 'Group', students: 8, status: 'upcoming' },
-      { id: 2, title: 'Individual Counseling - Omar', date: '2025-01-16T15:00', type: 'One-on-One', students: 1, status: 'upcoming' },
-      { id: 3, title: 'Assignment Review Session', date: '2025-01-17T19:00', type: 'Academic', students: 12, status: 'upcoming' },
-    ]);
-    setLoading(false);
+    const load = async () => {
+      try {
+        setError('');
+        const res = await fetch('/api/mentor/sessions', { cache: 'no-store' });
+        const data = await res.json();
+        if (!res.ok || !data?.success) throw new Error(data?.message || 'Failed to load sessions');
+        setSessions(data.sessions || []);
+      } catch (e) {
+        console.error(e);
+        setError(e?.message || 'Failed to load sessions');
+        setSessions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    load();
   }, []);
 
   return (
@@ -25,15 +43,19 @@ export default function Sessions() {
       icon={Calendar}
       loading={loading}
       actions={
-        <button
-          onClick={() => alert('Schedule Session feature coming soon!')}
+        <Link
+          href={`${mentorBase}/sessions/schedule`}
           className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Schedule Session
-        </button>
+        </Link>
       }
     >
+      {error ? (
+        <div className="bg-white rounded-2xl p-6 border border-red-200 text-red-700 mb-6">{error}</div>
+      ) : null}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {sessions.map((session) => (
           <div key={session.id} className="bg-white rounded-2xl p-6 border border-green-200 hover:shadow-lg transition-shadow">
@@ -53,7 +75,7 @@ export default function Sessions() {
             <div className="space-y-2 text-sm text-slate-600 mb-4">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                {new Date(session.date).toLocaleString()}
+                {session.date ? new Date(session.date).toLocaleString() : '—'}
               </div>
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4" />
@@ -61,7 +83,7 @@ export default function Sessions() {
               </div>
             </div>
 
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors" disabled>
               <Video className="w-4 h-4" />
               Join Session
             </button>

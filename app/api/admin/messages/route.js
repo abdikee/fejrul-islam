@@ -77,8 +77,8 @@ export async function POST(request) {
     // Insert messages for all recipients
     const insertPromises = targetUserIds.map(recipientId => {
       return query(
-        `INSERT INTO messages (sender_id, recipient_id, subject, content, message_type, priority, sent_at, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())`,
+        `INSERT INTO messages (sender_id, recipient_id, subject, content, message_type, priority, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
         [decoded.userId, recipientId, subject, content, messageType, priority]
       );
     });

@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Users, Search, Eye, AlertCircle, Shield, LogOut } from 'lucide-react';
+import notify from '@/lib/notify';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
+import { usePrompt } from '@/components/ui/PromptProvider';
 
 export default function ImpersonatePage() {
   const [users, setUsers] = useState([]);
@@ -10,6 +13,8 @@ export default function ImpersonatePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [impersonating, setImpersonating] = useState(false);
+  const confirmDialog = useConfirm();
+  const promptDialog = usePrompt();
 
   useEffect(() => {
     fetchUsers();
@@ -30,13 +35,23 @@ export default function ImpersonatePage() {
   };
 
   const handleImpersonate = async (userId, userName) => {
-    if (!confirm(`Are you sure you want to impersonate ${userName}? This action will be logged.`)) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: 'Impersonate User',
+      description: `Are you sure you want to impersonate ${userName}? This action will be logged.`,
+      confirmText: 'Impersonate',
+      cancelText: 'Cancel',
+    });
+    if (!ok) return;
 
-    const reason = prompt('Please provide a reason for impersonation:');
+    const reason = await promptDialog({
+      title: 'Reason Required',
+      description: 'Please provide a reason for impersonation:',
+      confirmText: 'Submit',
+      cancelText: 'Cancel',
+      placeholder: 'e.g., Debugging user enrollment issue',
+    });
     if (!reason) {
-      alert('Reason is required for impersonation');
+      notify.warning('Reason is required for impersonation');
       return;
     }
 
@@ -50,14 +65,14 @@ export default function ImpersonatePage() {
 
       const data = await response.json();
       if (data.success) {
-        alert(`Now impersonating ${userName}. You will be redirected.`);
+        notify.success(`Now impersonating ${userName}. Redirecting...`);
         window.location.href = data.redirectUrl;
       } else {
-        alert(`Failed to impersonate: ${data.message}`);
+        notify.error(`Failed to impersonate: ${data.message}`);
       }
     } catch (error) {
       console.error('Impersonation error:', error);
-      alert('Failed to start impersonation');
+      notify.error('Failed to start impersonation');
     } finally {
       setImpersonating(false);
     }

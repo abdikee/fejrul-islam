@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { User, Mail, Lock, Eye, EyeOff, BookOpen, ArrowLeft, Heart, Phone, Calendar, MapPin, Flower } from 'lucide-react';
-import Alert from '@/components/ui/Alert';
 import PhoneNumberInput from '@/components/ui/PhoneNumberInput';
+import Footer from '@/components/footer/Footer';
+import notify from '@/lib/notify';
 
 export default function FemaleSignupPage() {
   const [redirectUrl, setRedirectUrl] = useState(null);
@@ -12,7 +13,6 @@ export default function FemaleSignupPage() {
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [alert, setAlert] = useState(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -35,35 +35,22 @@ export default function FemaleSignupPage() {
     setShouldEnroll(enroll);
 
     if (redirect && enroll) {
-      setAlert({
-        type: 'info',
-        title: 'Register to Enroll',
-        message: 'Complete registration to enroll in your selected sector.'
-      });
+      notify.info('Complete registration to enroll in your selected sector.');
     }
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAlert(null); // Clear any existing alerts
     
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setAlert({
-        type: 'error',
-        title: 'Password Mismatch',
-        message: 'Passwords do not match. Please ensure both passwords are identical.'
-      });
+      notify.error('Passwords do not match. Please ensure both passwords are identical.');
       return;
     }
     
     // Validate terms agreement
     if (!formData.agreeToTerms) {
-      setAlert({
-        type: 'warning',
-        title: 'Terms Required',
-        message: 'Please agree to the terms and conditions to continue.'
-      });
+      notify.warning('Please agree to the terms and conditions to continue.');
       return;
     }
 
@@ -89,11 +76,9 @@ export default function FemaleSignupPage() {
       const data = await response.json();
 
       if (data.success) {
-        setAlert({
-          type: 'success',
-          title: 'Registration Successful!',
-          message: redirectUrl ? 'Redirecting to complete enrollment...' : 'Welcome to the Sisterhood! Redirecting to your dashboard...'
-        });
+        notify.success(
+          redirectUrl ? 'Redirecting to complete enrollment...' : 'Welcome to the Sisterhood! Redirecting to your dashboard...'
+        );
         
         // Redirect to sector page for enrollment or dashboard
         setTimeout(() => {
@@ -106,19 +91,11 @@ export default function FemaleSignupPage() {
           }
         }, 1500);
       } else {
-        setAlert({
-          type: 'error',
-          title: 'Registration Failed',
-          message: data.message || 'Unable to complete registration. Please try again.'
-        });
+        notify.error(data.message || 'Unable to complete registration. Please try again.');
       }
     } catch (error) {
       console.error('Registration error:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: 'An error occurred during registration. Please try again.'
-      });
+      notify.error('An error occurred during registration. Please try again.');
     }
   };
 
@@ -191,17 +168,6 @@ export default function FemaleSignupPage() {
 
             {/* Form */}
             <div className="p-6 sm:p-8">
-              {/* Alert Display */}
-              {alert && (
-                <Alert
-                  type={alert.type}
-                  title={alert.title}
-                  message={alert.message}
-                  onClose={() => setAlert(null)}
-                  className="mb-6"
-                />
-              )}
-
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -485,6 +451,8 @@ export default function FemaleSignupPage() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

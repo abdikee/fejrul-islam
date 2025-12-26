@@ -31,16 +31,6 @@ export default function ContactAdminForm({ onClose }) {
     setStatus(null);
 
     try {
-      // Get admin user ID (assuming admin has ID 1 or we can fetch it)
-      const adminResponse = await fetch('/api/admin/users?role=admin&limit=1');
-      const adminData = await adminResponse.json();
-      
-      if (!adminData.success || adminData.users.length === 0) {
-        throw new Error('Admin contact not available');
-      }
-
-      const adminId = adminData.users[0].id;
-
       // Send message to admin
       const response = await fetch('/api/messages', {
         method: 'POST',
@@ -49,7 +39,7 @@ export default function ContactAdminForm({ onClose }) {
         },
         credentials: 'include',
         body: JSON.stringify({
-          recipientId: adminId,
+          recipientRole: 'admin',
           subject: formData.subject || 'Message from Student/Mentor',
           content: formData.message,
           messageType: 'support',

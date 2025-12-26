@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { 
   Calendar, User, Tag, ArrowLeft, Share2, Heart, 
   BookOpen, Clock, Eye, MessageSquare, ChevronRight,
-  Facebook, Twitter, Linkedin, Copy, Check
+  Facebook, Twitter, Linkedin, Copy, Check, Video, Download, FileText
 } from 'lucide-react';
 
 export default function ArticlePage() {
@@ -237,13 +237,56 @@ export default function ArticlePage() {
           </header>
 
           {/* Article Image */}
-          {article.image && (
+          {article.image_url && (
             <div className="mb-12">
               <img
-                src={article.image}
+                src={article.image_url}
                 alt={article.title}
                 className="w-full h-96 object-cover rounded-2xl shadow-lg"
               />
+            </div>
+          )}
+
+          {/* Video & Attachment */}
+          {(article.video_url || article.attachment_url) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+              {article.video_url && (
+                <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <Video className="w-5 h-5 text-red-600" />
+                    Video Content
+                  </h3>
+                  <div className="aspect-video rounded-xl overflow-hidden bg-slate-100">
+                    <iframe 
+                      src={article.video_url.replace('watch?v=', 'embed/')} 
+                      className="w-full h-full" 
+                      allowFullScreen
+                      title="Article Video"
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {article.attachment_url && (
+                <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+                  <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <Download className="w-5 h-5 text-blue-600" />
+                    Downloadable Resource
+                  </h3>
+                  <div className="flex flex-col items-center justify-center h-48 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
+                    <FileText className="w-12 h-12 text-slate-400 mb-4" />
+                    <a 
+                      href={article.attachment_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download File
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -292,10 +335,10 @@ export default function ArticlePage() {
               {relatedArticles.map((relatedArticle) => (
                 <Link key={relatedArticle.id} href={`/articles/${relatedArticle.slug}`} className="group block">
                   <article className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                    {relatedArticle.image && (
+                    {relatedArticle.image_url && (
                       <div className="aspect-video overflow-hidden">
                         <img
-                          src={relatedArticle.image}
+                          src={relatedArticle.image_url}
                           alt={relatedArticle.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { 
   User, 
   BookOpen, 
@@ -16,10 +17,15 @@ import {
 } from 'lucide-react';
 
 const DashboardSidebar = ({ user, isOpen, onClose }) => {
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.href = '/auth/login';
+      window.location.href = `${localePrefix}/auth/login`;
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -29,7 +35,7 @@ const DashboardSidebar = ({ user, isOpen, onClose }) => {
     {
       title: 'Dashboard',
       icon: Home,
-      href: '/dashboard',
+      href: `${localePrefix}/dashboard`,
       color: 'text-slate-600'
     },
     {
@@ -38,28 +44,28 @@ const DashboardSidebar = ({ user, isOpen, onClose }) => {
         {
           name: 'Dawah & Comparative Religion',
           icon: MessageCircle,
-          href: '/sectors/comparative-religion',
+          href: `${localePrefix}/sectors/comparative-religion`,
           color: 'text-blue-600',
           progress: user?.progress?.dawah || 0
         },
         {
           name: 'Irshad (Qirat & Ilm)',
           icon: BookOpen,
-          href: '/sectors/qirat-ilm',
+          href: `${localePrefix}/sectors/qirat-ilm`,
           color: 'text-emerald-600',
           progress: user?.progress?.irshad || 0
         },
         {
           name: 'Tarbiya & Character',
           icon: Heart,
-          href: '/sectors/tarbiya-idad',
+          href: `${localePrefix}/sectors/tarbiya-idad`,
           color: 'text-rose-600',
           progress: user?.progress?.tarbiya || 0
         },
         {
           name: 'Idad Leadership',
           icon: GraduationCap,
-          href: '/sectors/tarbiya-idad',
+          href: `${localePrefix}/sectors/tarbiya-idad`,
           color: 'text-purple-600',
           progress: user?.progress?.idad || 0
         }
@@ -71,13 +77,13 @@ const DashboardSidebar = ({ user, isOpen, onClose }) => {
         {
           name: 'Resource Library',
           icon: Download,
-          href: '/resources',
+          href: `${localePrefix}/resources`,
           color: 'text-amber-600'
         },
         {
           name: 'Literature & History',
           icon: BookOpen,
-          href: '/sectors/literature',
+          href: `${localePrefix}/sectors/literature`,
           color: 'text-indigo-600'
         }
       ]
@@ -88,14 +94,14 @@ const DashboardSidebar = ({ user, isOpen, onClose }) => {
         {
           name: 'Support & Messages',
           icon: MessageSquare,
-          href: '/dashboard/feedback',
+          href: `${localePrefix}/dashboard/feedback`,
           color: 'text-green-600',
           private: true
         },
         {
           name: 'Student Welfare',
           icon: Shield,
-          href: '/sectors/ziyara-enhanced',
+          href: `${localePrefix}/sectors/ziyara-enhanced`,
           color: 'text-purple-600',
           protected: true
         }
@@ -214,7 +220,7 @@ const DashboardSidebar = ({ user, isOpen, onClose }) => {
         {/* Footer */}
         <div className="p-4 border-t border-slate-200 space-y-2">
           <Link
-            href="/dashboard/settings"
+            href={`${localePrefix}/dashboard/settings`}
             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors text-slate-600"
             onClick={onClose}
           >

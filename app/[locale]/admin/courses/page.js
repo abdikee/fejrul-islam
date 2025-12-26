@@ -10,8 +10,11 @@ import {
   Users, Clock, Award, TrendingUp, Download, Grid, List
 } from 'lucide-react';
 
+import { useConfirm } from '@/components/ui/ConfirmProvider';
+
 export default function AdminCoursesPage() {
   const searchParams = useSearchParams();
+  const confirmDialog = useConfirm();
   const { toasts, removeToast, success, error, warning } = useToast();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -104,7 +107,13 @@ export default function AdminCoursesPage() {
   };
 
   const handleDelete = async (courseId) => {
-    if (!confirm('Are you sure you want to delete this course?')) return;
+    const ok = await confirmDialog({
+      title: 'Delete Course',
+      description: 'Are you sure you want to delete this course?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/courses?id=${courseId}`, {

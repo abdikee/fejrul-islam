@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { BookOpen, Bell, FileText, Plus, Edit, Trash2, Save, X, Globe, Eye } from 'lucide-react';
+import { BookOpen, Bell, FileText, Plus, Edit, Trash2, Save, X, Globe, Eye, Upload, Loader2 } from 'lucide-react';
+import notify from '@/lib/notify';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
 
 export default function ContentManagement() {
   const searchParams = useSearchParams();
+  const confirmDialog = useConfirm();
   const [activeTab, setActiveTab] = useState('announcements');
   const [announcements, setAnnouncements] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -102,23 +105,29 @@ export default function ContentManagement() {
       
       if (data.success) {
         const label = activeTab === 'pages' ? 'page' : activeTab.slice(0, -1);
-        alert(`${label} ${editingItem ? 'updated' : 'created'} successfully!`);
+        notify.success(`${label} ${editingItem ? 'updated' : 'created'} successfully!`);
         setShowForm(false);
         setEditingItem(null);
         setFormData({});
         loadData();
       } else {
-        alert(data.message || 'Operation failed');
+        notify.error(data.message || 'Operation failed');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred');
+      notify.error('An error occurred');
     }
     setLoading(false);
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    const ok = await confirmDialog({
+      title: 'Delete Item',
+      description: 'Are you sure you want to delete this item?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+    });
+    if (!ok) return;
 
     try {
       const endpoint = activeTab === 'pages'
@@ -136,11 +145,14 @@ export default function ContentManagement() {
 
       const data = await res.json();
       if (data.success) {
-        alert('Deleted successfully!');
+        notify.success('Deleted successfully!');
         loadData();
+      } else {
+        notify.error(data.message || 'Delete failed');
       }
     } catch (error) {
       console.error('Error:', error);
+      notify.error('An error occurred');
     }
   };
 
@@ -594,6 +606,71 @@ function ResourceForm({ formData, setFormData }) {
   );
 }
 
+// File Upload Component
+function FileUpload({ label, value, onChange, accept = "*/*" }) {
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/admin/uploads', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        onChange(data.url);
+        notify.success('File uploaded successfully');
+      } else {
+        notify.error(data.message || 'Upload failed');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      notify.error('Upload failed');
+    }
+    setUploading(false);
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://..."
+          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          accept={accept}
+          onChange={handleUpload}
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 flex items-center gap-2"
+        >
+          {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+          Upload
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // Article Form Component
 function ArticleForm({ formData, setFormData }) {
   return (
@@ -692,16 +769,30 @@ function ArticleForm({ formData, setFormData }) {
         </div>
       </div>
 
+      <FileUpload
+        label="Image URL"
+        value={formData.imageUrl}
+        onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+        accept="image/*"
+      />
+
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Video URL</label>
         <input
           type="url"
-          value={formData.imageUrl || ''}
-          onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-          placeholder="https://example.com/image.jpg"
+          value={formData.videoUrl || ''}
+          onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+          placeholder="https://youtube.com/watch?v=..."
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         />
       </div>
+
+      <FileUpload
+        label="Attachment URL"
+        value={formData.attachmentUrl}
+        onChange={(url) => setFormData({ ...formData, attachmentUrl: url })}
+        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+      />
     </>
   );
 }

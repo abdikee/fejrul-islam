@@ -171,8 +171,8 @@ export async function GET(request) {
         
         ORDER BY content_type, title
       `;
-      
-      const relatedResult = await query(relatedQuery, [sectorId, sectorId]);
+
+      const relatedResult = await query(relatedQuery, [parseInt(sectorId)]);
       integratedContent.relatedContent = relatedResult.rows;
     }
 
@@ -265,66 +265,10 @@ export async function GET(request) {
 
   } catch (error) {
     console.error('Error fetching integrated content:', error);
-    
-    // Return mock integrated content for development
-    return NextResponse.json({
-      success: true,
-      content: {
-        courses: [
-          {
-            id: 1,
-            title: 'Islamic Finance Fundamentals',
-            description: 'Learn the basics of Islamic banking and finance',
-            level: 'Beginner',
-            duration_weeks: 8,
-            sector_name: 'Tarbiya & Idad',
-            sector_color: 'blue',
-            related_resources: 5,
-            created_at: new Date().toISOString()
-          }
-        ],
-        resources: [
-          {
-            id: 1,
-            title: 'Quran Recitation Guide',
-            description: 'Complete guide for proper Quran recitation',
-            resource_type: 'PDF',
-            download_count: 245,
-            sector_name: 'Qirat & Ilm',
-            sector_color: 'teal',
-            created_at: new Date().toISOString()
-          }
-        ],
-        announcements: [
-          {
-            id: 1,
-            title: 'Ramadan Schedule Update',
-            content: 'Updated prayer and study schedule for Ramadan',
-            priority: 'high',
-            target_audience: 'all',
-            created_at: new Date().toISOString()
-          }
-        ],
-        sectors: [
-          { id: 1, name: 'Tarbiya & Idad', color: 'blue', course_count: 45, resource_count: 89 },
-          { id: 2, name: 'Literature', color: 'green', course_count: 32, resource_count: 67 },
-          { id: 3, name: 'Comparative Religion', color: 'purple', course_count: 28, resource_count: 54 },
-          { id: 4, name: 'Ziyara', color: 'orange', course_count: 25, resource_count: 43 },
-          { id: 5, name: 'Qirat & Ilm', color: 'teal', course_count: 26, resource_count: 71 }
-        ],
-        recommendations: [
-          { type: 'course', id: 1, title: 'Islamic Finance Fundamentals', score: 245, sector_name: 'Tarbiya & Idad' },
-          { type: 'resource', id: 1, title: 'Quran Recitation Guide', score: 189, sector_name: 'Qirat & Ilm' }
-        ]
-      },
-      stats: {
-        totalCourses: 156,
-        totalResources: 324,
-        totalAnnouncements: 12,
-        totalSectors: 5,
-        totalDownloads: 5847
-      },
-      timestamp: new Date().toISOString()
-    });
+
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch integrated content' },
+      { status: 500 }
+    );
   }
 }

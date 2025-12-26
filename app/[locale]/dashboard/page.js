@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { RealtimeProvider } from '@/components/realtime/RealtimeProvider';
 import RealtimeNotifications from '@/components/realtime/RealtimeNotifications';
 import AmanahHeroSection from '@/components/dashboard/AmanahHeroSection';
@@ -10,9 +11,14 @@ import SectorNavigationGrid from '@/components/dashboard/SectorNavigationGrid';
 import IhsanProgressSection from '@/components/dashboard/IhsanProgressSection';
 import IdentitySection from '@/components/dashboard/IdentitySection';
 import PrivacyNotification from '@/components/ui/PrivacyNotification';
-import { Menu, MessageCircle } from 'lucide-react';
+import { Menu, X, LogOut, Settings, Home, BookOpen, Calendar, Users, Bell, MessageSquare } from 'lucide-react';
 
 export default function DashboardPage() {
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+
   const [user, setUser] = useState(null);
   const [examMode, setExamMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -26,7 +32,7 @@ export default function DashboardPage() {
         if (!response.ok) {
           // Redirect to login if unauthorized
           if (response.status === 401) {
-            window.location.href = '/auth/login';
+            window.location.href = `${localePrefix}/auth/login`;
             return;
           }
           throw new Error('Failed to fetch user data');
@@ -37,12 +43,12 @@ export default function DashboardPage() {
         if (data.success) {
           // Redirect admin users to admin dashboard
           if (data.user.role === 'admin') {
-            window.location.href = '/admin/dashboard';
+            window.location.href = `${localePrefix}/admin/dashboard`;
             return;
           }
           // Redirect mentor users to mentor dashboard
           if (data.user.role === 'mentor') {
-            window.location.href = '/mentor/dashboard';
+            window.location.href = `${localePrefix}/mentor/dashboard`;
             return;
           }
           setUser(data.user);
@@ -50,7 +56,7 @@ export default function DashboardPage() {
       } catch (error) {
         console.error('Error fetching user data:', error);
         // Redirect to login on error
-        window.location.href = '/auth/login';
+        window.location.href = `${localePrefix}/auth/login`;
       }
     };
 
@@ -89,11 +95,29 @@ export default function DashboardPage() {
     iconColor: 'text-emerald-600'
   };
 
+  const navItems = [
+    { icon: Home, label: 'Dashboard', href: `${localePrefix}/dashboard/${user?.gender || 'male'}` },
+    { icon: BookOpen, label: 'My Courses', href: `${localePrefix}/dashboard/courses` },
+    { icon: Calendar, label: 'Schedule', href: `${localePrefix}/dashboard/schedule` },
+    { icon: Users, label: 'Study Groups', href: `${localePrefix}/dashboard/study-groups` },
+    { icon: Bell, label: 'Announcements', href: `${localePrefix}/dashboard/announcements` },
+    { icon: MessageSquare, label: 'Support', href: `${localePrefix}/dashboard/feedback` },
+    { icon: Settings, label: 'Settings', href: `${localePrefix}/dashboard/settings` },
+  ];
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } finally {
+      window.location.href = `${localePrefix}/auth/login`;
+    }
+  };
+
   return (
     <RealtimeProvider userId={user.id}>
       <div className={`min-h-screen bg-gradient-to-br ${colorScheme.bgGradient} ${examMode ? 'exam-mode' : ''}`}>
         {/* Mobile Header */}
-        <div className="lg:hidden bg-white/90 backdrop-blur-sm border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+        <div className="lg:hidden bg-white/90 backdrop-blur-sm border-b border-slate-200 px-4 py-3 flex items-center justify-between gap-3 sticky top-0 z-40">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
@@ -101,8 +125,8 @@ export default function DashboardPage() {
             <Menu className="w-5 h-5 text-slate-600" />
           </button>
           
-          <div className="flex items-center gap-3">
-            <h1 className="font-bold text-slate-800">Amanah Dashboard</h1>
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <h1 className="font-bold text-slate-800 truncate">Amanah Dashboard</h1>
             <div className={`w-2 h-2 rounded-full ${user.gender === 'female' ? 'bg-teal-500' : 'bg-emerald-500'}`} />
           </div>
 
@@ -170,22 +194,55 @@ export default function DashboardPage() {
               className="absolute inset-0 bg-black bg-opacity-50"
               onClick={() => setSidebarOpen(false)}
             />
-            <div className="absolute left-0 top-0 bottom-0 w-64 bg-white shadow-xl">
-              {/* Mobile navigation content would go here */}
-              <div className="p-4">
-                <h2 className="font-bold text-slate-800 mb-4">Navigation</h2>
-                <nav className="space-y-2">
-                  <Link href="/dashboard" className="block p-2 text-slate-600 hover:bg-slate-100 rounded">
-                    Dashboard
-                  </Link>
-                  <Link href="/dashboard/home" className="block p-2 text-slate-600 hover:bg-slate-100 rounded">
-                    Enhanced Home
-                  </Link>
-                  <Link href="/sectors" className="block p-2 text-slate-600 hover:bg-slate-100 rounded">
-                    Sectors
-                  </Link>
-                </nav>
+            <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-white shadow-xl">
+              <div className="p-4 border-b border-slate-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 ${colorScheme.buttonPrimary} rounded-lg flex items-center justify-center`}>
+                      <span className="text-white font-bold text-sm">
+                        {user.firstName?.[0]}{user.lastName?.[0]}
+                      </span>
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-slate-800">Amanah</h2>
+                      <p className="text-xs text-slate-600">Student Portal</p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-1 hover:bg-slate-100 rounded"
+                    aria-label="Close menu"
+                  >
+                    <X className="w-5 h-5 text-slate-600" />
+                  </button>
+                </div>
               </div>
+
+              <nav className="p-4 space-y-2">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                      onClick={() => setSidebarOpen(false)}
+                    >
+                      <Icon className="w-5 h-5" />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-700 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Sign out
+                </button>
+              </nav>
             </div>
           </div>
         )}

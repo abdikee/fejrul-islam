@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { 
   GraduationCap, Search, Clock, Bell, Settings, LogOut,
   Users, FileCheck, Plus, Calendar, Filter, BarChart3, Download,
-  BookOpen, MessageSquare
+  BookOpen, MessageSquare, Menu, X, ArrowLeft
 } from 'lucide-react';
 import MentorFooter from './MentorFooter';
 
@@ -19,6 +19,7 @@ export default function MentorShell({ user, children }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState(3);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -35,6 +36,7 @@ export default function MentorShell({ user, children }) {
   };
 
   const isActive = (path) => pathname === path || pathname?.startsWith(`${path}/`);
+  const isMentorDashboard = pathname === `${mentorBase}/dashboard`;
 
   const sidebarItems = [
     { label: 'Dashboard', href: `${mentorBase}/dashboard` },
@@ -51,6 +53,62 @@ export default function MentorShell({ user, children }) {
 
   return (
     <>
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] bg-white shadow-xl">
+            <div className="p-4 border-b border-slate-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                    <GraduationCap className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-slate-800">Mentor Portal</h2>
+                    <p className="text-xs text-slate-600">HUMSJ</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="p-1 hover:bg-slate-100 rounded"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5 text-slate-600" />
+                </button>
+              </div>
+            </div>
+
+            <nav className="p-4 space-y-2">
+              {sidebarItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    isActive(item.href)
+                      ? 'bg-green-100 text-green-800'
+                      : 'text-slate-700 hover:bg-green-50 hover:text-green-800'
+                  }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-red-700 hover:bg-red-50 transition-colors"
+              >
+                Sign out
+              </button>
+            </nav>
+          </div>
+        </div>
+      )}
+
       {/* Top Header */}
       <header className="bg-white border-b border-green-200 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 lg:px-6">
@@ -58,6 +116,26 @@ export default function MentorShell({ user, children }) {
           <div className="flex items-center justify-between py-4">
             {/* Logo & Greeting */}
             <div className="flex items-center gap-4">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 hover:bg-green-50 rounded-lg transition-colors"
+                aria-label="Open menu"
+              >
+                <Menu className="w-5 h-5 text-green-700" />
+              </button>
+
+              {/* Back Button (to mentor dashboard) */}
+              {!isMentorDashboard && (
+                <Link
+                  href={`${mentorBase}/dashboard`}
+                  className="p-2 hover:bg-green-50 rounded-lg transition-colors"
+                  aria-label="Back to dashboard"
+                >
+                  <ArrowLeft className="w-5 h-5 text-green-700" />
+                </Link>
+              )}
+
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
                   <GraduationCap className="w-6 h-6 text-white" />

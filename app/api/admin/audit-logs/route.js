@@ -21,6 +21,8 @@ export async function GET(request) {
     const offset = parseInt(searchParams.get('offset')) || 0;
     const actionType = searchParams.get('actionType');
     const userId = searchParams.get('userId');
+    const searchQuery = (searchParams.get('q') || '').trim();
+    const format = (searchParams.get('format') || '').toLowerCase();
 
     let query = `
       SELECT 
@@ -48,6 +50,75 @@ export async function GET(request) {
       paramCount++;
     }
 
+    if (searchQuery) {
+      query += ` AND (
+        LOWER(al.action_type) LIKE $${paramCount}
+        OR LOWER(COALESCE(al.action_description, '')) LIKE $${paramCount}
+        OR LOWER(COALESCE(al.target_type, '')) LIKE $${paramCount}
+        OR LOWER(COALESCE(al.ip_address, '')) LIKE $${paramCount}
+        OR LOWER(COALESCE(u.first_name, '')) LIKE $${paramCount}
+        OR LOWER(COALESCE(u.last_name, '')) LIKE $${paramCount}
+        OR LOWER(COALESCE(u.email, '')) LIKE $${paramCount}
+        OR LOWER(COALESCE(al.metadata::text, '')) LIKE $${paramCount}
+      )`;
+      params.push(`%${searchQuery.toLowerCase()}%`);
+      paramCount++;
+    }
+
+    if (format === 'csv') {
+      // Export all matching rows up to a safe cap
+      const exportLimit = Math.min(limit || 5000, 5000);
+      query += ` ORDER BY al.created_at DESC LIMIT $${paramCount}`;
+      params.push(exportLimit);
+
+      const result = await pool.query(query, params);
+
+      const headers = [
+        'created_at',
+        'action_type',
+        'action_description',
+        'target_type',
+        'target_id',
+        'ip_address',
+        'user_email',
+        'user_role',
+        'metadata'
+      ];
+
+      const escapeCsv = (value) => {
+        if (value === null || value === undefined) return '';
+        const str = typeof value === 'string' ? value : JSON.stringify(value);
+        const escaped = str.replace(/"/g, '""');
+        return `"${escaped}"`;
+      };
+
+      const lines = [headers.join(',')];
+      for (const row of result.rows) {
+        lines.push(
+          [
+            escapeCsv(row.created_at),
+            escapeCsv(row.action_type),
+            escapeCsv(row.action_description),
+            escapeCsv(row.target_type),
+            escapeCsv(row.target_id),
+            escapeCsv(row.ip_address),
+            escapeCsv(row.email),
+            escapeCsv(row.role),
+            escapeCsv(row.metadata)
+          ].join(',')
+        );
+      }
+
+      const csv = lines.join('\n');
+      return new NextResponse(csv, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': 'attachment; filename="audit-logs.csv"'
+        }
+      });
+    }
+
     query += ` ORDER BY al.created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
     params.push(limit, offset);
 
@@ -67,6 +138,19 @@ export async function GET(request) {
     if (userId) {
       countQuery += ` AND user_id = $${countParamCount}`;
       countParams.push(userId);
+      countParamCount++;
+    }
+
+    if (searchQuery) {
+      countQuery += ` AND (
+        LOWER(action_type) LIKE $${countParamCount}
+        OR LOWER(COALESCE(action_description, '')) LIKE $${countParamCount}
+        OR LOWER(COALESCE(target_type, '')) LIKE $${countParamCount}
+        OR LOWER(COALESCE(ip_address, '')) LIKE $${countParamCount}
+        OR LOWER(COALESCE(metadata::text, '')) LIKE $${countParamCount}
+      )`;
+      countParams.push(`%${searchQuery.toLowerCase()}%`);
+      countParamCount++;
     }
 
     const countResult = await pool.query(countQuery, countParams);

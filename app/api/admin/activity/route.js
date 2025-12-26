@@ -103,16 +103,16 @@ export async function GET(request) {
       // Active sessions (users logged in today)
       query('SELECT COUNT(*) as count FROM users WHERE last_login > CURRENT_DATE'),
       
-      // Mock error logs count (you can implement actual error logging)
-      Promise.resolve({ rows: [{ count: 0 }] })
+      // Error logs not implemented
+      Promise.resolve({ rows: [{ count: null }] })
     ]);
 
     const systemHealth = {
       database: dbHealthResult.rows.length > 0 ? 'healthy' : 'error',
       activeSessions: parseInt(activeSessionsResult.rows[0].count),
-      errorCount: parseInt(errorLogsResult.rows[0].count),
-      uptime: '99.9%', // You can implement actual uptime tracking
-      lastBackup: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // Mock last backup
+      errorCount: errorLogsResult.rows[0].count === null ? null : parseInt(errorLogsResult.rows[0].count),
+      uptime: null,
+      lastBackup: null
     };
 
     return NextResponse.json({

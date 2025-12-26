@@ -6,6 +6,7 @@ import {
   CheckCircle, AlertCircle, Plus, Edit, Trash2,
   Eye, Download, Upload, Settings
 } from 'lucide-react';
+import notify from '@/lib/notify';
 
 export default function ActivityFeed() {
   const [activities, setActivities] = useState([
@@ -95,7 +96,7 @@ export default function ActivityFeed() {
     // View specific activity details
     console.log('Viewing activity:', activityId);
     // You could open a modal or navigate to details page
-    alert(`Viewing details for activity ${activityId}`);
+    notify.info(`Viewing details for activity ${activityId}`);
   };
 
   const handleExportLog = () => {

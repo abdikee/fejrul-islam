@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   BookOpen, Search, Filter, Plus, Calendar, 
-  Users, Clock, ArrowLeft, Edit, Trash2
+  Users
 } from 'lucide-react';
 import MentorPageTemplate from '@/components/mentor/MentorPageTemplate';
 
 export default function Assignments() {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const pathname = usePathname();
   const supportedLocales = ['en', 'ar', 'om', 'am'];
@@ -22,14 +23,19 @@ export default function Assignments() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Mock data for development
-        setAssignments([
-          { id: 1, title: 'Tafseer Analysis', course: 'Quranic Studies', dueDate: '2025-01-15', submissions: 8, total: 12, status: 'active' },
-          { id: 2, title: 'Hadith Research', course: 'Hadith Studies', dueDate: '2025-01-20', submissions: 10, total: 10, status: 'completed' },
-          { id: 3, title: 'Islamic Leadership Essay', course: 'Leadership', dueDate: '2025-01-25', submissions: 3, total: 15, status: 'active' },
-        ]);
+        setError('');
+        const res = await fetch('/api/mentor/assignments', { cache: 'no-store' });
+        const data = await res.json();
+
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.message || 'Failed to load assignments');
+        }
+
+        setAssignments(data.assignments || []);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError(error?.message || 'Failed to load assignments');
+        setAssignments([]);
       } finally {
         setLoading(false);
       }
@@ -48,6 +54,15 @@ export default function Assignments() {
       </div>
     );
   }
+
+  const filteredAssignments = assignments.filter((a) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (a.title || '').toLowerCase().includes(q) ||
+      (a.course || '').toLowerCase().includes(q)
+    );
+  });
 
   return (
     <MentorPageTemplate
@@ -84,9 +99,15 @@ export default function Assignments() {
           </div>
         </div>
 
+        {error ? (
+          <div className="bg-white rounded-2xl p-6 border border-red-200 text-red-700 mb-6">
+            {error}
+          </div>
+        ) : null}
+
         {/* Assignments List */}
         <div className="space-y-4">
-          {assignments.map((assignment) => (
+          {filteredAssignments.map((assignment) => (
             <div key={assignment.id} className="bg-white rounded-2xl p-6 border border-green-200 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -103,7 +124,7 @@ export default function Assignments() {
                   <div className="flex flex-wrap gap-4 text-sm">
                     <div className="flex items-center gap-2 text-slate-600">
                       <Calendar className="w-4 h-4" />
-                      Due: {new Date(assignment.dueDate).toLocaleDateString()}
+                      Due: {assignment.dueDate ? new Date(assignment.dueDate).toLocaleDateString() : '—'}
                     </div>
                     <div className="flex items-center gap-2 text-slate-600">
                       <Users className="w-4 h-4" />
@@ -111,21 +132,15 @@ export default function Assignments() {
                     </div>
                   </div>
                 </div>
-                
-                <div className="flex gap-2">
-                  <Link href={`${mentorBase}/assignments/${assignment.id}/edit`} className="p-2 hover:bg-green-100 rounded-lg transition-colors" aria-label="Edit assignment">
-                    <Edit className="w-4 h-4 text-green-600" />
-                  </Link>
-                  <button className="p-2 hover:bg-red-100 rounded-lg transition-colors">
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </button>
-                </div>
               </div>
               
               <div className="mt-4 pt-4 border-t border-slate-200">
                 <div className="flex justify-between items-center">
                   <div className="text-sm text-slate-600">
-                    Submission Progress: {Math.round((assignment.submissions / assignment.total) * 100)}%
+                    Submission Progress:{' '}
+                    {assignment.total > 0
+                      ? `${Math.round((assignment.submissions / assignment.total) * 100)}%`
+                      : '—'}
                   </div>
                   <Link href={`${mentorBase}/assignments/${assignment.id}`} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm">
                     View Details

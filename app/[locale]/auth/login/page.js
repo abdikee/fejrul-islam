@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { User, Lock, Eye, EyeOff, BookOpen, ArrowLeft } from 'lucide-react';
 import AuthHeader from '@/components/auth/AuthHeader';
-import MainFooter from '@/components/layout/MainFooter';
-import Alert from '@/components/ui/Alert';
+import Footer from '@/components/footer/Footer';
+import notify from '@/lib/notify';
 
 function safeInternalPath(value) {
   if (!value || typeof value !== 'string') return null;
@@ -26,7 +26,6 @@ export default function LoginPage() {
   const [returnUrl, setReturnUrl] = useState(null);
 
   const [showPassword, setShowPassword] = useState(false);
-  const [alert, setAlert] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -44,7 +43,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAlert(null);
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -59,11 +57,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!data.success) {
-        setAlert({
-          type: 'error',
-          title: 'Login Failed',
-          message: data.message || 'Invalid email or password. Please try again.'
-        });
+        notify.error(data.message || 'Invalid email or password. Please try again.');
         return;
       }
 
@@ -88,11 +82,7 @@ export default function LoginPage() {
       else window.location.href = `/dashboard/${gender || 'male'}`;
     } catch (error) {
       console.error('Login error:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: 'An error occurred during login. Please try again.'
-      });
+      notify.error('An error occurred during login. Please try again.');
     }
   };
 
@@ -134,16 +124,6 @@ export default function LoginPage() {
             </div>
 
             <div className="p-6 sm:p-8">
-              {alert && (
-                <Alert
-                  type={alert.type}
-                  title={alert.title}
-                  message={alert.message}
-                  onClose={() => setAlert(null)}
-                  className="mb-6"
-                />
-              )}
-
               {returnUrl && (
                 <div className="mb-6 flex items-start gap-3 bg-emerald-50 border border-emerald-200 rounded-lg p-4">
                   <ArrowLeft className="w-5 h-5 text-emerald-700 flex-shrink-0 mt-0.5" />
@@ -245,7 +225,7 @@ export default function LoginPage() {
       </div>
 
       {/* Footer */}
-      <MainFooter />
+      <Footer />
     </div>
   );
 }

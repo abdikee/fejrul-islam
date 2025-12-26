@@ -23,12 +23,14 @@ export async function GET(request) {
     // Get comprehensive dashboard statistics
     const [
       usersStats,
+      usersPrevPeriod,
       coursesStats,
+      coursesPrevPeriod,
       resourcesStats,
+      resourcesPrevPeriod,
       announcementsStats,
       sectorsStats,
-      recentActivity,
-      systemHealth
+      recentActivity
     ] = await Promise.all([
       // Users statistics
       query(`
@@ -42,6 +44,14 @@ export async function GET(request) {
           COUNT(CASE WHEN created_at > NOW() - INTERVAL '30 days' THEN 1 END) as new_users_month
         FROM users WHERE role != 'admin'
       `),
+
+      // Previous 30-day window users
+      query(`
+        SELECT
+          COUNT(CASE WHEN created_at <= NOW() - INTERVAL '30 days'
+                    AND created_at > NOW() - INTERVAL '60 days' THEN 1 END) as new_users_prev_month
+        FROM users WHERE role != 'admin'
+      `),
       
       // Courses statistics
       query(`
@@ -52,25 +62,79 @@ export async function GET(request) {
           AVG(duration_weeks) as avg_duration
         FROM courses
       `),
+
+      // Previous 30-day window courses
+      query(`
+        SELECT
+          COUNT(CASE WHEN created_at <= NOW() - INTERVAL '30 days'
+                    AND created_at > NOW() - INTERVAL '60 days' THEN 1 END) as new_courses_prev_month
+        FROM courses
+      `),
       
       // Resources statistics
       query(`
         SELECT 
           COUNT(*) as total_resources,
-
-          return NextResponse.json(
-            { success: false, message: 'Failed to fetch dashboard stats' },
-            { status: 500 }
-          );
-          END as status,
-          NOW() as last_check
+          COALESCE(SUM(download_count), 0) as total_downloads,
+          COUNT(CASE WHEN created_at > NOW() - INTERVAL '30 days' THEN 1 END) as new_resources_month,
+          COALESCE(SUM(file_size), 0) as total_storage_bytes
         FROM resources
+      `)
+
+      ,
+
+      // Previous 30-day window resources
+      query(`
+        SELECT
+          COUNT(CASE WHEN created_at <= NOW() - INTERVAL '30 days'
+                    AND created_at > NOW() - INTERVAL '60 days' THEN 1 END) as new_resources_prev_month
+        FROM resources
+      `),
+
+      // Announcements statistics
+      query(`
+        SELECT
+          COUNT(*) as total_announcements,
+          COUNT(CASE WHEN is_active = true THEN 1 END) as active_announcements,
+          COUNT(CASE WHEN is_active = true AND priority = 'urgent' THEN 1 END) as urgent_announcements
+        FROM announcements
+      `),
+
+      // Sector content distribution
+      query(`
+        SELECT
+          ls.id,
+          ls.name,
+          ls.color,
+          COUNT(DISTINCT c.id) as course_count,
+          COUNT(DISTINCT r.id) as resource_count
+        FROM learning_sectors ls
+        LEFT JOIN courses c ON c.sector_id = ls.id
+        LEFT JOIN resources r ON r.sector_id = ls.id
+        GROUP BY ls.id, ls.name, ls.color
+        ORDER BY ls.name
+      `),
+
+      // Recent activity (best-effort from audit_logs if present)
+      query(`
+        SELECT
+          action_type as activity_type,
+          action_description as description,
+          created_at as activity_time,
+          COALESCE((metadata->>'status'), 'info') as status,
+          COALESCE((metadata->>'audience'), 'system') as gender
+        FROM audit_logs
+        ORDER BY created_at DESC
+        LIMIT 15
       `)
     ]);
 
-    // Calculate growth percentages (mock calculation for demo)
-    const currentMonth = new Date().getMonth();
-    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const safeGrowthRate = (currentValue, previousValue) => {
+      const current = Number(currentValue) || 0;
+      const previous = Number(previousValue) || 0;
+      if (previous <= 0) return current > 0 ? 100 : 0;
+      return Math.round(((current - previous) / previous) * 100);
+    };
     
     // Format storage size
     const formatBytes = (bytes) => {
@@ -90,14 +154,20 @@ export async function GET(request) {
         male: parseInt(usersStats.rows[0].male_users),
         female: parseInt(usersStats.rows[0].female_users),
         newThisMonth: parseInt(usersStats.rows[0].new_users_month),
-        growthRate: Math.floor(Math.random() * 20) + 5 // Mock growth rate
+        growthRate: safeGrowthRate(
+          usersStats.rows[0].new_users_month,
+          usersPrevPeriod.rows[0]?.new_users_prev_month
+        )
       },
       courses: {
         total: parseInt(coursesStats.rows[0].total_courses),
         active: parseInt(coursesStats.rows[0].active_courses),
         newThisMonth: parseInt(coursesStats.rows[0].new_courses_month),
         averageDuration: parseFloat(coursesStats.rows[0].avg_duration || 0).toFixed(1),
-        growthRate: Math.floor(Math.random() * 15) + 3
+        growthRate: safeGrowthRate(
+          coursesStats.rows[0].new_courses_month,
+          coursesPrevPeriod.rows[0]?.new_courses_prev_month
+        )
       },
       resources: {
         total: parseInt(resourcesStats.rows[0].total_resources),
@@ -105,7 +175,10 @@ export async function GET(request) {
         newThisMonth: parseInt(resourcesStats.rows[0].new_resources_month),
         totalStorage: formatBytes(parseInt(resourcesStats.rows[0].total_storage_bytes || 0)),
         storageBytes: parseInt(resourcesStats.rows[0].total_storage_bytes || 0),
-        growthRate: Math.floor(Math.random() * 25) + 8
+        growthRate: safeGrowthRate(
+          resourcesStats.rows[0].new_resources_month,
+          resourcesPrevPeriod.rows[0]?.new_resources_prev_month
+        )
       },
       announcements: {
         total: parseInt(announcementsStats.rows[0].total_announcements),
@@ -128,16 +201,16 @@ export async function GET(request) {
         audience: activity.gender
       })),
       systemHealth: {
-        database: systemHealth.rows.find(h => h.component === 'database')?.status || 'healthy',
-        storage: systemHealth.rows.find(h => h.component === 'storage')?.status || 'healthy',
-        api: 'healthy', // Always healthy for demo
+        database: 'healthy',
+        storage: 'healthy',
+        api: 'healthy',
         users: 'healthy'
       },
       overview: {
         totalContent: parseInt(coursesStats.rows[0].total_courses) + parseInt(resourcesStats.rows[0].total_resources),
         totalEngagement: parseInt(resourcesStats.rows[0].total_downloads || 0),
-        systemUptime: '99.9%',
-        lastBackup: new Date().toISOString()
+        systemUptime: null,
+        lastBackup: null
       }
     };
 
@@ -149,67 +222,10 @@ export async function GET(request) {
 
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
-    
-    // Return mock data for development
-    return NextResponse.json({
-      success: true,
-      stats: {
-        users: {
-          total: 1247,
-          active: 892,
-          students: 1180,
-          mentors: 67,
-          male: 623,
-          female: 624,
-          newThisMonth: 45,
-          growthRate: 12
-        },
-        courses: {
-          total: 156,
-          active: 142,
-          newThisMonth: 8,
-          averageDuration: '6.5',
-          growthRate: 15
-        },
-        resources: {
-          total: 324,
-          totalDownloads: 5847,
-          newThisMonth: 23,
-          totalStorage: '2.4 GB',
-          storageBytes: 2576980377,
-          growthRate: 18
-        },
-        announcements: {
-          total: 89,
-          active: 12,
-          urgent: 2
-        },
-        sectors: [
-          { id: 1, name: 'Tarbiya & Idad', color: 'blue', courseCount: 45, resourceCount: 89, totalContent: 134 },
-          { id: 2, name: 'Literature', color: 'green', courseCount: 32, resourceCount: 67, totalContent: 99 },
-          { id: 3, name: 'Comparative Religion', color: 'purple', courseCount: 28, resourceCount: 54, totalContent: 82 },
-          { id: 4, name: 'Ziyara', color: 'orange', courseCount: 25, resourceCount: 43, totalContent: 68 },
-          { id: 5, name: 'Qirat & Ilm', color: 'teal', courseCount: 26, resourceCount: 71, totalContent: 97 }
-        ],
-        recentActivity: [
-          { type: 'user_registration', description: 'Fatima Al-Zahra registered', time: new Date(Date.now() - 300000), status: 'success', audience: 'female' },
-          { type: 'course_created', description: 'New course: Islamic Finance Basics', time: new Date(Date.now() - 900000), status: 'success', audience: 'system' },
-          { type: 'announcement_published', description: 'Announcement: Ramadan Schedule', time: new Date(Date.now() - 1800000), status: 'info', audience: 'all' }
-        ],
-        systemHealth: {
-          database: 'healthy',
-          storage: 'warning',
-          api: 'healthy',
-          users: 'healthy'
-        },
-        overview: {
-          totalContent: 480,
-          totalEngagement: 5847,
-          systemUptime: '99.9%',
-          lastBackup: new Date().toISOString()
-        }
-      },
-      timestamp: new Date().toISOString()
-    });
+
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch dashboard stats' },
+      { status: 500 }
+    );
   }
 }

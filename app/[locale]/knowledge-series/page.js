@@ -375,14 +375,32 @@ export default function KnowledgeSeriesPage() {
               
               <div className="mt-6 pt-4 border-t border-slate-200 text-center">
                 <button 
-                  onClick={() => alert('Video player coming soon!')}
-                  className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold mr-4"
+                  onClick={() => {
+                    if (selectedSeries?.video_url) {
+                      window.open(selectedSeries.video_url, '_blank', 'noreferrer');
+                    }
+                  }}
+                  disabled={!selectedSeries?.video_url}
+                  className={`px-8 py-3 rounded-lg transition-colors font-semibold mr-4 ${
+                    selectedSeries?.video_url
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                      : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                  }`}
                 >
                   Start Watching
                 </button>
                 <button 
-                  onClick={() => alert('Download feature coming soon!')}
-                  className="px-8 py-3 border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors font-semibold"
+                  onClick={() => {
+                    if (selectedSeries?.download_url) {
+                      window.open(selectedSeries.download_url, '_blank', 'noreferrer');
+                    }
+                  }}
+                  disabled={!selectedSeries?.download_url}
+                  className={`px-8 py-3 rounded-lg transition-colors font-semibold ${
+                    selectedSeries?.download_url
+                      ? 'border border-slate-300 text-slate-600 hover:bg-slate-50'
+                      : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                  }`}
                 >
                   Download Series
                 </button>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import PhoneNumberInput from '@/components/ui/PhoneNumberInput';
+import notify from '@/lib/notify';
 
 export default function UserFormModal({ isOpen, onClose, onSubmit, user = null, title }) {
   const [formData, setFormData] = useState({
@@ -54,12 +55,12 @@ export default function UserFormModal({ isOpen, onClose, onSubmit, user = null, 
     
     // Validate required fields
     if (!formData.firstName || !formData.lastName || !formData.email) {
-      alert('Please fill in all required fields');
+      notify.warning('Please fill in all required fields');
       return;
     }
 
     if (!user && !formData.password) {
-      alert('Password is required for new users');
+      notify.warning('Password is required for new users');
       return;
     }
 

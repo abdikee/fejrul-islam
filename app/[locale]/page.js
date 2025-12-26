@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import {
   ArrowRight, BookOpen, Users, Heart, MessageSquare,
-  Clock, Compass, CheckCircle, FileText
+  Clock, Compass, CheckCircle, FileText, Video, Download
 } from 'lucide-react';
 import EnrollmentButton from '@/components/enrollment/EnrollmentButton';
 
@@ -16,14 +16,15 @@ export default function Home() {
   const t = useTranslations('Hero');
   const [currentTime, setCurrentTime] = useState(new Date());
   const [stats, setStats] = useState({
-    peopleReached: 12847,
-    activeDais: 45,
-    dawahPrograms: 89,
-    onlineNow: 267,
-    guidanceSessions: 3421,
-    communities: 8
+    peopleReached: null,
+    activeDais: null,
+    dawahPrograms: null,
+    onlineNow: null,
+    guidanceSessions: null,
+    communities: null
   });
   const [activeFeature, setActiveFeature] = useState(0);
+  const [articles, setArticles] = useState([]);
 
   // Helper function to get correct sector codes
   const getSectorCode = (sectorName) => {
@@ -39,12 +40,34 @@ export default function Home() {
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    const statsTimer = setInterval(() => {
-      setStats(prev => ({
-        ...prev,
-        onlineNow: Math.floor(Math.random() * 50) + 220
-      }));
-    }, 5000);
+
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/public/stats', { cache: 'no-store' });
+        const data = await res.json();
+        if (data?.success && data?.stats) {
+          setStats(data.stats);
+        }
+      } catch (e) {
+        // best-effort
+      }
+    };
+
+    fetchStats();
+    const statsTimer = setInterval(fetchStats, 30000);
+
+    const fetchArticles = async () => {
+      try {
+        const res = await fetch('/api/public/articles?limit=3', { cache: 'no-store' });
+        const data = await res.json();
+        if (data?.success) {
+          setArticles(data.articles);
+        }
+      } catch (e) {
+        console.error('Error fetching articles:', e);
+      }
+    };
+    fetchArticles();
 
     return () => {
       clearInterval(timer);
@@ -58,28 +81,28 @@ export default function Home() {
       description: 'Comprehensive Islamic outreach initiatives to spread the message of Islam with wisdom and beautiful preaching to communities.',
       icon: MessageSquare,
       color: 'emerald',
-      stats: '12,847 People Reached'
+      stats: stats.peopleReached === null ? 'Loading...' : `${stats.peopleReached.toLocaleString()} People Reached`
     },
     {
       title: 'Irshad & Guidance Services',
       description: 'Connect with qualified Islamic scholars and counselors for spiritual guidance, religious questions, and life direction.',
       icon: Compass,
       color: 'blue',
-      stats: '3,421 Guidance Sessions'
+      stats: stats.guidanceSessions === null ? 'Loading...' : `${stats.guidanceSessions.toLocaleString()} Guidance Sessions`
     },
     {
       title: 'Community Engagement',
       description: 'Building strong Muslim communities through events, workshops, and interfaith dialogue programs.',
       icon: Users,
       color: 'purple',
-      stats: '8 Active Communities'
+      stats: stats.communities === null ? 'Loading...' : `${stats.communities.toLocaleString()} Active Communities`
     },
     {
       title: 'Islamic Resources Hub',
       description: 'Access authentic Islamic materials, books, videos, and resources for personal development and dawah work.',
       icon: BookOpen,
       color: 'orange',
-      stats: '89 Programs Available'
+      stats: stats.dawahPrograms === null ? 'Loading...' : `${stats.dawahPrograms.toLocaleString()} Programs Available`
     }
   ];
 
@@ -199,27 +222,27 @@ export default function Home() {
             {/* Live Statistics */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg dark:shadow-2xl rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.peopleReached.toLocaleString()}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400">{typeof stats.peopleReached === 'number' ? stats.peopleReached.toLocaleString() : '—'}</div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">People Reached</div>
               </div>
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg dark:shadow-2xl rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.activeDais}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">{typeof stats.activeDais === 'number' ? stats.activeDais.toLocaleString() : '—'}</div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Active Dais</div>
               </div>
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg dark:shadow-2xl rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.dawahPrograms}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">{typeof stats.dawahPrograms === 'number' ? stats.dawahPrograms.toLocaleString() : '—'}</div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Programs</div>
               </div>
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg dark:shadow-2xl rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.communities}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400">{typeof stats.communities === 'number' ? stats.communities.toLocaleString() : '—'}</div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Communities</div>
               </div>
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg dark:shadow-2xl rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-teal-600 dark:text-teal-400">{stats.guidanceSessions.toLocaleString()}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-teal-600 dark:text-teal-400">{typeof stats.guidanceSessions === 'number' ? stats.guidanceSessions.toLocaleString() : '—'}</div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Guidance Sessions</div>
               </div>
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg dark:shadow-2xl rounded-2xl p-4 sm:p-6 hover:shadow-xl transition-shadow">
-                <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">{stats.onlineNow}</div>
+                <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">{typeof stats.onlineNow === 'number' ? stats.onlineNow.toLocaleString() : '—'}</div>
                 <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Online Now</div>
               </div>
             </div>
@@ -406,6 +429,88 @@ export default function Home() {
       </section>
 
 
+
+      {/* Latest Articles */}
+      {articles.length > 0 && (
+        <section className="py-20 bg-gray-50 dark:bg-slate-900">
+          <div className="container mx-auto px-6">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                Latest Articles & Updates
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                Stay updated with our latest insights, teachings, and community news.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {articles.map((article) => (
+                <div key={article.id} className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow border border-gray-100 dark:border-slate-700 flex flex-col">
+                  {article.image_url && (
+                    <div className="relative h-48 w-full">
+                      <img 
+                        src={article.image_url} 
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-4 right-4 flex gap-2">
+                        {article.video_url && (
+                          <span className="bg-red-600 text-white p-2 rounded-full shadow-lg" title="Video available">
+                            <Video className="w-4 h-4" />
+                          </span>
+                        )}
+                        {article.attachment_url && (
+                          <span className="bg-blue-600 text-white p-2 rounded-full shadow-lg" title="Download available">
+                            <Download className="w-4 h-4" />
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold rounded-full">
+                        {article.sector || 'General'}
+                      </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {new Date(article.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
+                      {article.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3 flex-1">
+                      {article.description}
+                    </p>
+                    
+                    <div className="mt-auto pt-4 border-t border-gray-100 dark:border-slate-700 flex items-center justify-between">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        By {article.author}
+                      </span>
+                      <Link 
+                        href={`/articles/${article.slug}`}
+                        className="text-emerald-600 dark:text-emerald-400 font-semibold text-sm hover:underline flex items-center gap-1"
+                      >
+                        Read More <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="text-center mt-12">
+              <Link 
+                href="/articles"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl text-gray-900 dark:text-white font-semibold hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                View All Articles <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Call to Action */}
       <section className="py-20 bg-gradient-to-r from-emerald-600 via-teal-600 to-blue-600 islamic-gradient-dark text-white">

@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS articles (
 CREATE TABLE IF NOT EXISTS article_likes (
     id SERIAL PRIMARY KEY,
     article_id INTEGER REFERENCES articles(id) ON DELETE CASCADE,
-    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(article_id, user_id)
 );

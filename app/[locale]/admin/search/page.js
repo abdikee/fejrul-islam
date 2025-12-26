@@ -13,70 +13,141 @@ function AdminSearchPageInner() {
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    // Simulate search results
-    setTimeout(() => {
-      const mockResults = [
-        {
-          id: 1,
-          type: 'user',
-          title: 'Ahmad Ibrahim',
-          description: 'Student - Advanced Level',
-          details: 'ahmad.ibrahim@example.com',
-          date: '2024-01-15',
-          status: 'active'
-        },
-        {
-          id: 2,
-          type: 'content',
-          title: 'Islamic Finance Basics',
-          description: 'Course - Tarbiya & Idad Sector',
-          details: 'Published course with 150 enrolled students',
-          date: '2024-01-10',
-          status: 'published'
-        },
-        {
-          id: 3,
-          type: 'user',
-          title: 'Fatima Al-Zahra',
-          description: 'Student - Intermediate Level',
-          details: 'fatima.alzahra@example.com',
-          date: '2024-01-12',
-          status: 'active'
-        },
-        {
-          id: 4,
-          type: 'content',
-          title: 'Ramadan Schedule Update',
-          description: 'Announcement - System Wide',
-          details: 'Important schedule changes for Ramadan',
-          date: '2024-01-20',
-          status: 'published'
-        },
-        {
-          id: 5,
-          type: 'system',
-          title: 'Database Backup Log',
-          description: 'System Log - Backup Operation',
-          details: 'Successful backup completed at 2:00 AM',
-          date: '2024-01-22',
-          status: 'completed'
-        }
-      ].filter(item => 
-        item.title.toLowerCase().includes(query.toLowerCase()) ||
-        item.description.toLowerCase().includes(query.toLowerCase())
-      );
-      
-      setResults(mockResults);
-      setLoading(false);
-    }, 1000);
-  }, [query]);
+    let isCancelled = false;
 
-  const filteredResults = results.filter(result => 
-    filter === 'all' || result.type === filter
-  );
+    const fetchSearchResults = async () => {
+      if (!query.trim()) {
+        setResults([]);
+        setErrorMessage('');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setErrorMessage('');
+
+        if (filter === 'system') {
+          const res = await fetch(`/api/admin/audit-logs?q=${encodeURIComponent(query)}&limit=50&offset=0`, {
+            credentials: 'include'
+          });
+          const data = await res.json();
+          if (!data?.success) throw new Error(data?.message || 'Search failed');
+
+          const mapped = (data.logs || []).map((log) => ({
+            id: log.id,
+            type: 'system',
+            title: String(log.action_type || 'system_event'),
+            description: String(log.action_description || ''),
+            details: log.email ? String(log.email) : (log.ip_address ? `IP: ${log.ip_address}` : ''),
+            date: (log.created_at || log.timestamp || new Date().toISOString()),
+            status: String(log.action_type || 'logged')
+          }));
+
+          if (!isCancelled) setResults(mapped);
+          return;
+        }
+
+        const res = await fetch(`/api/admin/content/search?q=${encodeURIComponent(query)}&type=all&limit=50`, {
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (!data?.success) throw new Error(data?.message || 'Search failed');
+
+        const items = Array.isArray(data.results) ? data.results : [];
+        const mapped = items.map((item) => {
+          const type = item.type || item.content_type || 'content';
+
+          if (type === 'user') {
+            return {
+              id: item.id,
+              type: 'user',
+              title: item.title || item.full_name || 'User',
+              description: item.description || `${item.role || 'user'} - ${item.email || ''}`,
+              details: item.email || '',
+              date: item.created_at || new Date().toISOString(),
+              status: item.role || 'active'
+            };
+          }
+
+          if (type === 'course') {
+            return {
+              id: item.id,
+              type: 'content',
+              title: item.title || 'Course',
+              description: item.description || 'Course',
+              details: item.sector_name ? `Sector: ${item.sector_name}` : 'Course',
+              date: item.created_at || new Date().toISOString(),
+              status: 'published'
+            };
+          }
+
+          if (type === 'resource') {
+            return {
+              id: item.id,
+              type: 'content',
+              title: item.title || 'Resource',
+              description: item.description || 'Resource',
+              details: item.sector_name ? `Sector: ${item.sector_name}` : (item.resource_type ? `Type: ${item.resource_type}` : 'Resource'),
+              date: item.created_at || new Date().toISOString(),
+              status: 'published'
+            };
+          }
+
+          if (type === 'announcement') {
+            return {
+              id: item.id,
+              type: 'content',
+              title: item.title || 'Announcement',
+              description: item.description || 'Announcement',
+              details: item.priority ? `Priority: ${item.priority}` : 'Announcement',
+              date: item.created_at || new Date().toISOString(),
+              status: 'published'
+            };
+          }
+
+          return {
+            id: item.id,
+            type: 'content',
+            title: item.title || 'Result',
+            description: item.description || '',
+            details: '',
+            date: item.created_at || new Date().toISOString(),
+            status: 'published'
+          };
+        });
+
+        const filtered = mapped.filter((row) => {
+          if (filter === 'all') return true;
+          if (filter === 'user') return row.type === 'user';
+          if (filter === 'content') return row.type === 'content';
+          return true;
+        });
+
+        if (!isCancelled) setResults(filtered);
+      } catch (err) {
+        console.error('Admin search error:', err);
+        if (!isCancelled) {
+          setErrorMessage(err?.message || 'Search failed');
+          setResults([]);
+        }
+      } finally {
+        if (!isCancelled) setLoading(false);
+      }
+    };
+
+    fetchSearchResults();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [query, filter]);
+
+  const filteredResults = results;
 
   const getTypeIcon = (type) => {
     switch (type) {

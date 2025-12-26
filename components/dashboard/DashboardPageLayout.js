@@ -2,7 +2,7 @@
 
 import { useState, useEffect, createContext, useContext } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { ArrowLeft, Bell, Settings, Menu, X, Home, BookOpen, Calendar, Users, LogOut, Shield, Heart, MessageSquare } from 'lucide-react';
 import StudentFooter from './StudentFooter';
 
@@ -20,7 +20,11 @@ export default function DashboardPageLayout({
   showBackButton = true,
   rightContent = null 
 }) {
-  const router = useRouter();
+  const pathname = usePathname();
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -61,19 +65,19 @@ export default function DashboardPageLayout({
   };
 
   const navigationItems = [
-    { icon: Home, label: 'Dashboard', href: `/dashboard/${user?.gender || 'male'}` },
-    { icon: BookOpen, label: 'My Courses', href: '/dashboard/courses' },
-    { icon: Calendar, label: 'Schedule', href: '/dashboard/schedule' },
-    { icon: Users, label: 'Study Groups', href: '/dashboard/study-groups' },
-    { icon: Bell, label: 'Announcements', href: '/dashboard/announcements' },
-    { icon: MessageSquare, label: 'Support', href: '/dashboard/feedback' },
-    { icon: Settings, label: 'Settings', href: '/dashboard/settings' }
+    { icon: Home, label: 'Dashboard', href: `${localePrefix}/dashboard/${user?.gender || 'male'}` },
+    { icon: BookOpen, label: 'My Courses', href: `${localePrefix}/dashboard/courses` },
+    { icon: Calendar, label: 'Schedule', href: `${localePrefix}/dashboard/schedule` },
+    { icon: Users, label: 'Study Groups', href: `${localePrefix}/dashboard/study-groups` },
+    { icon: Bell, label: 'Announcements', href: `${localePrefix}/dashboard/announcements` },
+    { icon: MessageSquare, label: 'Support', href: `${localePrefix}/dashboard/feedback` },
+    { icon: Settings, label: 'Settings', href: `${localePrefix}/dashboard/settings` }
   ];
 
   const handleLogout = async () => {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
-      window.location.href = '/auth/login';
+      window.location.href = `${localePrefix}/auth/login`;
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -169,7 +173,7 @@ export default function DashboardPageLayout({
                 {/* Back Button */}
                 {showBackButton && (
                   <Link 
-                    href={`/dashboard/${user?.gender || 'male'}`}
+                    href={`${localePrefix}/dashboard/${user?.gender || 'male'}`}
                     className={`p-2 ${genderColors.hoverBg} rounded-lg transition-colors`}
                   >
                     <ArrowLeft className={`w-5 h-5 ${genderColors.iconColor}`} />

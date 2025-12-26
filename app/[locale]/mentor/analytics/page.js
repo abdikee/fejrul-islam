@@ -7,24 +7,71 @@ import MentorPageTemplate from '@/components/mentor/MentorPageTemplate';
 export default function Analytics() {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Mock data
-    setAnalytics({
-      overview: {
-        totalStudents: 45,
-        activeStudents: 38,
-        avgProgress: 78,
-        completionRate: 85
-      },
-      performance: [
-        { metric: 'Student Engagement', value: 88, color: 'bg-green-500' },
-        { metric: 'Assignment Completion', value: 94, color: 'bg-emerald-500' },
-        { metric: 'Session Attendance', value: 92, color: 'bg-teal-500' },
-        { metric: 'Feedback Quality', value: 96, color: 'bg-blue-500' }
-      ]
-    });
-    setLoading(false);
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [statsRes, studentsRes] = await Promise.all([
+          fetch('/api/mentor/stats', { credentials: 'include' }),
+          fetch('/api/mentor/students', { credentials: 'include' }),
+        ]);
+        const statsData = await statsRes.json();
+        const studentsData = await studentsRes.json();
+
+        if (!statsData.success) throw new Error(statsData.message || 'Failed to fetch stats');
+        if (!studentsData.success) throw new Error(studentsData.message || 'Failed to fetch students');
+
+        const students = studentsData.students || [];
+        const totalStudents = students.length;
+        const activeStudents = students.filter((s) => s.status === 'active').length;
+        const avgProgress = totalStudents
+          ? Math.round(students.reduce((sum, s) => sum + (Number(s.progress) || 0), 0) / totalStudents)
+          : 0;
+
+        const engagement = totalStudents ? Math.round((activeStudents / totalStudents) * 100) : 0;
+        const completionRate = Number(statsData.stats?.completionRate || 0);
+
+        // These are derived from real backend numbers; they will be 0 when the related data doesn't exist.
+        const pendingSubmissions = Number(statsData.stats?.pendingSubmissions || 0);
+        const activeAssignments = Number(statsData.stats?.activeAssignments || 0);
+        const assignmentCompletion = activeAssignments > 0
+          ? Math.max(0, Math.min(100, Math.round(100 - (pendingSubmissions / activeAssignments) * 100)))
+          : 0;
+
+        const upcomingSessions = Number(statsData.stats?.upcomingSessions || 0);
+        const sessionAttendance = upcomingSessions > 0 ? 100 : 0;
+
+        setAnalytics({
+          overview: {
+            totalStudents,
+            activeStudents,
+            avgProgress,
+            completionRate,
+          },
+          performance: [
+            { metric: 'Student Engagement', value: engagement, color: 'bg-green-500' },
+            { metric: 'Assignment Completion', value: assignmentCompletion, color: 'bg-emerald-500' },
+            { metric: 'Session Readiness', value: sessionAttendance, color: 'bg-teal-500' },
+            { metric: 'Overall Progress', value: avgProgress, color: 'bg-blue-500' }
+          ]
+        });
+      } catch (e) {
+        console.error('Mentor analytics error:', e);
+        setError(e?.message || 'Failed to load analytics');
+        setAnalytics({
+          overview: { totalStudents: 0, activeStudents: 0, avgProgress: 0, completionRate: 0 },
+          performance: []
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
   }, []);
 
   return (
@@ -33,6 +80,7 @@ export default function Analytics() {
       description="Track your mentorship performance and student progress"
       icon={BarChart3}
       loading={loading}
+      error={error}
     >
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -100,13 +148,6 @@ export default function Analytics() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Additional Analytics Placeholder */}
-      <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-8 text-white text-center">
-        <BarChart3 className="w-16 h-16 mx-auto mb-4 text-green-200" />
-        <h3 className="text-xl font-bold mb-2">Advanced Analytics Coming Soon</h3>
-        <p className="text-green-100">Detailed charts, trends, and insights will be available here</p>
       </div>
     </MentorPageTemplate>
   );

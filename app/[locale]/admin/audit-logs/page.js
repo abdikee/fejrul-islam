@@ -126,7 +126,24 @@ export default function AuditLogsPage() {
             </button>
 
             <button
-              onClick={() => alert('Export feature coming soon!')}
+              onClick={async () => {
+                const params = new URLSearchParams();
+                params.set('format', 'csv');
+                if (filterType && filterType !== 'all') params.set('actionType', filterType);
+                params.set('limit', '5000');
+
+                const res = await fetch(`/api/admin/audit-logs?${params.toString()}`);
+                if (!res.ok) return;
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'audit-logs.csv';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+              }}
               className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg hover:bg-slate-50"
             >
               <Download className="w-4 h-4" />

@@ -6,6 +6,7 @@ import {
   BookOpen, Megaphone, Upload, FileText, 
   Save, X, Plus, Calendar, Users, Tag
 } from 'lucide-react';
+import notify from '@/lib/notify';
 
 export default function NewContentPage() {
   const [contentType, setContentType] = useState('course');
@@ -22,7 +23,7 @@ export default function NewContentPage() {
     e.preventDefault();
     // Handle content creation
     console.log('Creating content:', { type: contentType, ...formData });
-    alert(`${contentType} "${formData.title}" created successfully!`);
+    notify.success(`${contentType} "${formData.title}" created successfully!`);
     // Redirect back to content management
     window.location.href = '/admin/content';
   };

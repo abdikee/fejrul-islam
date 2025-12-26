@@ -9,8 +9,8 @@ import {
   History, Scroll, Users, Lightbulb, Languages,
   Bell, Settings, Clock
 } from 'lucide-react';
-import Alert from '@/components/ui/Alert';
 import DashboardPageLayout, { useDashboard } from '@/components/dashboard/DashboardPageLayout';
+import notify from '@/lib/notify';
 
 const categoryIcons = {
   'Aqida': Lightbulb,
@@ -40,7 +40,6 @@ function QiratContent() {
   const [selectedBook, setSelectedBook] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
-  const [alert, setAlert] = useState(null);
   const [showEnrollForm, setShowEnrollForm] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
   const [enrollmentData, setEnrollmentData] = useState({
@@ -74,11 +73,7 @@ function QiratContent() {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: 'Failed to load course data'
-      });
+      notify.error('Failed to load course data');
       setLoading(false);
     }
   };
@@ -115,28 +110,16 @@ function QiratContent() {
       const data = await response.json();
 
       if (data.success) {
-        setAlert({
-          type: 'success',
-          title: 'Enrollment Successful!',
-          message: 'Welcome to the Qirat & Ilm Course System. You can now start your learning journey.'
-        });
+        notify.success('Welcome to the Qirat & Ilm Course System. You can now start your learning journey.');
         setShowEnrollForm(false);
         // Refresh data to show enrolled status
         fetchData();
       } else {
-        setAlert({
-          type: 'error',
-          title: 'Enrollment Failed',
-          message: data.message || 'Failed to enroll in the course'
-        });
+        notify.error(data.message || 'Failed to enroll in the course');
       }
     } catch (error) {
       console.error('Enrollment error:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: 'An error occurred during enrollment'
-      });
+      notify.error('An error occurred during enrollment');
     } finally {
       setEnrolling(false);
     }
@@ -156,16 +139,6 @@ function QiratContent() {
   return (
     <div className="container mx-auto px-4 lg:px-6 py-6">
       <div className="max-w-7xl mx-auto">
-
-        {alert && (
-          <Alert
-            type={alert.type}
-            title={alert.title}
-            message={alert.message}
-            onClose={() => setAlert(null)}
-            className="mb-6"
-          />
-        )}
 
         {/* Enrollment Form - Show if not enrolled */}
         {!userProgress && (

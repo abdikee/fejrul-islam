@@ -25,5 +25,52 @@
     "headlinePart1": "Gara Karaa",
     "headlinePart2": "Gooftaa Kee Waami",
     "subheadline": "Ergaa Islaamaa bareedaa beekumsa, gara-laafinaa fi qajeelfama dhugaa ta'een babal'isuuf hojii Da'awaa fi Irshaadaa Fajrul Islaamitti makamaa. Waliin taanee riqicha ijaarra, onnee jijjiirra."
+  },
+  "Dashboard": {
+    "Sidebar": {
+      "title": "Daashboordii Fajrul Islaam",
+      "dashboard": "Daashboordii",
+      "learningSectors": "Dameewwan Barumsaa",
+      "dawahComparative": "Da'awaa fi Amantiiwwan Wal-bira Qabuu",
+      "irshadQirat": "Irshaada (Qiraa'atii fi Ilmii)",
+      "tarbiyaCharacter": "Tarbiyaa fi Amala",
+      "idadLeadership": "I'idaada Hoggansa",
+      "resources": "Qabeenya",
+      "resourceLibrary": "Kuusaa Qabeenyaa",
+      "literatureHistory": "Bar-ruu fi Seenaa",
+      "support": "Deeggarsa",
+      "supportMessages": "Deeggarsa fi Ergaawwan",
+      "studentWelfare": "Nageenya Barattootaa",
+      "settings": "Qindoomina",
+      "signOut": "Ba'i"
+    },
+    "Footer": {
+      "brandTitle": "Fajrul Islaam",
+      "brandSubtitle": "Portaalii Barattoota HUMSJ",
+      "brandDescription": "Barattoota Muslimaa barnoota Islaamaa guutuu fi guddina hafuuraatiin cimsuu.",
+      "sistersWing": "Damee Dubartootaa",
+      "brothersWing": "Damee Dhiiraa",
+      "learning": "Barumsa",
+      "myCourses": "Koorsiiwwan Kiyya",
+      "availableCourses": "Koorsiiwwan Jiran",
+      "schedule": "Sagantaa",
+      "resources": "Qabeenya",
+      "sectors": "Dameewwan",
+      "tarbiyaIdad": "Tarbiyaa fi I'idaada",
+      "literature": "Bar-ruu",
+      "comparativeReligion": "Amantiiwwan Wal-bira Qabuu",
+      "ziyaraWelfare": "Ziyaaraa (Nageenya Barattootaa)",
+      "qiratIlm": "Qiraa'atii fi Ilmii",
+      "community": "Hawaasa",
+      "studyGroups": "Gareewwan Qoyyabaa",
+      "mentorship": "Gorsaa",
+      "events": "Taateewwan",
+      "announcements": "Beeksisa",
+      "support": "Deeggarsa",
+      "helpCenter": "Giddu-gala Gargaarsaa",
+      "contactMentor": "Gorsaa Quunnami",
+      "settings": "Qindoomina",
+      "feedback": "Yaada"
+    }
   }
 }

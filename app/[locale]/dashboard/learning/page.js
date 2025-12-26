@@ -22,6 +22,9 @@ function LearningContent() {
   const [courses, setCourses] = useState({ enrolled: [], available: [] });
   const [learningStats, setLearningStats] = useState({});
   const [currentLesson, setCurrentLesson] = useState(null);
+  const [courseContent, setCourseContent] = useState(null);
+  const [selectedLesson, setSelectedLesson] = useState(null);
+  const [lessonDetails, setLessonDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSector, setSelectedSector] = useState('all');
@@ -77,59 +80,62 @@ function LearningContent() {
     fetchData();
   }, []);
 
-  // Mock lesson content for demonstration
-  const mockLessons = [
-    {
-      id: 1,
-      title: 'Introduction to Islamic Dawah',
-      type: 'video',
-      duration: '15:30',
-      completed: true,
-      content: {
-        videoUrl: '/videos/dawah-intro.mp4',
-        transcript: 'Welcome to the comprehensive course on Islamic Dawah...',
-        resources: ['Dawah Handbook.pdf', 'Key Verses.pdf']
+  // Fetch course structure + first lesson when switching to Continue
+  useEffect(() => {
+    if (activeTab !== 'continue') return;
+    if (!currentLesson?.id) return;
+
+    const loadCourse = async () => {
+      try {
+        const res = await fetch(`/api/learning/content?courseId=${currentLesson.id}`, { cache: 'no-store' });
+        const data = await res.json();
+        if (!data?.success || !data?.course) {
+          setCourseContent(null);
+          setSelectedLesson(null);
+          setLessonDetails(null);
+          return;
+        }
+
+        setCourseContent(data.course);
+
+        const allLessons = (data.course.modules || []).flatMap(m => m.lessons || []);
+        const firstUnlocked = allLessons.find(l => !l.is_locked) || allLessons[0] || null;
+        setSelectedLesson(firstUnlocked);
+      } catch (e) {
+        setCourseContent(null);
+        setSelectedLesson(null);
+        setLessonDetails(null);
       }
-    },
-    {
-      id: 2,
-      title: 'Understanding Your Audience',
-      type: 'interactive',
-      duration: '20:00',
-      completed: true,
-      content: {
-        slides: 15,
-        quizzes: 3,
-        resources: ['Audience Analysis Template.docx']
-      }
-    },
-    {
-      id: 3,
-      title: 'Effective Communication Techniques',
-      type: 'video',
-      duration: '25:45',
-      completed: false,
-      current: true,
-      content: {
-        videoUrl: '/videos/communication-techniques.mp4',
-        transcript: 'Effective communication in dawah requires...',
-        resources: ['Communication Guide.pdf', 'Practice Scenarios.pdf']
-      }
-    },
-    {
-      id: 4,
-      title: 'Handling Questions and Objections',
-      type: 'interactive',
-      duration: '30:00',
-      completed: false,
-      locked: true,
-      content: {
-        slides: 20,
-        quizzes: 5,
-        resources: ['Q&A Database.pdf', 'Response Templates.docx']
-      }
+    };
+
+    loadCourse();
+  }, [activeTab, currentLesson?.id]);
+
+  useEffect(() => {
+    if (!currentLesson?.id || !selectedLesson?.id) {
+      setLessonDetails(null);
+      return;
     }
-  ];
+
+    const loadLesson = async () => {
+      try {
+        const res = await fetch(
+          `/api/learning/content?courseId=${currentLesson.id}&lessonId=${selectedLesson.id}`,
+          { cache: 'no-store' }
+        );
+        const data = await res.json();
+        if (data?.success && data?.lesson) {
+          setLessonDetails(data.lesson);
+        } else {
+          setLessonDetails(null);
+        }
+      } catch (e) {
+        setLessonDetails(null);
+      }
+    };
+
+    loadLesson();
+  }, [currentLesson?.id, selectedLesson?.id]);
 
   const sectors = [
     { id: 'qirat-ilm', name: 'Qirat & Ilm', icon: BookOpen, color: 'emerald' },
@@ -250,13 +256,37 @@ function LearningContent() {
                 <div className="grid lg:grid-cols-3 gap-8">
                   {/* Video/Content Player */}
                   <div className="lg:col-span-2">
-                    <VideoPlayer
-                      videoUrl="/videos/sample-lesson.mp4"
-                      title="Effective Communication Techniques"
-                      onProgress={(progress) => setVideoProgress(progress)}
-                      onComplete={() => markLessonComplete(3)}
-                      initialProgress={videoProgress}
-                    />
+                    {selectedLesson?.content_type === 'video' && lessonDetails?.content_url ? (
+                      <VideoPlayer
+                        videoUrl={lessonDetails.content_url}
+                        title={lessonDetails.title}
+                        onProgress={(progress) => setVideoProgress(progress)}
+                        onComplete={() => markLessonComplete(selectedLesson.id)}
+                        initialProgress={videoProgress}
+                      />
+                    ) : selectedLesson?.content_type === 'link' && lessonDetails?.content_url ? (
+                      <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                        <h3 className="text-lg font-semibold text-slate-800 mb-2">{lessonDetails.title}</h3>
+                        <p className="text-slate-600 mb-4">This lesson is hosted as an external link.</p>
+                        <a
+                          className={`inline-flex items-center gap-2 px-4 py-2 bg-${genderColors.primary}-600 text-white rounded-lg hover:bg-${genderColors.primary}-700 transition-colors`}
+                          href={lessonDetails.content_url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open Lesson <ArrowRight className="w-4 h-4" />
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                        <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                          {selectedLesson?.title || 'Lesson'}
+                        </h3>
+                        <p className="text-slate-600">
+                          Lesson content is not available yet.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Lesson Resources */}
@@ -264,53 +294,45 @@ function LearningContent() {
                     <div>
                       <h3 className="font-bold text-slate-800 mb-4">Lesson Resources</h3>
                       <div className="space-y-3">
-                        {['Communication Guide.pdf', 'Practice Scenarios.pdf', 'Key Points Summary.docx'].map((resource, index) => (
-                          <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <FileText className="w-5 h-5 text-slate-600" />
-                              <span className="text-sm font-medium text-slate-800">{resource}</span>
-                            </div>
-                            <button className="p-1 text-slate-600 hover:text-slate-800">
-                              <Download className="w-4 h-4" />
-                            </button>
+                        {(lessonDetails?.resources || []).length === 0 ? (
+                          <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 text-sm text-slate-600">
+                            No resources for this lesson.
                           </div>
-                        ))}
+                        ) : (
+                          (lessonDetails.resources || []).map((resource) => (
+                            <div key={resource.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <FileText className="w-5 h-5 text-slate-600" />
+                                <span className="text-sm font-medium text-slate-800">{resource.title}</span>
+                              </div>
+                              {resource.file_path ? (
+                                <a
+                                  className="p-1 text-slate-600 hover:text-slate-800"
+                                  href={resource.file_path}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  title="Open resource"
+                                >
+                                  <Download className="w-4 h-4" />
+                                </a>
+                              ) : null}
+                            </div>
+                          ))
+                        )}
                       </div>
                     </div>
 
                     <LessonProgress
-                      modules={[{
-                        id: 1,
-                        title: 'Dawah Fundamentals',
-                        lessons: mockLessons,
-                        lesson_count: mockLessons.length,
-                        total_duration: mockLessons.reduce((sum, lesson) => sum + parseInt(lesson.duration.split(':')[0]) * 60 + parseInt(lesson.duration.split(':')[1]), 0)
-                      }]}
-                      currentLesson={mockLessons.find(l => l.current)}
+                      modules={courseContent?.modules || []}
+                      currentLesson={selectedLesson}
                       completedLessons={completedLessons}
-                      onLessonSelect={(lesson) => console.log('Selected lesson:', lesson)}
+                      onLessonSelect={(lesson) => setSelectedLesson(lesson)}
                     />
                   </div>
                 </div>
               </div>
             </div>
           )}
-
-          {/* Interactive Lesson Demo */}
-          <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-            <div className="p-6 border-b border-slate-200">
-              <h2 className="text-2xl font-bold text-slate-800 mb-2">Interactive Lesson</h2>
-              <p className="text-slate-600">Experience our interactive learning format</p>
-            </div>
-            
-            <div className="p-6">
-              <InteractiveLesson
-                lessonData={{ slides: [] }} // Will use default mock data
-                onProgress={(progress) => console.log('Lesson progress:', progress)}
-                onComplete={() => console.log('Lesson completed!')}
-              />
-            </div>
-          </div>
 
           {/* Quick Actions */}
           <div className="grid md:grid-cols-3 gap-6">
@@ -550,7 +572,7 @@ function LearningContent() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Users className="w-4 h-4" />
-                        <span>{Math.floor(Math.random() * 100) + 50} enrolled</span>
+                        <span>{course.enrolled_students ?? 0} enrolled</span>
                       </div>
                     </div>
 

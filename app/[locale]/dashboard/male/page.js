@@ -280,7 +280,6 @@ export default function MaleDashboard() {
   // Calculate dynamic stats
   const userLevel = stats.averageProgress > 80 ? 'Advanced' : stats.averageProgress > 50 ? 'Intermediate' : 'Beginner';
   const points = Math.floor(stats.averageProgress * 10 + stats.completedCourses * 100);
-  const streak = Math.floor(Math.random() * 30) + 1; // Mock streak for now
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${maleColorScheme.bgGradient}`}>
@@ -438,10 +437,6 @@ export default function MaleDashboard() {
                     <div className="flex items-center gap-2">
                       <Star className="w-4 h-4" />
                       <span>{points} Points</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4" />
-                      <span>{streak} Day Streak</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Activity className="w-4 h-4" />

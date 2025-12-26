@@ -19,8 +19,11 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import UserFormModal from './UserFormModal';
+import notify from '@/lib/notify';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
 
 export default function UserManagement() {
+  const confirmDialog = useConfirm();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,13 +89,13 @@ export default function UserManagement() {
       if (data.success) {
         setShowAddModal(false);
         fetchUsers(pagination.currentPage);
-        alert('User created successfully!');
+        notify.success('User created successfully!');
       } else {
-        alert('Error creating user: ' + data.message);
+        notify.error('Error creating user: ' + data.message);
       }
     } catch (error) {
       console.error('Error creating user:', error);
-      alert('Error creating user');
+      notify.error('Error creating user');
     }
   };
 
@@ -111,13 +114,13 @@ export default function UserManagement() {
         setShowEditModal(false);
         setEditingUser(null);
         fetchUsers(pagination.currentPage);
-        alert('User updated successfully!');
+        notify.success('User updated successfully!');
       } else {
-        alert('Error updating user: ' + data.message);
+        notify.error('Error updating user: ' + data.message);
       }
     } catch (error) {
       console.error('Error updating user:', error);
-      alert('Error updating user');
+      notify.error('Error updating user');
     }
   };
 
@@ -126,8 +129,13 @@ export default function UserManagement() {
     const message = type === 'permanent' 
       ? 'Are you sure you want to PERMANENTLY delete this user? This action cannot be undone.' 
       : 'Are you sure you want to deactivate this user?';
-
-    if (!confirm(message)) return;
+    const ok = await confirmDialog({
+      title: type === 'permanent' ? 'Delete User Permanently' : 'Deactivate User',
+      description: message,
+      confirmText: type === 'permanent' ? 'Delete' : 'Deactivate',
+      cancelText: 'Cancel',
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/users?userId=${userId}&type=${type}`, {
@@ -138,19 +146,25 @@ export default function UserManagement() {
       const data = await response.json();
       if (data.success) {
         fetchUsers(pagination.currentPage);
-        alert(data.message);
+        notify.success(data.message || 'Operation successful');
       } else {
-        alert('Error: ' + data.message);
+        notify.error('Error: ' + data.message);
       }
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Error deleting user');
+      notify.error('Error deleting user');
     }
   };
 
   // Handle user restoration
   const handleRestoreUser = async (user) => {
-    if (!confirm('Are you sure you want to reactivate this user?')) return;
+    const ok = await confirmDialog({
+      title: 'Reactivate User',
+      description: 'Are you sure you want to reactivate this user?',
+      confirmText: 'Reactivate',
+      cancelText: 'Cancel',
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch('/api/admin/users', {
@@ -174,13 +188,13 @@ export default function UserManagement() {
       const data = await response.json();
       if (data.success) {
         fetchUsers(pagination.currentPage);
-        alert('User reactivated successfully!');
+        notify.success('User reactivated successfully!');
       } else {
-        alert('Error reactivating user: ' + data.message);
+        notify.error('Error reactivating user: ' + data.message);
       }
     } catch (error) {
       console.error('Error reactivating user:', error);
-      alert('Error reactivating user');
+      notify.error('Error reactivating user');
     }
   };
 
@@ -191,8 +205,13 @@ export default function UserManagement() {
     const confirmMessage = action === 'activate' 
       ? 'Are you sure you want to activate selected users?'
       : 'Are you sure you want to deactivate selected users?';
-
-    if (!confirm(confirmMessage)) return;
+    const ok = await confirmDialog({
+      title: action === 'activate' ? 'Activate Users' : 'Deactivate Users',
+      description: confirmMessage,
+      confirmText: action === 'activate' ? 'Activate' : 'Deactivate',
+      cancelText: 'Cancel',
+    });
+    if (!ok) return;
 
     try {
       // Process bulk actions (you can implement this API endpoint)
@@ -210,10 +229,10 @@ export default function UserManagement() {
       
       setSelectedUsers([]);
       fetchUsers(pagination.currentPage);
-      alert(`Users ${action}d successfully!`);
+      notify.success(`Users ${action}d successfully!`);
     } catch (error) {
       console.error(`Error ${action}ing users:`, error);
-      alert(`Error ${action}ing users`);
+      notify.error(`Error ${action}ing users`);
     }
   };
 
@@ -298,7 +317,7 @@ export default function UserManagement() {
         </div>
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => alert('Export functionality coming soon')}
+            onClick={() => notify.info('Export functionality coming soon')}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
             <Download className="w-4 h-4" />
@@ -370,7 +389,7 @@ export default function UserManagement() {
                   Deactivate
                 </button>
                 <button 
-                  onClick={() => alert('Email functionality coming soon')}
+                  onClick={() => notify.info('Email functionality coming soon')}
                   className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
                 >
                   <Mail className="w-3 h-3" />
@@ -470,7 +489,7 @@ export default function UserManagement() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <button 
-                        onClick={() => alert('View functionality coming soon')}
+                        onClick={() => notify.info('View functionality coming soon')}
                         className="p-1 text-slate-400 hover:text-blue-600 transition-colors"
                         title="View Details"
                       >

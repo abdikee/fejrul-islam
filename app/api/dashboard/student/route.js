@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db/connection';
 import { verifyJwtToken } from '@/lib/auth/jwt.js';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     // Verify student authentication
@@ -232,75 +235,11 @@ export async function GET(request) {
 
   } catch (error) {
     console.error('Error fetching student dashboard:', error);
-    
-    // Return mock data for development
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: 1,
-        name: 'Ahmad Ibrahim',
-        email: 'ahmad@student.humsj.edu.et',
-        gender: 'male',
-        role: 'student'
-      },
-      dashboard: {
-        enrolledCourses: [
-          {
-            id: 1,
-            title: 'Islamic Finance Fundamentals',
-            description: 'Learn the basics of Islamic banking',
-            level: 'Beginner',
-            sector_name: 'Tarbiya & Idad',
-            sector_color: 'blue',
-            progress_percentage: 65,
-            related_resources: 8
-          }
-        ],
-        availableCourses: [
-          {
-            id: 2,
-            title: 'Arabic Literature',
-            description: 'Classical Arabic poetry and prose',
-            level: 'Intermediate',
-            sector_name: 'Literature',
-            sector_color: 'green',
-            related_resources: 12
-          }
-        ],
-        resources: [
-          {
-            id: 1,
-            title: 'Quran Recitation Guide',
-            description: 'Complete guide for proper recitation',
-            resource_type: 'PDF',
-            download_count: 245,
-            sector_name: 'Qirat & Ilm',
-            sector_color: 'teal'
-          }
-        ],
-        announcements: [
-          {
-            id: 1,
-            title: 'Ramadan Schedule Update',
-            content: 'Updated prayer and study schedule',
-            priority: 'high',
-            target_audience: 'all'
-          }
-        ],
-        sectors: [
-          { id: 1, name: 'Tarbiya & Idad', color: 'blue', course_count: 45, resource_count: 89, enrolled_courses: 3 },
-          { id: 2, name: 'Literature', color: 'green', course_count: 32, resource_count: 67, enrolled_courses: 1 }
-        ]
-      },
-      stats: {
-        totalEnrolled: 4,
-        completedCourses: 1,
-        averageProgress: 65,
-        totalResources: 15,
-        activeAnnouncements: 3
-      },
-      timestamp: new Date().toISOString()
-    });
+
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch student dashboard' },
+      { status: 500 }
+    );
   }
 }
 

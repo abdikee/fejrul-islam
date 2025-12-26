@@ -7,8 +7,9 @@ import {
   Calendar, CheckCircle, XCircle, Filter, Download,
   UserCheck, BookOpen, Award
 } from 'lucide-react';
-import Alert from '@/components/ui/Alert';
 import PhoneNumberInput from '@/components/ui/PhoneNumberInput';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
+import notify from '@/lib/notify';
 
 export default function AdminMentorsPage() {
   const [mentors, setMentors] = useState([]);
@@ -17,7 +18,7 @@ export default function AdminMentorsPage() {
   const [filterGender, setFilterGender] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingMentor, setEditingMentor] = useState(null);
-  const [alert, setAlert] = useState(null);
+  const confirmDialog = useConfirm();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -50,27 +51,18 @@ export default function AdminMentorsPage() {
       if (data?.success) {
         setMentors(data.mentors);
       } else {
-        setAlert({
-          type: 'error',
-          title: 'Error',
-          message: data?.message || (text ? `Request failed (${status}): ${text}` : 'Failed to load mentors')
-        });
+        notify.error(data?.message || (text ? `Request failed (${status}): ${text}` : 'Failed to load mentors'));
       }
       setLoading(false);
     } catch (error) {
       console.error('Error fetching mentors:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: error?.message || 'Failed to load mentors'
-      });
+      notify.error(error?.message || 'Failed to load mentors');
       setLoading(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setAlert(null);
 
     try {
       const url = editingMentor 
@@ -89,34 +81,28 @@ export default function AdminMentorsPage() {
       const { data, text, status } = await readResponse(response);
 
       if (data.success) {
-        setAlert({
-          type: 'success',
-          title: 'Success',
-          message: editingMentor ? 'Mentor updated successfully' : 'Mentor added successfully'
-        });
+        notify.success(editingMentor ? 'Mentor updated successfully' : 'Mentor added successfully');
         setShowAddModal(false);
         setEditingMentor(null);
         resetForm();
         fetchMentors();
       } else {
-        setAlert({
-          type: 'error',
-          title: 'Error',
-          message: data?.message || (text ? `Request failed (${status}): ${text}` : 'Operation failed')
-        });
+        notify.error(data?.message || (text ? `Request failed (${status}): ${text}` : 'Operation failed'));
       }
     } catch (error) {
       console.error('Error:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: error?.message || 'An error occurred'
-      });
+      notify.error(error?.message || 'An error occurred');
     }
   };
 
   const handleDelete = async (mentorId) => {
-    if (!confirm('Are you sure you want to delete this mentor?')) return;
+    const ok = await confirmDialog({
+      title: 'Delete Mentor',
+      description: 'Are you sure you want to delete this mentor?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/mentors/${mentorId}`, {
@@ -127,26 +113,14 @@ export default function AdminMentorsPage() {
       const { data, text, status } = await readResponse(response);
 
       if (data.success) {
-        setAlert({
-          type: 'success',
-          title: 'Success',
-          message: 'Mentor deleted successfully'
-        });
+        notify.success('Mentor deleted successfully');
         fetchMentors();
       } else {
-        setAlert({
-          type: 'error',
-          title: 'Error',
-          message: data?.message || (text ? `Request failed (${status}): ${text}` : 'Delete failed')
-        });
+        notify.error(data?.message || (text ? `Request failed (${status}): ${text}` : 'Delete failed'));
       }
     } catch (error) {
       console.error('Error:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: error?.message || 'An error occurred'
-      });
+      notify.error(error?.message || 'An error occurred');
     }
   };
 
@@ -225,33 +199,12 @@ export default function AdminMentorsPage() {
           </button>
         </div>
 
-        {alert && (
-          <Alert
-            type={alert.type}
-            title={alert.title}
-            message={alert.message}
-            onClose={() => setAlert(null)}
-            className="mb-4"
-          />
-        )}
-
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white p-4 rounded-lg border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
                 <Users className="w-6 h-6 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-sm text-slate-600">Total Mentors</p>
-                <p className="text-2xl font-bold text-slate-800">{mentors.length}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg border border-slate-200">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <UserCheck className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-slate-600">Male Mentors</p>

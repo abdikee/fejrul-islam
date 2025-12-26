@@ -101,7 +101,7 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { title, description, content, sector, targetAudience, status, imageUrl, author } = body;
+    const { title, description, content, sector, targetAudience, status, imageUrl, author, videoUrl, attachmentUrl } = body;
 
     if (!title || !content) {
       return NextResponse.json(
@@ -128,8 +128,8 @@ export async function POST(request) {
     const insertQuery = `
       INSERT INTO articles (
         title, description, content, sector, target_audience, 
-        status, slug, image_url, author, views, likes, created_at, updated_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 0, 0, NOW(), NOW())
+        status, slug, image_url, author, video_url, attachment_url, views, likes, created_at, updated_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 0, 0, NOW(), NOW())
       RETURNING *
     `;
 
@@ -142,7 +142,9 @@ export async function POST(request) {
       status || 'draft',
       finalSlug,
       imageUrl || null,
-      author || 'Fejrul Islam'
+      author || 'Fejrul Islam',
+      videoUrl || null,
+      attachmentUrl || null
     ]);
 
     return NextResponse.json({
@@ -176,7 +178,7 @@ export async function PUT(request) {
     }
 
     const body = await request.json();
-    const { id, title, description, content, sector, targetAudience, status, imageUrl, author } = body;
+    const { id, title, description, content, sector, targetAudience, status, imageUrl, author, videoUrl, attachmentUrl } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -195,8 +197,10 @@ export async function PUT(request) {
         status = COALESCE($6, status),
         image_url = COALESCE($7, image_url),
         author = COALESCE($8, author),
+        video_url = COALESCE($9, video_url),
+        attachment_url = COALESCE($10, attachment_url),
         updated_at = NOW()
-      WHERE id = $9
+      WHERE id = $11
       RETURNING *
     `;
 
@@ -209,6 +213,8 @@ export async function PUT(request) {
       status,
       imageUrl,
       author,
+      videoUrl,
+      attachmentUrl,
       id
     ]);
 

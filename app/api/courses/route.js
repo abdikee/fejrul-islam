@@ -9,7 +9,7 @@ export async function GET(request) {
     const limit = parseInt(searchParams.get('limit') || '10');
 
     // Build query conditions
-    let whereConditions = ['c.is_active = true'];
+    let whereConditions = ['COALESCE(c.is_active, true) = true'];
     let queryParams = [];
     let paramIndex = 1;
 
@@ -30,7 +30,9 @@ export async function GET(request) {
     // Get courses with sector info
     const coursesQuery = `
       SELECT 
-        c.id, c.title, c.description, c.level, c.duration_weeks, 
+        c.id, c.title, c.description,
+        COALESCE(c.difficulty_level, c.level, 'Beginner') as level,
+        COALESCE(c.estimated_weeks, c.duration_weeks, 8) as duration_weeks,
         c.prerequisites, c.learning_objectives, c.created_at,
         ls.name as sector_name, ls.description as sector_description,
         ls.icon as sector_icon, ls.color as sector_color

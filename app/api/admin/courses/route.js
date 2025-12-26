@@ -51,9 +51,14 @@ export async function GET(request) {
         CASE WHEN COALESCE(c.is_active, true) = true THEN 'published' ELSE 'draft' END as status,
         COALESCE(s.name, 'General') as sector_name, 
         COALESCE(s.color, 'blue') as sector_color,
-        0 as enrolled_students
+        COALESCE(es.enrolled_students, 0) as enrolled_students
       FROM courses c
       LEFT JOIN sectors s ON c.sector_id = s.id
+      LEFT JOIN (
+        SELECT course_id, COUNT(*)::int as enrolled_students
+        FROM student_course_progress
+        GROUP BY course_id
+      ) es ON es.course_id = c.id
       ${whereClause}
       ORDER BY c.created_at DESC 
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}

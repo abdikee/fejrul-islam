@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import notify from '@/lib/notify';
 
 /**
  * EnrollmentGate - Protects content and handles enrollment flow
@@ -62,16 +63,17 @@ export default function EnrollmentGate({
       if (result.success) {
         setEnrollmentStatus({ enrolled: true, enrollment: result.enrollment });
         setShowEnrollmentForm(false);
+        notify.success('Enrollment successful');
         
         if (redirectAfterEnroll) {
           router.push(redirectAfterEnroll);
         }
       } else {
-        alert('Enrollment failed: ' + result.error);
+        notify.error('Enrollment failed: ' + (result.error || 'Unknown error'));
       }
     } catch (error) {
       console.error('Enrollment error:', error);
-      alert('Enrollment failed. Please try again.');
+      notify.error('Enrollment failed. Please try again.');
     } finally {
       setEnrolling(false);
     }

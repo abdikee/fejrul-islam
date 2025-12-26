@@ -16,7 +16,7 @@ CREATE TABLE users (
     academic_year INTEGER,
     role VARCHAR(20) DEFAULT 'student' CHECK (role IN ('student', 'mentor', 'admin')),
     level VARCHAR(50) DEFAULT 'Level 1: Seeker',
-    profile_photo VARCHAR(255),
+    profile_photo TEXT,
     bio TEXT,
     phone VARCHAR(20),
     specialization VARCHAR(255),

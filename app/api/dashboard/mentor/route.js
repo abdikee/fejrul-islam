@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { query } from '@/lib/db/connection';
 import { verifyJwtToken } from '@/lib/auth/jwt.js';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(request) {
   try {
     // Verify mentor authentication
@@ -41,13 +44,13 @@ export async function GET(request) {
           AVG(up.progress_percentage) as avg_progress,
           MAX(up.last_accessed) as last_activity
         FROM users u
+        JOIN mentorship m ON m.student_id = u.id AND m.mentor_id = $1 AND m.is_active = true
         LEFT JOIN user_progress up ON u.id = up.user_id
-        WHERE u.role = 'student' 
-        ${mentor.gender === 'male' ? "AND u.gender = 'male'" : "AND u.gender = 'female'"}
+        WHERE u.role = 'student'
         GROUP BY u.id, u.first_name, u.last_name, u.email, u.gender, u.created_at, u.last_login
         ORDER BY u.last_login DESC NULLS LAST
         LIMIT 50
-      `),
+      `, [mentor.id]),
 
       // Courses managed by mentor (in their expertise areas)
       query(`
@@ -110,7 +113,10 @@ export async function GET(request) {
         JOIN users u ON up.user_id = u.id
         JOIN courses c ON up.course_id = c.id
         WHERE up.last_accessed > NOW() - INTERVAL '24 hours'
-        AND u.gender = $1
+        AND EXISTS (
+          SELECT 1 FROM mentorship m
+          WHERE m.mentor_id = $1 AND m.student_id = u.id AND m.is_active = true
+        )
         ORDER BY up.last_accessed DESC
         LIMIT 10)
         
@@ -129,7 +135,7 @@ export async function GET(request) {
         
         ORDER BY activity_time DESC
         LIMIT 15
-      `, [mentor.gender, mentor.id]),
+      `, [mentor.id]),
 
       // All sectors for navigation
       query(`
@@ -157,7 +163,10 @@ export async function GET(request) {
         FROM user_progress up
         JOIN users u ON up.user_id = u.id
         WHERE up.last_accessed > NOW() - INTERVAL '7 days'
-        AND u.gender = $1
+        AND EXISTS (
+          SELECT 1 FROM mentorship m
+          WHERE m.mentor_id = $1 AND m.student_id = u.id AND m.is_active = true
+        )
         AND up.progress_percentage BETWEEN 80 AND 99
         
         UNION ALL
@@ -181,9 +190,12 @@ export async function GET(request) {
           COUNT(*) as count
         FROM users u
         WHERE u.role = 'student' 
-        AND u.gender = $1
+        AND EXISTS (
+          SELECT 1 FROM mentorship m
+          WHERE m.mentor_id = $1 AND m.student_id = u.id AND m.is_active = true
+        )
         AND u.last_login < NOW() - INTERVAL '14 days'
-      `, [mentor.gender, mentor.gender]),
+      `, [mentor.id]),
 
       // Mentor statistics
       query(`
@@ -268,66 +280,11 @@ export async function GET(request) {
 
   } catch (error) {
     console.error('Error fetching mentor dashboard:', error);
-    
-    // Return mock data for development
-    return NextResponse.json({
-      success: true,
-      mentor: {
-        id: 1,
-        name: 'Dr. Fatima Al-Zahra',
-        email: 'fatima@mentor.humsj.edu.et',
-        gender: 'female',
-        role: 'mentor'
-      },
-      dashboard: {
-        assignedStudents: [
-          {
-            id: 1,
-            first_name: 'Aisha',
-            last_name: 'Ahmed',
-            email: 'aisha@student.humsj.edu.et',
-            gender: 'female',
-            enrolled_courses: 3,
-            completed_courses: 1,
-            avg_progress: 75
-          }
-        ],
-        managedCourses: [
-          {
-            id: 1,
-            title: 'Islamic Finance Fundamentals',
-            description: 'Comprehensive course on Islamic banking',
-            level: 'Beginner',
-            sector_name: 'Tarbiya & Idad',
-            sector_color: 'blue',
-            enrolled_students: 25,
-            avg_progress: 68
-          }
-        ],
-        mentorResources: [
-          {
-            id: 1,
-            title: 'Islamic Banking Guidelines',
-            description: 'Complete guide to Islamic banking principles',
-            resource_type: 'PDF',
-            download_count: 156,
-            sector_name: 'Tarbiya & Idad',
-            sector_color: 'blue'
-          }
-        ],
-        sectors: [
-          { id: 1, name: 'Tarbiya & Idad', color: 'blue', course_count: 45, resource_count: 89, student_count: 234 }
-        ]
-      },
-      stats: {
-        totalStudents: 125,
-        activeStudents: 89,
-        managedCourses: 8,
-        uploadedResources: 15,
-        averageProgress: 72
-      },
-      timestamp: new Date().toISOString()
-    });
+
+    return NextResponse.json(
+      { success: false, message: 'Failed to fetch mentor dashboard' },
+      { status: 500 }
+    );
   }
 }
 

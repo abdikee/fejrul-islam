@@ -4,16 +4,15 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  FileCheck, Search, Filter, Clock, CheckCircle, 
-  XCircle, ArrowLeft, Eye, Download
+  FileCheck, Clock, Eye
 } from 'lucide-react';
 import MentorPageTemplate from '@/components/mentor/MentorPageTemplate';
 
 export default function Submissions() {
-  const [user, setUser] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('pending');
+  const [error, setError] = useState('');
   const pathname = usePathname();
   const supportedLocales = ['en', 'ar', 'om', 'am'];
   const maybeLocale = pathname?.split('/')?.[1];
@@ -23,29 +22,26 @@ export default function Submissions() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const authResponse = await fetch('/api/auth/me');
-        const authData = await authResponse.json();
-        
-        if (authData.success) {
-          setUser(authData.user);
+        setError('');
+        const res = await fetch(`/api/mentor/submissions?status=${encodeURIComponent(filterStatus)}`, {
+          cache: 'no-store',
+        });
+        const data = await res.json();
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.message || 'Failed to load submissions');
         }
-
-        // Mock data
-        setSubmissions([
-          { id: 1, student: 'Fatima Hassan', assignment: 'Tafseer Analysis', submittedAt: '2025-01-10', status: 'pending' },
-          { id: 2, student: 'Omar Abdullah', assignment: 'Hadith Research', submittedAt: '2025-01-09', status: 'pending' },
-          { id: 3, student: 'Aisha Mohamed', assignment: 'Islamic Leadership Essay', submittedAt: '2025-01-08', status: 'reviewed' },
-        ]);
+        setSubmissions(data.submissions || []);
       } catch (error) {
         console.error('Error:', error);
-        setUser({ firstName: 'Ahmad', role: 'mentor' });
+        setError(error?.message || 'Failed to load submissions');
+        setSubmissions([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [filterStatus]);
 
   if (loading) {
     return (
@@ -58,14 +54,16 @@ export default function Submissions() {
     );
   }
 
-  const filteredSubmissions = submissions.filter(s => filterStatus === 'all' || s.status === filterStatus);
-
   return (
     <MentorPageTemplate
       title="Reviews & Submissions"
       description="Review student submissions"
       icon={FileCheck}
     >
+        {error ? (
+          <div className="bg-white rounded-2xl p-6 border border-red-200 text-red-700 mb-6">{error}</div>
+        ) : null}
+
         <div className="bg-white rounded-2xl p-6 border border-green-200 mb-6">
           <div className="flex gap-4">
             <select
@@ -81,7 +79,7 @@ export default function Submissions() {
         </div>
 
         <div className="space-y-4">
-          {filteredSubmissions.map((submission) => (
+          {submissions.map((submission) => (
             <div key={submission.id} className="bg-white rounded-2xl p-6 border border-green-200 hover:shadow-lg transition-shadow">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -90,7 +88,7 @@ export default function Submissions() {
                   <div className="flex items-center gap-4 text-sm text-slate-600">
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      {new Date(submission.submittedAt).toLocaleDateString()}
+                      {submission.submittedAt ? new Date(submission.submittedAt).toLocaleDateString() : '—'}
                     </div>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                       submission.status === 'pending' ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700'

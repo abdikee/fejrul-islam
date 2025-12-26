@@ -8,8 +8,11 @@ import {
   Activity, AlertCircle, CheckCircle, Clock, LogOut,
   Menu, X, Download, Plus, RefreshCw
 } from 'lucide-react';
+import notify from '@/lib/notify';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
 
 export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
+  const confirmDialog = useConfirm();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -86,9 +89,9 @@ export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
     window.URL.revokeObjectURL(url);
   };
 
-  const handleBulkAction = () => {
+  const handleBulkAction = async () => {
     if (!bulkAction) {
-      alert('Please select a bulk action first');
+      notify.warning('Please select a bulk action first');
       return;
     }
     
@@ -96,16 +99,22 @@ export default function AdminHeader({ user, onMenuToggle, isSidebarOpen }) {
     const selectedItems = document.querySelectorAll('input[type="checkbox"]:checked').length;
     
     if (selectedItems === 0) {
-      alert('Please select items to perform bulk action');
+      notify.warning('Please select items to perform bulk action');
       return;
     }
     
     const confirmMessage = `Are you sure you want to ${bulkAction.toLowerCase()} ${selectedItems} selected item(s)?`;
     
-    if (confirm(confirmMessage)) {
+    const ok = await confirmDialog({
+      title: 'Confirm Bulk Action',
+      description: confirmMessage,
+      confirmText: 'Proceed',
+      cancelText: 'Cancel',
+    });
+    if (ok) {
       console.log(`Performing ${bulkAction} on ${selectedItems} items`);
       // Implement actual bulk action logic here
-      alert(`${bulkAction} completed for ${selectedItems} items`);
+      notify.success(`${bulkAction} completed for ${selectedItems} items`);
       setBulkAction('');
     }
   };

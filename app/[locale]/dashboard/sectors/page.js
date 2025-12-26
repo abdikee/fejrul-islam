@@ -7,8 +7,8 @@ import {
   GraduationCap, CheckCircle, Lock, ArrowRight, Clock,
   Award, TrendingUp, Target
 } from 'lucide-react';
-import Alert from '@/components/ui/Alert';
 import DashboardPageLayout, { useDashboard } from '@/components/dashboard/DashboardPageLayout';
+import notify from '@/lib/notify';
 
 const sectorIcons = {
   'BookOpen': BookOpen,
@@ -22,7 +22,6 @@ function SectorsContent() {
   const { user, genderColors } = useDashboard();
   const [sectors, setSectors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [alert, setAlert] = useState(null);
   const [selectedSector, setSelectedSector] = useState(null);
   const [showEnrollForm, setShowEnrollForm] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
@@ -48,11 +47,7 @@ function SectorsContent() {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: 'Failed to load sectors data'
-      });
+      notify.error('Failed to load sectors data');
       setLoading(false);
     }
   };
@@ -86,29 +81,19 @@ function SectorsContent() {
       const data = await response.json();
 
       if (data.success) {
-        setAlert({
-          type: 'success',
-          title: 'Enrollment Successful!',
-          message: `Welcome to ${selectedSector.name}! You have been enrolled in ${data.coursesEnrolled} courses.`
-        });
+        notify.success(
+          `Welcome to ${selectedSector.name}! You have been enrolled in ${data.coursesEnrolled} courses.`
+        );
         setShowEnrollForm(false);
         setSelectedSector(null);
         // Refresh data
         fetchData();
       } else {
-        setAlert({
-          type: 'error',
-          title: 'Enrollment Failed',
-          message: data.message || 'Failed to enroll in the sector'
-        });
+        notify.error(data.message || 'Failed to enroll in the sector');
       }
     } catch (error) {
       console.error('Enrollment error:', error);
-      setAlert({
-        type: 'error',
-        title: 'Error',
-        message: 'An error occurred during enrollment'
-      });
+      notify.error('An error occurred during enrollment');
     } finally {
       setEnrolling(false);
     }
@@ -128,16 +113,6 @@ function SectorsContent() {
 
   return (
     <div className="container mx-auto px-4 lg:px-6 py-6">
-      {alert && (
-        <Alert
-          type={alert.type}
-          title={alert.title}
-          message={alert.message}
-          onClose={() => setAlert(null)}
-          className="mb-6"
-        />
-      )}
-
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-xl p-6 border-2 border-emerald-200">

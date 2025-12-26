@@ -47,9 +47,8 @@ export async function GET(request) {
         m.priority,
         m.is_read,
         m.is_archived,
-        COALESCE(m.created_at, m.sent_at) as created_at,
+        m.created_at,
         m.read_at,
-        m.sent_at,
         sender.first_name as sender_first_name,
         sender.last_name as sender_last_name,
         sender.email as sender_email,
@@ -62,7 +61,7 @@ export async function GET(request) {
       LEFT JOIN users sender ON m.sender_id = sender.id
       LEFT JOIN users recipient ON m.recipient_id = recipient.id
       ${whereClause}
-      ORDER BY COALESCE(m.created_at, m.sent_at) DESC
+      ORDER BY m.created_at DESC
       LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}
     `;
 
@@ -110,17 +109,45 @@ export async function POST(request) {
     const senderId = decoded.userId;
 
     const body = await request.json();
-    const { recipientId, subject, content, messageType = 'direct', priority = 'normal' } = body;
+    const {
+      recipientId,
+      recipientRole,
+      subject,
+      content,
+      message,
+      messageType = 'direct',
+      priority = 'normal'
+    } = body;
 
-    if (!recipientId || !content) {
+    const resolvedContent = typeof content === 'string' ? content : (typeof message === 'string' ? message : '');
+    let resolvedRecipientId = recipientId;
+
+    if (!resolvedRecipientId && recipientRole) {
+      if (recipientRole === 'admin') {
+        const adminResult = await query(
+          `SELECT id FROM users WHERE role = 'admin' ORDER BY id ASC LIMIT 1`,
+          []
+        );
+        resolvedRecipientId = adminResult.rows[0]?.id;
+      }
+    }
+
+    if (!resolvedRecipientId || !resolvedContent?.trim()) {
       return NextResponse.json(
         { success: false, message: 'Recipient and content are required' },
         { status: 400 }
       );
     }
 
+    if (recipientRole === 'admin' && !resolvedRecipientId) {
+      return NextResponse.json(
+        { success: false, message: 'No admin user found to receive this message' },
+        { status: 404 }
+      );
+    }
+
     // Verify recipient exists
-    const recipientCheck = await query('SELECT id FROM users WHERE id = $1', [recipientId]);
+    const recipientCheck = await query('SELECT id FROM users WHERE id = $1', [resolvedRecipientId]);
     if (recipientCheck.rows.length === 0) {
       return NextResponse.json(
         { success: false, message: 'Recipient not found' },
@@ -130,16 +157,16 @@ export async function POST(request) {
 
     // Insert message
     const insertQuery = `
-      INSERT INTO messages (sender_id, recipient_id, subject, content, message_type, priority, sent_at, created_at)
-      VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
+      INSERT INTO messages (sender_id, recipient_id, subject, content, message_type, priority, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, NOW())
       RETURNING *
     `;
 
     const result = await query(insertQuery, [
       senderId,
-      recipientId,
+      resolvedRecipientId,
       subject,
-      content,
+      resolvedContent,
       messageType,
       priority
     ]);

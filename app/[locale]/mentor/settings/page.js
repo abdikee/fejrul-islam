@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import MentorProfilePhotoSettings from '@/components/mentor/MentorProfilePhotoSettings';
 
 export const metadata = {
   title: 'Settings - Mentor Portal',
@@ -9,6 +10,10 @@ export default function MentorSettingsPage() {
     <div className="bg-white border border-slate-200 rounded-xl p-6 max-w-2xl">
       <h1 className="text-2xl font-bold text-slate-800">Settings</h1>
       <p className="text-slate-600 mt-2">Manage your mentor portal preferences and access support links.</p>
+
+      <div className="mt-6">
+        <MentorProfilePhotoSettings />
+      </div>
 
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Link href="/mentor/contact" className="border border-slate-200 rounded-xl p-4 hover:bg-slate-50">

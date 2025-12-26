@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import notify from '@/lib/notify';
+import { useConfirm } from '@/components/ui/ConfirmProvider';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { FileText, Plus, Edit, Trash2, Eye, Save, X } from 'lucide-react';
 
 export default function ContentManagerPage() {
   const searchParams = useSearchParams();
+  const confirmDialog = useConfirm();
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingContent, setEditingContent] = useState(null);
@@ -62,15 +65,15 @@ export default function ContentManagerPage() {
 
       const data = await response.json();
       if (data.success) {
-        alert(data.message);
+        notify.success(data.message || 'Content saved');
         fetchContent();
         resetForm();
       } else {
-        alert(`Error: ${data.message}`);
+        notify.error(`Error: ${data.message}`);
       }
     } catch (error) {
       console.error('Error saving content:', error);
-      alert('Failed to save content');
+      notify.error('Failed to save content');
     }
   };
 
@@ -88,9 +91,13 @@ export default function ContentManagerPage() {
   };
 
   const handleDelete = async (contentKey) => {
-    if (!confirm(`Are you sure you want to delete "${contentKey}"?`)) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: 'Delete Content',
+      description: `Are you sure you want to delete "${contentKey}"?`,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+    });
+    if (!ok) return;
 
     try {
       const response = await fetch(`/api/admin/content-manager?key=${contentKey}`, {
@@ -99,14 +106,14 @@ export default function ContentManagerPage() {
 
       const data = await response.json();
       if (data.success) {
-        alert('Content deleted successfully');
+        notify.success('Content deleted successfully');
         fetchContent();
       } else {
-        alert(`Error: ${data.message}`);
+        notify.error(`Error: ${data.message}`);
       }
     } catch (error) {
       console.error('Error deleting content:', error);
-      alert('Failed to delete content');
+      notify.error('Failed to delete content');
     }
   };
 

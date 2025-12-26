@@ -25,5 +25,52 @@
     "headlinePart1": "Invite to the Way",
     "headlinePart2": "of Your Lord",
     "subheadline": "New to Islam? Whether you're a non-Muslim exploring the faith or a Muslim seeking guidance, discover the beautiful message of Islam through wisdom, compassion, and authentic knowledge. Together, we build bridges and transform hearts."
+  },
+  "Dashboard": {
+    "Sidebar": {
+      "title": "Fejrul Islam Dashboard",
+      "dashboard": "Dashboard",
+      "learningSectors": "Learning Sectors",
+      "dawahComparative": "Dawah & Comparative Religion",
+      "irshadQirat": "Irshad (Qirat & Ilm)",
+      "tarbiyaCharacter": "Tarbiya & Character",
+      "idadLeadership": "Idad Leadership",
+      "resources": "Resources",
+      "resourceLibrary": "Resource Library",
+      "literatureHistory": "Literature & History",
+      "support": "Support",
+      "supportMessages": "Support & Messages",
+      "studentWelfare": "Student Welfare",
+      "settings": "Settings",
+      "signOut": "Sign Out"
+    },
+    "Footer": {
+      "brandTitle": "Fejrul Islam",
+      "brandSubtitle": "HUMSJ Student Portal",
+      "brandDescription": "Empowering Muslim students through comprehensive Islamic education and spiritual development.",
+      "sistersWing": "Sisters Wing",
+      "brothersWing": "Brothers Wing",
+      "learning": "Learning",
+      "myCourses": "My Courses",
+      "availableCourses": "Available Courses",
+      "schedule": "Schedule",
+      "resources": "Resources",
+      "sectors": "Sectors",
+      "tarbiyaIdad": "Tarbiya & Idad",
+      "literature": "Literature",
+      "comparativeReligion": "Comparative Religion",
+      "ziyaraWelfare": "Ziyara (Student Welfare)",
+      "qiratIlm": "Qirat & Ilm",
+      "community": "Community",
+      "studyGroups": "Study Groups",
+      "mentorship": "Mentorship",
+      "events": "Events",
+      "announcements": "Announcements",
+      "support": "Support",
+      "helpCenter": "Help Center",
+      "contactMentor": "Contact Mentor",
+      "settings": "Settings",
+      "feedback": "Feedback"
+    }
   }
 }
