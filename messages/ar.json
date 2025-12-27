@@ -6,6 +6,8 @@
   },
   "Navigation": {
     "home": "الرئيسية",
+    "discoverIslam": "اكتشف الإسلام",
+    "articles": "مقالات",
     "about": "عن المنصة",
     "contact": "اتصل بنا",
     "login": "تسجيل الدخول",
@@ -71,6 +73,34 @@
       "contactMentor": "تواصل مع المرشد",
       "settings": "الإعدادات",
       "feedback": "الملاحظات"
+    }
+  },
+  "Site": {
+    "Footer": {
+      "nextPrayer": "الصلاة القادمة: {name} {time}",
+      "inTime": "بعد {time}",
+      "loadingPrayerTimes": "جاري تحميل أوقات الصلاة...",
+      "hijriLabel": "هجري:",
+      "memberLogin": "دخول الأعضاء",
+      "emergency": "طوارئ:",
+      "quickLinks": "روابط سريعة",
+      "ourFiveSectors": "قطاعاتنا الخمسة",
+      "description": "الدعوة إلى الله بالحكمة والموعظة الحسنة وتقديم الإرشاد والدعم الروحي.",
+      "rights": "جميع الحقوق محفوظة.",
+      "builtBy": "تم البناء بواسطة A2K لخدمة الأمة"
+    },
+    "MainFooter": {
+      "quickLinks": "روابط سريعة",
+      "sectors": "قطاعات التعلم",
+      "getStarted": "ابدأ الآن",
+      "getStartedDesc": "انضم إلى آلاف الطلاب في طريق العلم الشرعي والنمو الروحي.",
+      "signUpNow": "سجل الآن",
+      "memberLogin": "دخول الأعضاء",
+      "privacyPolicy": "سياسة الخصوصية",
+      "termsOfService": "شروط الخدمة",
+      "contactUs": "اتصل بنا",
+      "rights": "جميع الحقوق محفوظة.",
+      "quoteTranslation": "\"وقل رب زدني علماً\" - القرآن 20:114"
     }
   }
 }

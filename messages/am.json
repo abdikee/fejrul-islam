@@ -25,5 +25,84 @@
     "headlinePart1": "ወደ ጌታህ መንገድ",
     "headlinePart2": "ጥራ",
     "subheadline": "የእስልምናን ውብ መልእክት በጥበብ፣ በእዝነት እና በትክክለኛ መመሪያ ለማሰራጨት የፈጅሩል ኢስላም የዳዕዋ እና ኢርሻድ ተልዕኮን ይቀላቀሉ። አብረን ድልድዮችን እንገነባለን፣ ልቦችን እንለውጣለን።"
+  },
+  "Dashboard": {
+    "Sidebar": {
+      "title": "የፈጅሩል ኢስላም ዳሽቦርድ",
+      "dashboard": "ዳሽቦርድ",
+      "learningSectors": "የትምህርት ዘርፎች",
+      "dawahComparative": "ዳዕዋ እና የእምነቶች ንጽጽር",
+      "irshadQirat": "ኢርሻድ (ቂራአት እና ኢልም)",
+      "tarbiyaCharacter": "ተርቢያ እና ሥነ-ምግባር",
+      "idadLeadership": "እዳድ እና አመራር",
+      "resources": "ሀብቶች",
+      "resourceLibrary": "የሀብት ቤተ-መጻሕፍት",
+      "literatureHistory": "ሥነ-ጽሁፍ እና ታሪክ",
+      "support": "ድጋፍ",
+      "supportMessages": "ድጋፍ እና መልዕክቶች",
+      "studentWelfare": "የተማሪ ደህንነት",
+      "settings": "ቅንብሮች",
+      "signOut": "ውጣ"
+    },
+    "Footer": {
+      "brandTitle": "ፈጅሩል ኢስላም",
+      "brandSubtitle": "የHUMSJ ተማሪ ፖርታል",
+      "brandDescription": "ተማሪዎችን በሙሉ የእስልምና ትምህርት እና በመንፈሳዊ እድገት ማበረታታት።",
+      "sistersWing": "የእህቶች ክፍል",
+      "brothersWing": "የወንድሞች ክፍል",
+      "learning": "ትምህርት",
+      "myCourses": "የእኔ ኮርሶች",
+      "availableCourses": "ያሉ ኮርሶች",
+      "schedule": "መርሃ ግብር",
+      "resources": "ሀብቶች",
+      "sectors": "ዘርፎች",
+      "tarbiyaIdad": "ተርቢያ እና እዳድ",
+      "literature": "ሥነ-ጽሁፍ",
+      "comparativeReligion": "የእምነቶች ንጽጽር",
+      "ziyaraWelfare": "ዚያራ (የተማሪ ደህንነት)",
+      "qiratIlm": "ቂራአት እና ኢልም",
+      "community": "ማህበረሰብ",
+      "studyGroups": "የጥናት ቡድኖች",
+      "mentorship": "መምሪያ",
+      "events": "ክስተቶች",
+      "announcements": "ማስታወቂያዎች",
+      "support": "ድጋፍ",
+      "helpCenter": "የእርዳታ ማዕከል",
+      "contactMentor": "ከመምህር ጋር ያግኙ",
+      "settings": "ቅንብሮች",
+      "feedback": "አስተያየት"
+    }
+  },
+  "Site": {
+    "Navigation": {
+      "discoverIslam": "እስልምናን ያግኙ",
+      "articles": "መጣጥፎች"
+    },
+    "Footer": {
+      "nextPrayer": "ቀጣይ ሰላት: {name} {time}",
+      "inTime": "በ{time}",
+      "loadingPrayerTimes": "የሰላት ጊዜዎች በመጫን ላይ...",
+      "hijriLabel": "ሂጅሪ:",
+      "memberLogin": "የአባል መግቢያ",
+      "emergency": "አስቸኳይ:",
+      "quickLinks": "ፈጣን አገናኞች",
+      "ourFiveSectors": "አምስቱ ዘርፎቻችን",
+      "description": "በጥበብ እና በመልካም ምክር ወደ እስልምና መጥራት፣ መንፈሳዊ መመሪያ እና ድጋፍ መስጠት።",
+      "rights": "መብቶች ሁሉ የተጠበቁ ናቸው።",
+      "builtBy": "ለሙስሊሙ ኡማ በA2K የተገነባ"
+    },
+    "MainFooter": {
+      "quickLinks": "ፈጣን አገናኞች",
+      "sectors": "የትምህርት ዘርፎች",
+      "getStarted": "ጀምር",
+      "getStartedDesc": "በእስልምና እውቀት እና መንፈሳዊ እድገት መንገድ ላይ ከሺዎች ተማሪዎች ጋር ይቀላቀሉ።",
+      "signUpNow": "አሁን ተመዝገብ",
+      "memberLogin": "የአባል መግቢያ",
+      "privacyPolicy": "የግላዊነት ፖሊሲ",
+      "termsOfService": "የአገልግሎት መመሪያ",
+      "contactUs": "ያግኙን",
+      "rights": "መብቶች ሁሉ የተጠበቁ ናቸው።",
+      "quoteTranslation": "\"እና ንገር: ጌታዬ ሆይ በእውቀት ጨምረኝ\" - ቁርአን 20:114"
+    }
   }
 }

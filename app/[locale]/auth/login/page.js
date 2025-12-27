@@ -24,6 +24,7 @@ function safeInternalPath(value) {
 
 export default function LoginPage() {
   const [returnUrl, setReturnUrl] = useState(null);
+  const [enrollTarget, setEnrollTarget] = useState(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,9 +32,17 @@ export default function LoginPage() {
     password: ''
   });
 
+  const signupHref = `/auth/signup?redirect=${encodeURIComponent(returnUrl || '/')}${
+    enrollTarget ? `&enroll=${encodeURIComponent(enrollTarget)}` : ''
+  }`;
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setReturnUrl(safeInternalPath(params.get('returnUrl')));
+    const enroll = params.get('enroll');
+    if (enroll && typeof enroll === 'string') {
+      setEnrollTarget(enroll);
+    }
   }, []);
 
   const handleInputChange = (e) => {
@@ -61,9 +70,28 @@ export default function LoginPage() {
         return;
       }
 
+      // If user came from a program click, auto-enroll after login.
+      if (enrollTarget && enrollTarget.includes(':')) {
+        const [programType, programId] = enrollTarget.split(':');
+        try {
+          await fetch('/api/enrollment/enroll', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+              programType,
+              programId,
+              enrollmentData: { source: 'auth_login_auto_enroll', auto_enrolled: true }
+            })
+          });
+        } catch (err) {
+          // best-effort (still allow login)
+        }
+      }
+
       const redirectUrl = data.redirectUrl;
 
-      // If user is verified and a returnUrl is provided, honor it (internal only).
+      // If a returnUrl is provided, honor it (internal only).
       if (!data.requiresVerification && returnUrl) {
         window.location.href = returnUrl;
         return;
@@ -209,7 +237,7 @@ export default function LoginPage() {
 
                 <p className="text-sm text-slate-600 mb-4 text-center">
                   Don't have an account?{' '}
-                  <Link href="/auth/signup" className="text-emerald-600 hover:text-emerald-700 font-semibold">
+                  <Link href={signupHref} className="text-emerald-600 hover:text-emerald-700 font-semibold">
                     Register here
                   </Link>
                 </p>

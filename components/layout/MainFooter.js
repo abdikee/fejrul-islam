@@ -1,10 +1,26 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { GraduationCap, Heart, BookOpen, Users, MessageCircle, Mail, Phone, MapPin } from 'lucide-react';
 
 export default function MainFooter() {
+  const pathname = usePathname();
+  const tNav = useTranslations('Navigation');
+  const tMain = useTranslations('Site.MainFooter');
   const currentYear = new Date().getFullYear();
+
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+
+  const withLocale = (href) => {
+    if (!href || typeof href !== 'string') return href;
+    if (!href.startsWith('/')) return href;
+    if (localePrefix && href.startsWith(`${localePrefix}/`)) return href;
+    return `${localePrefix}${href}`;
+  };
 
   return (
     <footer className="bg-slate-900 text-slate-300">
@@ -43,34 +59,26 @@ export default function MainFooter() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">{tMain('quickLinks')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  Home
-                </Link>
+                <Link href={withLocale('/')} className="text-slate-400 hover:text-emerald-400 transition-colors">{tNav('home')}</Link>
               </li>
               <li>
-                <Link href="/sectors" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  Sectors
-                </Link>
+                <Link href={withLocale('/sectors')} className="text-slate-400 hover:text-emerald-400 transition-colors">{tMain('sectors')}</Link>
               </li>
               <li>
-                <Link href="/about" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  About Us
-                </Link>
+                <Link href={withLocale('/about')} className="text-slate-400 hover:text-emerald-400 transition-colors">{tNav('about')}</Link>
               </li>
               <li>
-                <Link href="/contact" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                  Contact
-                </Link>
+                <Link href={withLocale('/contact')} className="text-slate-400 hover:text-emerald-400 transition-colors">{tNav('contact')}</Link>
               </li>
             </ul>
           </div>
 
           {/* Learning Sectors */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Learning Sectors</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">{tMain('sectors')}</h4>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2 text-slate-400">
                 <BookOpen className="w-4 h-4 text-emerald-400" />
@@ -97,22 +105,22 @@ export default function MainFooter() {
 
           {/* Get Started */}
           <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Get Started</h4>
+            <h4 className="text-lg font-semibold text-white mb-4">{tMain('getStarted')}</h4>
             <p className="text-sm text-slate-400 mb-4">
-              Join thousands of students on the path of Islamic knowledge and spiritual growth.
+              {tMain('getStartedDesc')}
             </p>
             <div className="space-y-3">
               <Link
-                href="/auth/signup"
+                href={withLocale('/auth/signup')}
                 className="block w-full px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-center rounded-lg font-semibold hover:from-emerald-700 hover:to-teal-700 transition-all"
               >
-                Sign Up Now
+                {tMain('signUpNow')}
               </Link>
               <Link
-                href="/auth/login"
+                href={withLocale('/auth/login')}
                 className="block w-full px-4 py-2 border border-slate-600 text-slate-300 text-center rounded-lg font-semibold hover:border-emerald-500 hover:text-emerald-400 transition-all"
               >
-                Member Login
+                {tMain('memberLogin')}
               </Link>
             </div>
           </div>
@@ -122,18 +130,12 @@ export default function MainFooter() {
         <div className="mt-12 pt-8 border-t border-slate-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-400">
-              © {currentYear} Fejrul Islam HUMSJ. All rights reserved.
+              © {currentYear} Fejrul Islam HUMSJ. {tMain('rights')}
             </p>
             <div className="flex items-center gap-6 text-sm">
-              <Link href="/privacy" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/contact" className="text-slate-400 hover:text-emerald-400 transition-colors">
-                Contact Us
-              </Link>
+              <Link href={withLocale('/privacy')} className="text-slate-400 hover:text-emerald-400 transition-colors">{tMain('privacyPolicy')}</Link>
+              <Link href={withLocale('/terms')} className="text-slate-400 hover:text-emerald-400 transition-colors">{tMain('termsOfService')}</Link>
+              <Link href={withLocale('/contact')} className="text-slate-400 hover:text-emerald-400 transition-colors">{tMain('contactUs')}</Link>
             </div>
           </div>
         </div>
@@ -144,7 +146,7 @@ export default function MainFooter() {
             "وَقُل رَّبِّ زِدْنِي عِلْمًا"
           </p>
           <p className="text-xs text-slate-600 italic">
-            "And say: My Lord, increase me in knowledge" - Quran 20:114
+            {tMain('quoteTranslation')}
           </p>
         </div>
       </div>

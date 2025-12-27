@@ -15,10 +15,16 @@ export default function SignupGenderSelection() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const redirectUrl = params.get('redirect');
-    const shouldEnroll = params.get('enroll') === 'true';
-    setQueryString(
-      redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}${shouldEnroll ? '&enroll=true' : ''}` : ''
-    );
+    const enroll = params.get('enroll');
+
+    let enrollPart = '';
+    if (enroll === 'true') {
+      enrollPart = '&enroll=true';
+    } else if (typeof enroll === 'string' && enroll.includes(':')) {
+      enrollPart = `&enroll=${encodeURIComponent(enroll)}`;
+    }
+
+    setQueryString(redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}${enrollPart}` : '');
   }, []);
   
   return (

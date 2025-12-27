@@ -6,6 +6,8 @@
   },
   "Navigation": {
     "home": "Home",
+    "discoverIslam": "Discover Islam",
+    "articles": "Articles",
     "about": "About",
     "contact": "Contact",
     "login": "Login",
@@ -71,6 +73,34 @@
       "contactMentor": "Contact Mentor",
       "settings": "Settings",
       "feedback": "Feedback"
+    }
+  },
+  "Site": {
+    "Footer": {
+      "nextPrayer": "Next Prayer: {name} {time}",
+      "inTime": "in {time}",
+      "loadingPrayerTimes": "Loading prayer times...",
+      "hijriLabel": "Hijri:",
+      "memberLogin": "Member Login",
+      "emergency": "Emergency:",
+      "quickLinks": "Quick Links",
+      "ourFiveSectors": "Our Five Sectors",
+      "description": "Inviting to Islam with wisdom and beautiful preaching, providing spiritual guidance and support.",
+      "rights": "All rights reserved.",
+      "builtBy": "Built by A2K for the Muslim Ummah"
+    },
+    "MainFooter": {
+      "quickLinks": "Quick Links",
+      "sectors": "Learning Sectors",
+      "getStarted": "Get Started",
+      "getStartedDesc": "Join thousands of students on the path of Islamic knowledge and spiritual growth.",
+      "signUpNow": "Sign Up Now",
+      "memberLogin": "Member Login",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service",
+      "contactUs": "Contact Us",
+      "rights": "All rights reserved.",
+      "quoteTranslation": "\"And say: My Lord, increase me in knowledge\" - Quran 20:114"
     }
   }
 }

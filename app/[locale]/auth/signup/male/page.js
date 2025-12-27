@@ -10,6 +10,7 @@ import notify from '@/lib/notify';
 export default function MaleSignupPage() {
   const [redirectUrl, setRedirectUrl] = useState(null);
   const [shouldEnroll, setShouldEnroll] = useState(false);
+  const [enrollTarget, setEnrollTarget] = useState(null);
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -30,11 +31,14 @@ export default function MaleSignupPage() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get('redirect');
-    const enroll = params.get('enroll') === 'true';
+    const enroll = params.get('enroll');
     setRedirectUrl(redirect);
-    setShouldEnroll(enroll);
+    setShouldEnroll(enroll === 'true');
+    if (typeof enroll === 'string' && enroll.includes(':')) {
+      setEnrollTarget(enroll);
+    }
 
-    if (redirect && enroll) {
+    if (redirect && enroll === 'true') {
       notify.info('Complete registration to enroll in your selected sector.');
     }
   }, []);
@@ -79,9 +83,27 @@ export default function MaleSignupPage() {
         notify.success(
           redirectUrl ? 'Redirecting to complete enrollment...' : 'Welcome to the Brotherhood! Redirecting to your dashboard...'
         );
-        
-        // Redirect to sector page for enrollment or dashboard
-        setTimeout(() => {
+
+        // Redirect to sector page for enrollment or dashboard (and auto-enroll if requested)
+        setTimeout(async () => {
+          if (enrollTarget && enrollTarget.includes(':')) {
+            const [programType, programId] = enrollTarget.split(':');
+            try {
+              await fetch('/api/enrollment/enroll', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                  programType,
+                  programId,
+                  enrollmentData: { source: 'auth_signup_auto_enroll', auto_enrolled: true }
+                })
+              });
+            } catch (err) {
+              // best-effort
+            }
+          }
+
           if (redirectUrl && shouldEnroll) {
             window.location.href = redirectUrl;
           } else if (data.redirectUrl) {
@@ -89,7 +111,7 @@ export default function MaleSignupPage() {
           } else {
             window.location.href = '/dashboard/male';
           }
-        }, 1500);
+        }, 1200);
       } else {
         notify.error(data.message || 'Unable to complete registration. Please try again.');
       }

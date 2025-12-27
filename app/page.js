@@ -12,6 +12,7 @@ import {
 import EnrollmentButton from '@/components/enrollment/EnrollmentButton';
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [stats, setStats] = useState({
     peopleReached: null,
@@ -21,6 +22,8 @@ export default function Home() {
     guidanceSessions: null,
     communities: null
   });
+  const [homeSectors, setHomeSectors] = useState([]);
+  const [homeSectorsLoading, setHomeSectorsLoading] = useState(true);
   const [activeFeature, setActiveFeature] = useState(0);
 
   // Helper function to get correct sector codes
@@ -36,6 +39,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    setMounted(true);
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
 
     const fetchStats = async () => {
@@ -52,6 +56,22 @@ export default function Home() {
 
     fetchStats();
     const statsTimer = setInterval(fetchStats, 30000);
+
+    const fetchHomeSectors = async () => {
+      try {
+        const res = await fetch('/api/public/home-sectors', { cache: 'no-store' });
+        const data = await res.json();
+        if (data?.success && Array.isArray(data.sectors)) {
+          setHomeSectors(data.sectors);
+        }
+      } catch (e) {
+        // best-effort
+      } finally {
+        setHomeSectorsLoading(false);
+      }
+    };
+
+    fetchHomeSectors();
 
     return () => {
       clearInterval(timer);
@@ -90,49 +110,23 @@ export default function Home() {
     }
   ];
 
-  // The 5 main sectors of HUMSJ
-  const sectors = [
-    {
-      name: 'Qirat & Ilm',
-      description: 'Quranic Recitation & Islamic Knowledge',
-      icon: BookOpen,
-      color: 'bg-gradient-to-br from-emerald-500 to-teal-600',
-      programs: 24,
-      participants: 2847
-    },
-    {
-      name: 'Literature & History',
-      description: 'Islamic Heritage & Creative Expression',
-      icon: FileText,
-      color: 'bg-gradient-to-br from-amber-500 to-orange-600',
-      programs: 18,
-      participants: 1234
-    },
-    {
-      name: 'Dawah & Comparative Religion',
-      description: 'Outreach, Dialogue & Intellectual Defense',
-      icon: MessageSquare,
-      color: 'bg-gradient-to-br from-blue-500 to-indigo-600',
-      programs: 22,
-      participants: 1567
-    },
-    {
-      name: 'Tarbiya & Idad',
-      description: 'Character Building & Leadership Training',
-      icon: Heart,
-      color: 'bg-gradient-to-br from-rose-500 to-pink-600',
-      programs: 16,
-      participants: 987
-    },
-    {
-      name: 'Ziyara',
-      description: 'Student Welfare & Community Support',
-      icon: Heart,
-      color: 'bg-gradient-to-br from-purple-500 to-violet-600',
-      programs: 12,
-      participants: 756
-    }
-  ];
+  const sectorStyles = {
+    'qirat-ilm': { icon: BookOpen, color: 'bg-gradient-to-br from-emerald-500 to-teal-600' },
+    'literature-history': { icon: FileText, color: 'bg-gradient-to-br from-amber-500 to-orange-600' },
+    'dawah-comparative-religion': { icon: MessageSquare, color: 'bg-gradient-to-br from-blue-500 to-indigo-600' },
+    'tarbiya-idad': { icon: Heart, color: 'bg-gradient-to-br from-rose-500 to-pink-600' },
+    'ziyara': { icon: Heart, color: 'bg-gradient-to-br from-purple-500 to-violet-600' }
+  };
+
+  const sectors = homeSectorsLoading || homeSectors.length === 0
+    ? [
+        { code: 'qirat-ilm', name: 'Qirat & Ilm', description: 'Quranic Recitation & Islamic Knowledge', program_count: 0, participants_count: 0, programs: [] },
+        { code: 'literature-history', name: 'Literature & History', description: 'Islamic Heritage & Creative Expression', program_count: 0, participants_count: 0, programs: [] },
+        { code: 'dawah-comparative-religion', name: 'Dawah & Comparative Religion', description: 'Outreach, Dialogue & Intellectual Defense', program_count: 0, participants_count: 0, programs: [] },
+        { code: 'tarbiya-idad', name: 'Tarbiya & Idad', description: 'Character Building & Leadership Training', program_count: 0, participants_count: 0, programs: [] },
+        { code: 'ziyara', name: 'Ziyara', description: 'Student Welfare & Community Support', program_count: 0, participants_count: 0, programs: [] }
+      ]
+    : homeSectors;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-emerald-950">
@@ -154,7 +148,7 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="w-4 h-4" />
-                <span>{currentTime.toLocaleTimeString()}</span>
+                <span suppressHydrationWarning>{mounted ? currentTime.toLocaleTimeString() : ''}</span>
               </div>
             </div>
           </div>
@@ -354,50 +348,74 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {sectors.map((sector, index) => {
-              const Icon = sector.icon;
-              
-              // Generate href for each sector
-              const getHref = (sectorName) => {
-                const slug = sectorName.toLowerCase()
-                  .replace(/\s+/g, '-')
-                  .replace('&', '')
-                  .replace(/[()]/g, '')
-                  .replace('--', '-');
-                return `/sectors/${slug}`;
+              const style = sectorStyles[sector.code] || {
+                icon: BookOpen,
+                color: 'bg-gradient-to-br from-slate-600 to-slate-700'
               };
+              const Icon = style.icon;
+              const href = `/sectors/${sector.code}`;
+              const programsCount = typeof sector.program_count === 'number' ? sector.program_count : (sector.programs?.length || sector.programs || 0);
+              const participantsCount = typeof sector.participants_count === 'number' ? sector.participants_count : sector.participants;
               
               return (
-                <Link key={index} href={getHref(sector.name)} className="group block">
-                  <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg dark:shadow-2xl rounded-3xl p-8 hover:shadow-[0_20px_50px_rgba(16,185,129,0.2)] dark:hover:shadow-[0_20px_50px_rgba(16,185,129,0.1)] transition-all duration-500 hover:-translate-y-2 cursor-pointer">
+                <div key={sector.code || index} className="group">
+                  <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg dark:shadow-2xl rounded-3xl p-8 hover:shadow-[0_20px_50px_rgba(16,185,129,0.2)] dark:hover:shadow-[0_20px_50px_rgba(16,185,129,0.1)] transition-all duration-500 hover:-translate-y-2">
                     <div className="flex items-start justify-between mb-6">
-                      <div className={`w-16 h-16 ${sector.color} rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                      <div className={`w-16 h-16 ${style.color} rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
                         <Icon className="w-8 h-8 text-white" />
                       </div>
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{sector.programs}</div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{programsCount}</div>
                         <div className="text-sm text-slate-600 dark:text-slate-400">Programs</div>
                       </div>
                     </div>
                     
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">{sector.name}</h3>
                     <p className="text-slate-600 dark:text-slate-400 mb-6">{sector.description}</p>
+
+                    {/* Programs list (admin-created) */}
+                    <div className="mb-6">
+                      {Array.isArray(sector.programs) && sector.programs.length > 0 ? (
+                        <div className="space-y-2">
+                          {sector.programs.map((program) => (
+                            <EnrollmentButton
+                              key={program.id}
+                              programType="course"
+                              programId={program.id}
+                              programName={program.title}
+                              variant="secondary"
+                              className="w-full justify-between px-4 py-3 rounded-xl text-left"
+                            >
+                              {program.title}
+                            </EnrollmentButton>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-slate-500 dark:text-slate-400">
+                          {homeSectorsLoading ? 'Loading programs…' : 'No programs yet.'}
+                        </div>
+                      )}
+                    </div>
                     
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                         <Users className="w-4 h-4" />
-                        <span>{sector.participants.toLocaleString()} participants</span>
+                        <span>{typeof participantsCount === 'number' ? participantsCount.toLocaleString() : '—'} participants</span>
                       </div>
-                      <span className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl font-semibold group-hover:bg-emerald-600 dark:group-hover:bg-emerald-500 transition-colors shadow-lg group-hover:shadow-xl">
+                      <Link
+                        href={href}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-slate-700 text-white rounded-xl font-semibold hover:bg-emerald-600 dark:hover:bg-emerald-500 transition-colors shadow-lg hover:shadow-xl"
+                      >
                         Explore
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </span>
+                      </Link>
                     </div>
                     
                     {/* Enrollment Button */}
                     <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
                       <EnrollmentButton
                         programType="sector"
-                        programId={getSectorCode(sector.name)}
+                        programId={sector.code || getSectorCode(sector.name)}
                         programName={sector.name}
                         className="w-full border-2 border-emerald-600 dark:border-emerald-400 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors"
                         variant="outline"
@@ -406,7 +424,7 @@ export default function Home() {
                       </EnrollmentButton>
                     </div>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

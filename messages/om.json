@@ -6,6 +6,8 @@
   },
   "Navigation": {
     "home": "Fuula Duraa",
+    "discoverIslam": "Islaama Beeki",
+    "articles": "Barreeffamoota",
     "about": "Waa'ee Keenya",
     "contact": "Nu Quunnamaa",
     "login": "Seeni",
@@ -71,6 +73,34 @@
       "contactMentor": "Gorsaa Quunnami",
       "settings": "Qindoomina",
       "feedback": "Yaada"
+    }
+  },
+  "Site": {
+    "Footer": {
+      "nextPrayer": "Salaata Itti Aanu: {name} {time}",
+      "inTime": "daqiiqaa/sa'aatii {time} keessatti",
+      "loadingPrayerTimes": "Yeroo salaataa fe'aa jira...",
+      "hijriLabel": "Hijri:",
+      "memberLogin": "Seensa Miseensaa",
+      "emergency": "Hatattamaa:",
+      "quickLinks": "Hidhannoo Saffisaa",
+      "ourFiveSectors": "Dameewwan Shan Keenya",
+      "description": "Islaama gara namootaatti beekumsaa fi gorsa gaariin waamuun; gorsa hafuuraa fi deeggarsa kennuu.",
+      "rights": "Mirgi hundi eegameera.",
+      "builtBy": "A2K'n Uumata Muslimaaaf ijaarame"
+    },
+    "MainFooter": {
+      "quickLinks": "Hidhannoo Saffisaa",
+      "sectors": "Dameewwan Barumsaa",
+      "getStarted": "Jalqabi",
+      "getStartedDesc": "Daandii beekumsa Islaamaa fi guddina hafuuraa irratti barattoota kumaatamaan waliin makami.",
+      "signUpNow": "Amma Galmaa'i",
+      "memberLogin": "Seensa Miseensaa",
+      "privacyPolicy": "Seera Dhuunfaa",
+      "termsOfService": "Haala Tajaajilaa",
+      "contactUs": "Nu Quunnamaa",
+      "rights": "Mirgi hundi eegameera.",
+      "quoteTranslation": "\"Gooftaa kiyya, beekumsa keessatti na dabali\" - Qur'aana 20:114"
     }
   }
 }

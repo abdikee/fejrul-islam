@@ -1,12 +1,28 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Mail, Phone, MapPin, Clock, Calendar } from 'lucide-react';
 import { useRealtimeContext } from '@/components/realtime/RealtimeProvider';
 
 export default function Footer() {
   const { nextPrayer, timeToNext } = useRealtimeContext();
+  const pathname = usePathname();
+  const tNav = useTranslations('Navigation');
+  const tFooter = useTranslations('Site.Footer');
   const currentYear = new Date().getFullYear();
+
+  const supportedLocales = ['en', 'ar', 'om', 'am'];
+  const maybeLocale = pathname?.split('/')?.[1];
+  const localePrefix = supportedLocales.includes(maybeLocale) ? `/${maybeLocale}` : '';
+
+  const withLocale = (href) => {
+    if (!href || typeof href !== 'string') return href;
+    if (!href.startsWith('/')) return href;
+    if (localePrefix && href.startsWith(`${localePrefix}/`)) return href;
+    return `${localePrefix}${href}`;
+  };
 
   // Get current Hijri date (simplified)
   const getHijriDate = () => {
@@ -33,24 +49,29 @@ export default function Footer() {
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 <span>
-                  {nextPrayer ? `Next Prayer: ${nextPrayer.name} ${timeToNext ? `in ${timeToNext}` : ''}` : 'Loading prayer times...'}
+                  {nextPrayer
+                    ? tFooter('nextPrayer', {
+                        name: nextPrayer.name,
+                        time: timeToNext ? tFooter('inTime', { time: timeToNext }) : ''
+                      })
+                    : tFooter('loadingPrayerTimes')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                <span>Hijri: {getHijriDate()}</span>
+                <span>{tFooter('hijriLabel')} {getHijriDate()}</span>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-              <Link href="/auth/login" className="hover:text-emerald-200 transition-colors">
-                Member Login
+              <Link href={withLocale('/auth/login')} className="hover:text-emerald-200 transition-colors">
+                {tFooter('memberLogin')}
               </Link>
               <a 
                 href="tel:+251911234567" 
                 className="flex items-center gap-2 hover:text-emerald-200 transition-colors"
               >
                 <Phone className="w-4 h-4" />
-                Emergency: +251 911 234 567
+                {tFooter('emergency')} +251 911 234 567
               </a>
             </div>
           </div>
@@ -79,7 +100,7 @@ export default function Footer() {
               </div>
               
               <p className="text-slate-400 mb-4 leading-relaxed">
-                Inviting to Islam with wisdom and beautiful preaching, providing spiritual guidance and support.
+                {tFooter('description')}
               </p>
 
               {/* Contact Info */}
@@ -101,26 +122,26 @@ export default function Footer() {
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Quick Links</h4>
+              <h4 className="text-lg font-semibold text-white mb-4">{tFooter('quickLinks')}</h4>
               <ul className="space-y-2">
-                <li><Link href="/" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Home</Link></li>
-                <li><Link href="/discover-islam" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Discover Islam</Link></li>
-                <li><Link href="/about" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">About Us</Link></li>
-                <li><Link href="/contact" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Contact</Link></li>
-                <li><Link href="/auth/login" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Login</Link></li>
-                <li><Link href="/auth/signup" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Sign Up</Link></li>
+                <li><Link href={withLocale('/')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">{tNav('home')}</Link></li>
+                <li><Link href={withLocale('/discover-islam')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">{tNav('discoverIslam')}</Link></li>
+                <li><Link href={withLocale('/about')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">{tNav('about')}</Link></li>
+                <li><Link href={withLocale('/contact')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">{tNav('contact')}</Link></li>
+                <li><Link href={withLocale('/auth/login')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">{tNav('login')}</Link></li>
+                <li><Link href={withLocale('/auth/signup')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">{tNav('signup')}</Link></li>
               </ul>
             </div>
 
             {/* Our Sectors */}
             <div>
-              <h4 className="text-lg font-semibold text-white mb-4">Our Five Sectors</h4>
+              <h4 className="text-lg font-semibold text-white mb-4">{tFooter('ourFiveSectors')}</h4>
               <ul className="space-y-2">
-                <li><Link href="/sectors/qirat-ilm" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Qirat & Ilm</Link></li>
-                <li><Link href="/sectors/literature-history" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Literature & History</Link></li>
-                <li><Link href="/sectors/dawah-comparative-religion" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Dawah & Comparative Religion</Link></li>
-                <li><Link href="/sectors/tarbiya-idad" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Tarbiya & Idad</Link></li>
-                <li><Link href="/sectors/ziyara" className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Ziyara</Link></li>
+                <li><Link href={withLocale('/sectors/qirat-ilm')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Qirat & Ilm</Link></li>
+                <li><Link href={withLocale('/sectors/literature-history')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Literature & History</Link></li>
+                <li><Link href={withLocale('/sectors/dawah-comparative-religion')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Dawah & Comparative Religion</Link></li>
+                <li><Link href={withLocale('/sectors/tarbiya-idad')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Tarbiya & Idad</Link></li>
+                <li><Link href={withLocale('/sectors/ziyara')} className="text-slate-400 hover:text-emerald-400 transition-colors text-sm">Ziyara</Link></li>
               </ul>
             </div>
           </div>
@@ -128,10 +149,10 @@ export default function Footer() {
           {/* Copyright */}
           <div className="mt-8 pt-6 border-t border-slate-700 text-center">
             <p className="text-sm text-slate-400">
-              © {currentYear} Fejrul Islam - Dawah & Irshad Sector, HUMSJ. All rights reserved.
+              © {currentYear} Fejrul Islam - Dawah & Irshad Sector, HUMSJ. {tFooter('rights')}
             </p>
             <p className="text-xs text-slate-500 mt-1">
-              Built by A2K for the Muslim Ummah
+              {tFooter('builtBy')}
             </p>
           </div>
         </div>

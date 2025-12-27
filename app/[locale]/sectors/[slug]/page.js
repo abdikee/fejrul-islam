@@ -9,6 +9,7 @@ import {
   Heart, Phone, Mail, MapPin, Clock, Award, FileText, Shield,
   UserPlus, Loader2
 } from 'lucide-react';
+import EnrollmentButton from '@/components/enrollment/EnrollmentButton';
 
 // The 5 main sectors of HUMSJ with their programs
 const sectorsData = {
@@ -282,6 +283,7 @@ export default function SectorDetailPage() {
   const router = useRouter();
   const slug = params.slug;
   const sector = sectorsData[slug];
+  const [dbSector, setDbSector] = useState(null);
   const [activeProgram, setActiveProgram] = useState(null);
   const [user, setUser] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
@@ -295,18 +297,35 @@ export default function SectorDetailPage() {
   });
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  const sectorIdForApi = dbSector?.id ?? sector?.id;
+  const programsToShow = Array.isArray(dbSector?.programs) && dbSector.programs.length > 0 ? dbSector.programs : (sector?.programs || []);
+  const programsCount = typeof dbSector?.program_count === 'number' ? dbSector.program_count : sector?.stats?.programs;
+  const participantsCount = typeof dbSector?.participants_count === 'number' ? dbSector.participants_count : sector?.stats?.participants;
+
   // Check if user is logged in and enrolled
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // Load DB-backed sector info (programs + real sector id)
+        try {
+          const homeRes = await fetch('/api/public/home-sectors', { cache: 'no-store' });
+          const homeData = await homeRes.json();
+          if (homeData?.success && Array.isArray(homeData.sectors)) {
+            const match = homeData.sectors.find((s) => s.code === slug);
+            if (match) setDbSector(match);
+          }
+        } catch (e) {
+          // best-effort
+        }
+
         const res = await fetch('/api/auth/me');
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
           
           // Check enrollment status
-          if (sector) {
-            const enrollRes = await fetch(`/api/sectors/${sector.id}/enrollment-status`);
+          if (sectorIdForApi) {
+            const enrollRes = await fetch(`/api/sectors/${sectorIdForApi}/enrollment-status`);
             if (enrollRes.ok) {
               const enrollData = await enrollRes.json();
               setIsEnrolled(enrollData.isEnrolled);
@@ -320,18 +339,52 @@ export default function SectorDetailPage() {
       }
     };
     checkAuth();
-  }, [sector]);
+  }, [slug, sectorIdForApi]);
 
   // Handle enrollment
   const handleEnroll = async () => {
+    const returnUrl = encodeURIComponent(`/sectors/${slug}`);
     if (!user) {
-      // Redirect to signup with return URL
-      router.push(`/auth/signup?redirect=/sectors/${slug}&enroll=true`);
+      router.push(`/auth/login?returnUrl=${returnUrl}&enroll=sector:${slug}`);
       return;
     }
 
-    setShowEnrollModal(true);
+    setEnrolling(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const res = await fetch('/api/enrollment/enroll', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          programType: 'sector',
+          programId: slug,
+          enrollmentData: { source: 'sector_page', auto_enrolled: true }
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setIsEnrolled(true);
+        setMessage({ type: 'success', text: 'Successfully enrolled! Redirecting to dashboard...' });
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 1200);
+      } else {
+        setMessage({ type: 'error', text: data.message || 'Enrollment failed' });
+      }
+    } catch (e) {
+      setMessage({ type: 'error', text: 'An error occurred. Please try again.' });
+    } finally {
+      setEnrolling(false);
+    }
   };
+
+  // Modal-based enrollment is deprecated in favor of auto-enroll.
+  useEffect(() => {
+    if (showEnrollModal) setShowEnrollModal(false);
+  }, [showEnrollModal]);
 
   const submitEnrollment = async () => {
     if (!enrollmentData.motivation || !enrollmentData.studyHours) {
@@ -422,11 +475,11 @@ export default function SectorDetailPage() {
         <div className="container mx-auto px-6 py-6">
           <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto text-center">
             <div>
-              <div className={`text-3xl font-bold ${colors.text}`}>{sector.stats.programs}</div>
+              <div className={`text-3xl font-bold ${colors.text}`}>{typeof programsCount === 'number' ? programsCount : sector.stats.programs}</div>
               <div className="text-sm text-slate-600">Programs</div>
             </div>
             <div>
-              <div className={`text-3xl font-bold ${colors.text}`}>{sector.stats.participants.toLocaleString()}</div>
+              <div className={`text-3xl font-bold ${colors.text}`}>{typeof participantsCount === 'number' ? participantsCount.toLocaleString() : sector.stats.participants.toLocaleString()}</div>
               <div className="text-sm text-slate-600">Participants</div>
             </div>
             <div>
@@ -455,30 +508,74 @@ export default function SectorDetailPage() {
           <h2 className="text-3xl font-bold text-center text-slate-800 mb-10">Our Programs</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {sector.programs.map((program, idx) => (
-              <div 
-                key={idx}
-                className={`bg-white rounded-xl p-6 border-2 ${colors.border} hover:shadow-lg transition-all cursor-pointer ${
-                  activeProgram === idx ? 'ring-2 ring-offset-2 ' + colors.border : ''
-                }`}
-                onClick={() => setActiveProgram(activeProgram === idx ? null : idx)}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-xl font-bold text-slate-800">{program.name}</h3>
-                  <ArrowRight className={`w-5 h-5 ${colors.text} transition-transform ${activeProgram === idx ? 'rotate-90' : ''}`} />
-                </div>
-                <p className="text-slate-600 mb-4">{program.description}</p>
-                
-                <div className={`grid grid-cols-2 gap-2 ${activeProgram === idx ? '' : 'hidden md:grid'}`}>
-                  {program.features.map((feature, fIdx) => (
-                    <div key={fIdx} className={`flex items-center gap-2 text-sm ${colors.text}`}>
-                      <CheckCircle className="w-4 h-4" />
-                      {feature}
+            {programsToShow.map((program, idx) => {
+              const title = program.title || program.name;
+              const description = program.description;
+              const isDbProgram = Boolean(program.id) && program.title;
+
+              if (isDbProgram) {
+                return (
+                  <EnrollmentButton
+                    key={program.id}
+                    programType="course"
+                    programId={program.id}
+                    programName={title}
+                    variant="secondary"
+                    className={`bg-white rounded-xl p-6 border-2 ${colors.border} hover:shadow-lg transition-all text-left justify-between items-start`}
+                  >
+                    <div className="flex flex-col items-start">
+                      <div className="flex items-start justify-between w-full gap-4">
+                        <h3 className="text-xl font-bold text-slate-800">{title}</h3>
+                        <ArrowRight className={`w-5 h-5 ${colors.text}`} />
+                      </div>
+                      {description ? <p className="text-slate-600 mt-2">{description}</p> : null}
+                      <div className={`mt-4 flex flex-wrap gap-3 text-sm ${colors.text}`}>
+                        {program.level ? (
+                          <span className={`inline-flex items-center gap-2 ${colors.bg} ${colors.border} border rounded-lg px-3 py-1`}>
+                            <CheckCircle className="w-4 h-4" />
+                            {program.level}
+                          </span>
+                        ) : null}
+                        {program.duration_weeks ? (
+                          <span className={`inline-flex items-center gap-2 ${colors.bg} ${colors.border} border rounded-lg px-3 py-1`}>
+                            <Calendar className="w-4 h-4" />
+                            {program.duration_weeks} weeks
+                          </span>
+                        ) : null}
+                      </div>
                     </div>
-                  ))}
+                  </EnrollmentButton>
+                );
+              }
+
+              // Fallback: existing hardcoded programs
+              return (
+                <div
+                  key={idx}
+                  className={`bg-white rounded-xl p-6 border-2 ${colors.border} hover:shadow-lg transition-all cursor-pointer ${
+                    activeProgram === idx ? 'ring-2 ring-offset-2 ' + colors.border : ''
+                  }`}
+                  onClick={() => setActiveProgram(activeProgram === idx ? null : idx)}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-xl font-bold text-slate-800">{title}</h3>
+                    <ArrowRight className={`w-5 h-5 ${colors.text} transition-transform ${activeProgram === idx ? 'rotate-90' : ''}`} />
+                  </div>
+                  {description ? <p className="text-slate-600 mb-4">{description}</p> : null}
+
+                  {Array.isArray(program.features) ? (
+                    <div className={`grid grid-cols-2 gap-2 ${activeProgram === idx ? '' : 'hidden md:grid'}`}>
+                      {program.features.map((feature, fIdx) => (
+                        <div key={fIdx} className={`flex items-center gap-2 text-sm ${colors.text}`}>
+                          <CheckCircle className="w-4 h-4" />
+                          {feature}
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
