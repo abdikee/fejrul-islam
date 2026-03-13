@@ -148,6 +148,23 @@ pm2 start npm --name "humsj-lms" -- start
 
 ---
 
+## 🌐 Making This Repository Public
+
+To change this repository's visibility from **private** to **public** on GitHub:
+
+1. Go to your repository on GitHub.
+2. Click **Settings** (top-right tab in the repository).
+3. Scroll down to the **Danger Zone** section at the bottom.
+4. Click **Change visibility** → **Change to public**.
+5. Type the repository name to confirm, then click **I understand, make this repository public**.
+
+> **Before making the repository public**, verify that:
+> - No real credentials or secrets are committed (check your `.env` files are in `.gitignore`).
+> - The `.env.example` file only contains placeholder/example values, not real secrets.
+> - Any sensitive configuration is loaded from environment variables (e.g., `process.env.JWT_SECRET`).
+
+---
+
 ## 📞 Support
 
 For issues or questions, contact the development team.
